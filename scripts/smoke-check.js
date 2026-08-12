@@ -58,6 +58,11 @@ const insecureElectronPatterns = [
 const appHtml = fs.readFileSync(path.join(root, 'app/app.html'), 'utf8');
 const failures = [];
 const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
+const koffiVersion = String(packageJson.dependencies?.koffi || '').replace(
+  /^[^\d]*/u,
+  ''
+);
+const [koffiMajor] = koffiVersion.split('.').map(Number);
 
 if (!String(packageJson.packageManager || '').startsWith('bun@')) {
   failures.push('package.json must declare Bun as its package manager');
@@ -65,6 +70,12 @@ if (!String(packageJson.packageManager || '').startsWith('bun@')) {
 
 if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 12)) {
   failures.push('Node.js 22.12.0 or newer is required');
+}
+
+if (koffiMajor !== 2) {
+  failures.push(
+    'Kalam requires Koffi 2.x; Koffi 3 crashes Electron async callbacks'
+  );
 }
 
 if (missingFiles.length) {
