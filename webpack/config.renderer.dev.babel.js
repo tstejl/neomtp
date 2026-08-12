@@ -35,10 +35,10 @@ if (process.env.NODE_ENV === 'production') {
 if (!requiredByDLLConfig && !(fs.existsSync(dll) && fs.existsSync(manifest))) {
   console.info(
     chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'
+      'The DLL files are missing. Sit back while we build them for you with "bun run build-dll"'
     )
   );
-  execSync('yarn build-dll');
+  execSync('bun run build-dll');
 }
 
 export default merge(baseConfig, {

@@ -89,7 +89,7 @@ Do checkout the Go package which I've written to build Kalam Kernel: [github.com
 
 ## Building from Source
 
-Requirements: [Node.js v16](https://nodejs.org/en/download/ 'Install Node.js v16'), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git 'Install Git') and [Yarn package manager](https://yarnpkg.com/lang/en/docs/install/ 'Install Yarn package manager')
+Requirements: [Node.js v16](https://nodejs.org/en/download/ 'Install Node.js v16'), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git 'Install Git') and [Bun](https://bun.sh/docs/installation 'Install Bun')
 
 ### Clone
 
@@ -98,13 +98,13 @@ $ git clone https://github.com/tstejl/openmtp.git
 
 $ cd openmtp
 
-# install yarn
-npm install -g yarn
+# install Bun
+npm install -g bun@1.3.11
 
 ```
 
 ```shell
-$ yarn
+$ bun install
 ```
 
 ### Run
@@ -113,7 +113,7 @@ A fresh clone might throw _undefined state_ error. Run the following commands on
 
 ```shell
 # For Mac and Linux
-$ UPGRADE_EXTENSIONS=1 npm run dev
+$ UPGRADE_EXTENSIONS=1 bun run dev
 
 # For Windows
 $ set UPGRADE_EXTENSIONS=1 && npm run dev
@@ -121,10 +121,10 @@ $ set UPGRADE_EXTENSIONS=1 && npm run dev
 
 ```shell
 # Development
-$ yarn dev
+$ bun run dev
 
 # Pre-production
-$ yarn start
+$ bun run start
 
 ```
 
@@ -225,10 +225,10 @@ $ export GH_TOKEN="<github token>"
 
 ```shell
 # For local platform
-$ yarn package
+$ bun run package
 
 # For multiple platforms
-$ yarn package-all
+$ bun run package-all
 ```
 
 ### Technical Features
@@ -264,10 +264,10 @@ $ yarn package-all
 
 ```shell
 # For Mac and Linux
-$ UPGRADE_EXTENSIONS=1 npm run dev
+$ UPGRADE_EXTENSIONS=1 bun run dev
 
 # For Windows
-$ set UPGRADE_EXTENSIONS=1 && npm run dev
+$ set UPGRADE_EXTENSIONS=1 && bun run dev
 ```
 
 ### Troubleshooting
@@ -276,7 +276,7 @@ $ set UPGRADE_EXTENSIONS=1 && npm run dev
 
 #### **node-mac-permissions** throws `Speech framework is not compatible with macOS < 10.15`
 
-- On macOS <= 10.14.x (mojave) the `yarn install` will throw a npm-rebuild error
+- On macOS <= 10.14.x (mojave) the `bun install` will throw a npm-rebuild error
 - To "test" or "debug" the app on macOS mojave:
   - remove the `node-mac-permissions` dependency from `package.json`
   - Add the ignorePlugin line to `default.plugins` in the file `webpack/config.base.js`

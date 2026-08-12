@@ -27,17 +27,17 @@ definitions:
     - &install_global_packages
       name: Installing global packages
       script: |
-        npm install -g yarn node-gyp zx --force
+        npm install -g bun@1.3.11 node-gyp zx --force
 
     - &install_app_packages
       name: Installing app packages
       script: |
         export NODE_OPTIONS=--max_old_space_size=8096
-        yarn
+        bun install --frozen-lockfile
 
     - &build_package
       name: Building the Package
-      script: yarn package-mac
+      script: bun run package-mac
 
     - &finalize_build_instance_mac_mini_m1
       name: Build finished mac mini M1 successfully
