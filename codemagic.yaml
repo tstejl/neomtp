@@ -6,13 +6,13 @@ definitions:
     instance_type: mac_pro
 
   mac_m1_env_versions: &mac_m1_env_versions
-    node: 16.19.0
-    npm: 8.16.0
+    node: 22.12.0
+    npm: 10.9.0
     xcode: 15.3
 
   mac_intel_x64_env_versions: &mac_intel_x64_env_versions
-    node: 16.19.0
-    npm: 8.16.0
+    node: 22.12.0
+    npm: 10.9.0
     xcode: 14.2
 
   mac_m1_arm64_artifacts: &mac_m1_arm64_artifacts

@@ -8,19 +8,19 @@ on:
 
 jobs:
   build:
-    runs-on: macOS-11.00
+    runs-on: macos-13
     steps:
       - name: Setup build environment
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '22.12.0'
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.11'
       - run: npm install -g create-dmg
       - name: Cloning Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
       - name: Attempt to build OpenMTP
         run: |
           bun install --frozen-lockfile
@@ -38,7 +38,7 @@ jobs:
           create-dmg dist/mac/OpenMTP.app dist/dmg 2>&1 || true
           shasum dist/dmg/* >> dist/dmg/CHECKSUM_SHA256.txt
       - name: Upload disk image and checksum as artifact
-        uses: actions/upload-artifact@v1.0.0
+        uses: actions/upload-artifact@v4
         with:
           name: 'Disk Image'
           path: dist/dmg/

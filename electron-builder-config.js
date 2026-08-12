@@ -78,7 +78,7 @@ module.exports = () => {
       entitlements: './build/entitlements.mac.plist',
       entitlementsInherit: './build/entitlements.mac.plist',
       extendInfo: {
-        LSMinimumSystemVersion: '10.11.0',
+        LSMinimumSystemVersion: '11.0.0',
         NSDesktopFolderUsageDescription: 'Desktop folder access',
         NSDocumentsFolderUsageDescription: 'Documents folder access',
         NSDownloadsFolderUsageDescription: 'Downloads folder access',

@@ -51,9 +51,14 @@ const insecureElectronPatterns = [
 ];
 const appHtml = fs.readFileSync(path.join(root, 'app/app.html'), 'utf8');
 const failures = [];
+const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
 
 if (!String(packageJson.packageManager || '').startsWith('bun@')) {
   failures.push('package.json must declare Bun as its package manager');
+}
+
+if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 12)) {
+  failures.push('Node.js 22.12.0 or newer is required');
 }
 
 if (missingFiles.length) {

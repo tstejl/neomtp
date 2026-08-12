@@ -89,7 +89,7 @@ Do checkout the Go package which I've written to build Kalam Kernel: [github.com
 
 ## Building from Source
 
-Requirements: [Node.js v16](https://nodejs.org/en/download/ 'Install Node.js v16'), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git 'Install Git') and [Bun](https://bun.sh/docs/installation 'Install Bun')
+Requirements: [Node.js v22.12 or later](https://nodejs.org/en/download/ 'Install Node.js v22.12 or later'), [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git 'Install Git') and [Bun](https://bun.sh/docs/installation 'Install Bun')
 
 ### Clone
 
@@ -283,7 +283,7 @@ $ set UPGRADE_EXTENSIONS=1 && bun run dev
     - `new webpack.IgnorePlugin({ resourceRegExp: /^(node-mac-permissions)$/u }),`
   - WARNING: **DO NOT commit** these changes to the upstream!!
 - The `NODE_MAC_PERMISSIONS_MIN_OS` constant defines the minimum os version that is required to show the macos usage access permission popup
-- For distribution make sure to build the app on a machine which is at least 10.15 (Catalina)
+- For distribution make sure to build the app on a machine which is at least macOS 11 (Big Sur)
 
 [https://stackoverflow.com/questions/58358449/notarizing-electron-apps-throws-you-must-first-sign-the-relevant-contracts-on](https://stackoverflow.com/questions/58358449/notarizing-electron-apps-throws-you-must-first-sign-the-relevant-contracts-on 'https://stackoverflow.com/questions/58358449/notarizing-electron-apps-throws-you-must-first-sign-the-relevant-contracts-on')
 
