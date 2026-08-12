@@ -25,6 +25,7 @@ class FileExplorerController {
     }
 
     const mtpMode = getMtpModeSetting();
+
     await processMtpBuffer({
       error: result?.error,
       stderr: result?.stderr,

@@ -66,7 +66,6 @@ export default merge(baseConfig, {
       DEBUG_PROD: false,
       START_MINIMIZED: false,
     }),
-
   ],
 
   /**

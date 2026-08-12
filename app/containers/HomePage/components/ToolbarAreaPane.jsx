@@ -297,7 +297,6 @@ class ToolbarAreaPane extends PureComponent {
 
   _handleFaqsBtn = () => {
     ipcRenderer.send(IpcEvents.OPEN_FAQS_WINDOW);
-
   };
 
   render() {
@@ -502,9 +501,7 @@ const mapDispatchToProps = (dispatch, _) =>
           checkIf(value, 'string');
           checkIf(deviceType, 'string');
 
-          dispatch(
-            selectMtpMode({ value }, deviceType, getState)
-          );
+          dispatch(selectMtpMode({ value }, deviceType, getState));
         },
       actionCreateToggleSettings: (data) => (_, __) => {
         dispatch(toggleSettings(data));

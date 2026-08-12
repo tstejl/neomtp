@@ -139,6 +139,5 @@ export const log = {
     const _error = `${sectionSeperator}${EOL}${_appInfo}${EOL}${_mtpMode}${EOL}${_date}${EOL}${_osInfo}${EOL}${_deviceInfoStrigified}${logType}: ${err}${EOL}${sectionSeperator}${EOL}`;
 
     appendFileAsync(logFile, _error);
-
   },
 };

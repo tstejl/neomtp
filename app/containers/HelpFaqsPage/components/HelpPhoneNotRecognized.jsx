@@ -57,7 +57,6 @@ const deviceLabel = DEVICES_LABEL[DEVICE_TYPE.mtp];
 class HelpPhoneNotRecognized extends PureComponent {
   _handleGithubThreadTap = (events) => {
     openExternalUrl(`${APP_GITHUB_ISSUES_URL}8`, events);
-
   };
 
   RenderFileTransfer = () => {

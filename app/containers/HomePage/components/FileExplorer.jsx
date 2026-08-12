@@ -1108,6 +1108,7 @@ class FileExplorer extends Component {
   /* activate actions using mouse */
   _handleContextMenuListActions = ({ ...args }) => {
     const { deviceType, directoryLists, actionCreateCopy } = this.props;
+
     Object.keys(args).map((a) => {
       const item = args[a];
 
@@ -1217,6 +1218,7 @@ class FileExplorer extends Component {
     const { data } = this.state.toggleDialog.rename;
     const { confirm, textFieldValue: newFilename } = args;
     const targetAction = 'rename';
+
     if (!confirm || newFilename === null) {
       this._handleClearEditDialog(targetAction);
 
@@ -1406,6 +1408,7 @@ class FileExplorer extends Component {
 
     const isExternalFiles = !isEmpty(externalFiles);
     // if files were dragged from the app pane itself
+
     if (!isExternalFiles) {
       return directoryLists[sourceDeviceType]?.queue?.selected ?? [];
     }
@@ -1482,6 +1485,7 @@ class FileExplorer extends Component {
     const { data } = this.state.toggleDialog.newFolder;
     const { confirm, textFieldValue: newFolderName } = args;
     const targetAction = 'newFolder';
+
     if (!confirm) {
       this._handleClearEditDialog(targetAction);
 
@@ -1558,6 +1562,7 @@ class FileExplorer extends Component {
     let { queue } = fileTransferClipboard;
     const destinationFolder = currentBrowsePath[deviceType];
     let invalidFileNameFlag = false;
+
     queue = queue.map((a) => {
       const _baseName = baseName(a);
       const fullPath = `${destinationFolder}/${_baseName}`;
@@ -1718,7 +1723,6 @@ class FileExplorer extends Component {
       path,
       deviceType,
     });
-
   };
 
   tableSort = ({ ...args }) => {
@@ -2433,7 +2437,6 @@ const mapDispatchToProps = (dispatch, _) =>
                   },
                 })
               );
-
             };
 
             // on completed callback for file transfer
@@ -2443,7 +2446,6 @@ const mapDispatchToProps = (dispatch, _) =>
               dispatch(
                 listDirectory({ ...listDirectoryArgs }, deviceType, getState)
               );
-
             };
 
             switch (deviceType) {

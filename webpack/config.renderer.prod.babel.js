@@ -245,7 +245,6 @@ export default merge(baseConfig, {
     //     process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
     //   openAnalyzer: process.env.OPEN_ANALYZER === 'true',
     // }),
-
   ],
 
   /**

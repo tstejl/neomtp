@@ -59,7 +59,6 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
 
   _handleHelpPhoneNotRecognizedBtn = () => {
     ipcRenderer.send(IpcEvents.OPEN_HELP_PHONE_NOT_CONNECTING_WINDOW);
-
   };
 
   render() {

@@ -20,7 +20,6 @@ class Breadcrumb extends PureComponent {
     }
 
     onBreadcrumbPathClick({ path: value });
-
   };
 
   tokenizeCurrentBrowsePath(currentBrowsePath) {

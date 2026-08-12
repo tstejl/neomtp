@@ -124,8 +124,8 @@ class PrivacyPolicyPage extends Component {
           <p>
             <span>
               <u>LocalStorage Data</u>: The application uses local storage to
-              remember your preferences and settings. These files remain on
-              your device.
+              remember your preferences and settings. These files remain on your
+              device.
             </span>
           </p>
           <p>

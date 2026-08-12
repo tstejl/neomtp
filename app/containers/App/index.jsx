@@ -46,7 +46,6 @@ class App extends Component {
       if (this.allowWritingJsonToSettings) {
         this.writeJsonToSettings();
       }
-
     } catch (e) {
       log.error(e, `App -> componentWillMount`);
     }

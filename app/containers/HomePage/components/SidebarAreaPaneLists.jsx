@@ -12,10 +12,9 @@ import { quickHash } from '../../../utils/funcs';
 
 class SidebarAreaPaneLists extends PureComponent {
   _handleListDirectory({ ...args }) {
-    const { onClickHandler, deviceType } = this.props;
+    const { onClickHandler } = this.props;
 
     onClickHandler({ ...args });
-
   }
 
   ListsRender = (listData) => {

@@ -157,7 +157,7 @@ export function initializeMtp(
           );
 
         default:
-          return;
+          break;
       }
     } catch (e) {
       log.error(e);
@@ -225,10 +225,10 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
             );
           });
 
-          return;
+          break;
 
         default:
-          return;
+          break;
       }
     } catch (e) {
       log.error(e);

@@ -40,7 +40,6 @@ export function freshInstall({ ...data }, getState) {
     });
 
     dispatch(copySettingsToJsonFile(getState));
-
   };
 }
 
@@ -52,7 +51,6 @@ export function setOnboarding({ ...data }, getState) {
     });
 
     dispatch(copySettingsToJsonFile(getState));
-
   };
 }
 
@@ -67,7 +65,6 @@ export function hideHiddenFiles({ ...data }, deviceType, getState) {
     });
 
     dispatch(copySettingsToJsonFile(getState));
-
   };
 }
 
@@ -82,7 +79,6 @@ export function setFilesPreprocessingBeforeTransfer({ ...data }, getState) {
     });
 
     dispatch(copySettingsToJsonFile(getState));
-
   };
 }
 
@@ -97,7 +93,6 @@ export function fileExplorerListingType({ ...data }, deviceType, getState) {
     });
 
     dispatch(copySettingsToJsonFile(getState));
-
   };
 }
 
@@ -200,7 +195,6 @@ export function setCommonSettings(
         }
       })
     );
-
   };
 }
 

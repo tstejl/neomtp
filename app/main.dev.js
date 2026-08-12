@@ -1,6 +1,5 @@
 /* eslint global-require: off */
 
-
 import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron';
 import electronIs from 'electron-is';
 import usbDetect from 'usb-detection';
