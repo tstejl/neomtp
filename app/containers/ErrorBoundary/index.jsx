@@ -6,9 +6,7 @@ import { styles } from './styles';
 import { imgsrc } from '../../utils/imgsrc';
 import GenerateErrorReport from './components/GenerateErrorReport';
 import { log } from '../../utils/log';
-import { getRemoteWindow } from '../../helpers/remoteWindowHelpers';
-
-const remote = getRemoteWindow();
+import { getOpenMtpApi } from '../../helpers/electronApi';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -34,7 +32,7 @@ class ErrorBoundary extends Component {
 
   _handleReload = () => {
     try {
-      remote.getCurrentWindow().reload();
+      getOpenMtpApi().window.reload();
     } catch (e) {
       log.error(e, `ErrorBoundary -> _handleReload`);
     }

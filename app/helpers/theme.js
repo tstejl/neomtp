@@ -1,16 +1,18 @@
-import { nativeTheme } from 'electron';
 import { APP_THEME_MODE_TYPE } from '../enums';
 import { undefinedOrNull } from '../utils/funcs';
 import { getAppThemeModeSetting } from './settings';
-import { getRemoteWindow } from './remoteWindowHelpers';
-
-const remote = getRemoteWindow();
 
 // [appThemeModeSettings] is optional
 // if [appThemeModeSettings] is not provided then fetch the theme value from the settings
-export const getAppThemeMode = (appThemeModeSettings) => {
-  // compatible with both renderer and main process
-  const { shouldUseDarkColors } = remote?.nativeTheme ?? nativeTheme ?? {};
+export const getAppThemeMode = (
+  appThemeModeSettings,
+  systemShouldUseDarkColors
+) => {
+  const shouldUseDarkColors =
+    systemShouldUseDarkColors ??
+    (typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   let _appThemeModeSettings = appThemeModeSettings;
 

@@ -1,4 +1,4 @@
-import { app, Menu } from 'electron';
+import { app, Menu, shell } from 'electron';
 import {
   appFeaturesWindow,
   keyboardShortcutsWindow,
@@ -213,19 +213,19 @@ export default class MenuBuilder {
         {
           label: 'Buy Me A Coffee!',
           click: () => {
-            openExternalUrl(BUY_ME_A_COFFEE_URL);
+            openExternalUrl(BUY_ME_A_COFFEE_URL, null, shell);
           },
         },
         {
           label: `Invite A Friend`,
           click: () => {
-            openExternalUrl(inviteViaEmail);
+            openExternalUrl(inviteViaEmail, null, shell);
           },
         },
         {
           label: 'Find Us On GitHub',
           click: () => {
-            openExternalUrl(APP_GITHUB_URL);
+            openExternalUrl(APP_GITHUB_URL, null, shell);
           },
         },
       ],
@@ -333,19 +333,19 @@ export default class MenuBuilder {
           {
             label: 'Buy Me A Coffee!',
             click: () => {
-              openExternalUrl(BUY_ME_A_COFFEE_URL);
+              openExternalUrl(BUY_ME_A_COFFEE_URL, null, shell);
             },
           },
           {
             label: `Invite A Friend`,
             click: () => {
-              openExternalUrl(inviteViaEmail);
+              openExternalUrl(inviteViaEmail, null, shell);
             },
           },
           {
             label: 'Find Us On GitHub',
             click: () => {
-              openExternalUrl(APP_GITHUB_URL);
+              openExternalUrl(APP_GITHUB_URL, null, shell);
             },
           },
         ],

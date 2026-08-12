@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { ipcRenderer } from 'electron';
 import electronIs from 'electron-is';
 import classNames from 'classnames';
 import Tabs from '@material-ui/core/Tabs';
@@ -28,6 +27,7 @@ import {
 import { capitalize, isPrereleaseVersion } from '../../../utils/funcs';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { isKalamModeSupported } from '../../../helpers/binaries';
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 const isMas = electronIs.mas();
 
@@ -582,7 +582,7 @@ export default class SettingsDialog extends PureComponent {
                       <a
                         className={styles.a}
                         onClick={() => {
-                          ipcRenderer.send(
+                          getOpenMtpApi().ipc.send(
                             IpcEvents.OPEN_HELP_PRIVACY_POLICY_WINDOW
                           );
                         }}

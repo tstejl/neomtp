@@ -16,7 +16,7 @@ import { bootLoader } from './helpers/bootHelper';
 import { nonBootableDeviceWindow } from './helpers/createWindows';
 import { APP_TITLE } from './constants/meta';
 import { isPackaged } from './utils/isPackaged';
-import { getWindowBackgroundColor } from './helpers/windowHelper';
+import { getWindowBackgroundColor } from './helpers/mainWindowHelper';
 import {
   APP_THEME_MODE_TYPE,
   DEVICE_TYPE,
@@ -25,13 +25,10 @@ import {
 } from './enums';
 import fileExplorerController from './data/file-explorer/controllers/FileExplorerController';
 import { getEnablePrereleaseUpdatesSetting } from './helpers/settings';
-import { getRemoteWindow } from './helpers/remoteWindowHelpers';
 import { IpcEvents } from './services/ipc-events/IpcEventType';
 import IpcEventService from './services/ipc-events/IpcEventHandler';
 import { isKalamModeSupported } from './helpers/binaries';
 import { fileExistsSync } from './helpers/fileOps';
-
-const remote = getRemoteWindow();
 
 const isSingleInstance = app.requestSingleInstanceLock();
 const isDeviceBootable = bootTheDevice();
@@ -134,14 +131,12 @@ async function createWindow() {
       minHeight: 640,
       titleBarStyle: 'hidden',
       webPreferences: {
-        enableRemoteModule: true,
-        nodeIntegration: true,
-        contextIsolation: false,
+        preload: PATHS.preloadPath,
+        nodeIntegration: false,
+        contextIsolation: true,
       },
       backgroundColor: getWindowBackgroundColor(),
     });
-
-    remote.enable(mainWindow.webContents);
 
     mainWindow?.loadURL(`${PATHS.loadUrlPath}`);
 

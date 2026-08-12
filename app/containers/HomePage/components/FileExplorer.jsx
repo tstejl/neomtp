@@ -12,7 +12,6 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { withStyles } from '@material-ui/core/styles';
-import { ipcRenderer, shell } from 'electron';
 import lodashSortBy from 'lodash/sortBy';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -83,7 +82,6 @@ import {
   springTruncate,
   undefinedOrNull,
 } from '../../../utils/funcs';
-import { getMainWindowRendererProcess } from '../../../helpers/windowHelper';
 import { throwAlert } from '../../Alerts/actions';
 import { imgsrc } from '../../../utils/imgsrc';
 import FileExplorerBodyRender from './FileExplorerBodyRender';
@@ -110,11 +108,8 @@ import {
   supportUsingPayPal,
 } from '../../../templates/fileExplorer';
 import { fileExistsSync } from '../../../helpers/fileOps';
-import { getRemoteWindow } from '../../../helpers/remoteWindowHelpers';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
-
-const remote = getRemoteWindow();
-const { Menu, getCurrentWindow } = remote;
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 let allowFileDropFlag = false;
 let multipleSelectDirection = null;
@@ -175,7 +170,6 @@ class FileExplorer extends Component {
   constructor(props) {
     super(props);
 
-    this.mainWindowRendererProcess = getMainWindowRendererProcess();
     this.filesDragGhostImg = this._createDragIcon();
 
     this.initialState = {
@@ -204,8 +198,6 @@ class FileExplorer extends Component {
     this.state = {
       ...this.initialState,
     };
-
-    this.electronMenu = new Menu();
 
     this.keyedAcceleratorList = {
       shift: false,
@@ -267,19 +259,15 @@ class FileExplorer extends Component {
 
     this.deregisterAccelerators();
 
-    this.mainWindowRendererProcess.webContents.removeListener(
-      'fileExplorerToolbarActionCommunication',
-      () => {}
-    );
-    ipcRenderer.removeListener('isFileTransferActiveSeek', () => {});
-    ipcRenderer.removeListener('isFileTransferActiveReply', () => {});
+    getOpenMtpApi().ipc.removeListener('isFileTransferActiveSeek', () => {});
+    getOpenMtpApi().ipc.removeListener('isFileTransferActiveReply', () => {});
 
     if (deviceType === DEVICE_TYPE.mtp) {
-      ipcRenderer.removeListener(
+      getOpenMtpApi().ipc.removeListener(
         IpcEvents.REPORT_BUGS_DISPOSE_MTP,
         this._reportBugsDisposeMtpEvent
       );
-      ipcRenderer.removeListener(
+      getOpenMtpApi().ipc.removeListener(
         IpcEvents.USB_HOTPLUG,
         this._handleUsbHotplugEvent
       );
@@ -319,20 +307,23 @@ class FileExplorer extends Component {
      */
 
     if (deviceType === DEVICE_TYPE.local) {
-      ipcRenderer.on('isFileTransferActiveSeek', (event, { ...args }) => {
-        const { check: checkIsFileTransferActiveSeek } = args;
+      getOpenMtpApi().ipc.on(
+        'isFileTransferActiveSeek',
+        (event, { ...args }) => {
+          const { check: checkIsFileTransferActiveSeek } = args;
 
-        if (!checkIsFileTransferActiveSeek) {
-          return null;
+          if (!checkIsFileTransferActiveSeek) {
+            return null;
+          }
+
+          const { fileTransferProgess } = this.props;
+          const { toggle: isActiveFileTransferProgess } = fileTransferProgess;
+
+          getOpenMtpApi().ipc.send('isFileTransferActiveReply', {
+            isActive: isActiveFileTransferProgess,
+          });
         }
-
-        const { fileTransferProgess } = this.props;
-        const { toggle: isActiveFileTransferProgess } = fileTransferProgess;
-
-        ipcRenderer.send('isFileTransferActiveReply', {
-          isActive: isActiveFileTransferProgess,
-        });
-      });
+      );
     }
   };
 
@@ -340,7 +331,7 @@ class FileExplorer extends Component {
     const { deviceType } = this.props;
 
     if (deviceType === DEVICE_TYPE.mtp) {
-      ipcRenderer.on(
+      getOpenMtpApi().ipc.on(
         IpcEvents.REPORT_BUGS_DISPOSE_MTP,
         this._reportBugsDisposeMtpEvent
       );
@@ -351,7 +342,10 @@ class FileExplorer extends Component {
     const { deviceType } = this.props;
 
     if (deviceType === DEVICE_TYPE.mtp) {
-      ipcRenderer.on(IpcEvents.USB_HOTPLUG, this._handleUsbHotplugEvent);
+      getOpenMtpApi().ipc.on(
+        IpcEvents.USB_HOTPLUG,
+        this._handleUsbHotplugEvent
+      );
     }
   };
 
@@ -369,7 +363,9 @@ class FileExplorer extends Component {
       storageId: null,
     });
 
-    ipcRenderer.send(IpcEvents.REPORT_BUGS_DISPOSE_MTP_REPLY, { error });
+    getOpenMtpApi().ipc.send(IpcEvents.REPORT_BUGS_DISPOSE_MTP_REPLY, {
+      error,
+    });
   };
 
   _handleUsbHotplugEvent = async (_, { device, eventName }) => {
@@ -696,23 +692,17 @@ class FileExplorer extends Component {
           break;
         }
 
-        this.mainWindowRendererProcess.webContents.send(
-          'fileExplorerToolbarActionCommunication',
-          {
-            type,
-            deviceType: _focussedFileExplorerDeviceType,
-          }
-        );
+        getOpenMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
+          type,
+          deviceType: _focussedFileExplorerDeviceType,
+        });
         break;
 
       case 'refresh':
-        this.mainWindowRendererProcess.webContents.send(
-          'fileExplorerToolbarActionCommunication',
-          {
-            type,
-            deviceType: _focussedFileExplorerDeviceType,
-          }
-        );
+        getOpenMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
+          type,
+          deviceType: _focussedFileExplorerDeviceType,
+        });
         break;
 
       case 'up':
@@ -720,13 +710,10 @@ class FileExplorer extends Component {
           break;
         }
 
-        this.mainWindowRendererProcess.webContents.send(
-          'fileExplorerToolbarActionCommunication',
-          {
-            type,
-            deviceType: _focussedFileExplorerDeviceType,
-          }
-        );
+        getOpenMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
+          type,
+          deviceType: _focussedFileExplorerDeviceType,
+        });
         break;
 
       case 'selectAll':
@@ -962,8 +949,28 @@ class FileExplorer extends Component {
   };
 
   fireElectronMenu(menuItems) {
-    this.electronMenu = Menu.buildFromTemplate(menuItems);
-    this.electronMenu.popup(remote.getCurrentWindow());
+    const { menu } = getOpenMtpApi();
+
+    return menu
+      .popup(
+        menuItems.map((item, id) => ({
+          id,
+          label: item.label,
+          enabled: item.enabled !== false,
+        }))
+      )
+      .then((selectedId) => {
+        if (selectedId !== null && menuItems[selectedId]?.click) {
+          menuItems[selectedId].click();
+        }
+
+        return selectedId;
+      })
+      .catch((e) => {
+        log.error(e, 'FileExplorer.fireElectronMenu');
+
+        return null;
+      });
   }
 
   _handleContextMenuClick = (
@@ -1321,7 +1328,7 @@ class FileExplorer extends Component {
         return;
       }
 
-      shell.showItemInFolder(filePath);
+      getOpenMtpApi().shell.showItemInFolder(filePath);
     } catch (e) {
       log.error(e, 'FileExplorer._handleShowInEnclosingFolder');
     }
@@ -1713,7 +1720,7 @@ class FileExplorer extends Component {
 
     if (!isFolder) {
       if (deviceType === DEVICE_TYPE.local) {
-        shell.openPath(path);
+        getOpenMtpApi().shell.openPath(path);
       }
 
       return null;
@@ -2295,7 +2302,7 @@ const mapDispatchToProps = (dispatch, _) =>
                 springTruncate(fullPath, 45).truncatedText
               }"`;
 
-              getCurrentWindow().setProgressBar(0);
+              getOpenMtpApi().window.setProgressBar(0);
               dispatch(
                 setFileTransferProgress({
                   titleText: `Copying files to ${DEVICES_LABEL[deviceType]}...`,
@@ -2404,7 +2411,7 @@ const mapDispatchToProps = (dispatch, _) =>
                 }
               }
 
-              getCurrentWindow().setProgressBar(windowProgressBar);
+              getOpenMtpApi().window.setProgressBar(windowProgressBar);
               dispatch(
                 setFileTransferProgress({
                   titleText: `Copying files to ${DEVICES_LABEL[deviceType]}...`,
@@ -2425,7 +2432,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   data,
                   mtpMode,
                   onSuccess: () => {
-                    getCurrentWindow().setProgressBar(-1);
+                    getOpenMtpApi().window.setProgressBar(-1);
                     dispatch(clearFileTransfer());
                     dispatch(
                       listDirectory(
@@ -2441,7 +2448,7 @@ const mapDispatchToProps = (dispatch, _) =>
 
             // on completed callback for file transfer
             const onCompleted = () => {
-              getCurrentWindow().setProgressBar(-1);
+              getOpenMtpApi().window.setProgressBar(-1);
               dispatch(clearFileTransfer());
               dispatch(
                 listDirectory({ ...listDirectoryArgs }, deviceType, getState)

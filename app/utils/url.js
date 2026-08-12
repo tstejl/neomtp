@@ -1,9 +1,9 @@
-import { shell } from 'electron';
+import { getOpenMtpApi } from '../helpers/electronApi';
 
-export const openExternalUrl = (url, events = null) => {
+export const openExternalUrl = (url, events = null, shellApi = null) => {
   if (events) {
     events.preventDefault();
   }
 
-  shell.openExternal(url);
+  (shellApi || getOpenMtpApi().shell).openExternal(url);
 };

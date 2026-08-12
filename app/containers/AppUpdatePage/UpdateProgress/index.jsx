@@ -1,9 +1,9 @@
-import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import { styles } from './styles';
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 class ProgressbarPage extends Component {
   constructor(props) {
@@ -22,17 +22,22 @@ class ProgressbarPage extends Component {
   }
 
   componentWillMount() {
-    ipcRenderer.on(
+    getOpenMtpApi().ipc.on(
       'appUpdatesProgressBarCommunication',
-      (event, { ...args }) => {
-        this.setState({ ...args });
-      }
+      this.progressBarCommunicationEvent
     );
   }
 
   componentWillUnmount() {
-    ipcRenderer.removeListener('appUpdatesProgressBarCommunication', () => {});
+    getOpenMtpApi().ipc.removeListener(
+      'appUpdatesProgressBarCommunication',
+      this.progressBarCommunicationEvent
+    );
   }
+
+  progressBarCommunicationEvent = (_, { ...args }) => {
+    this.setState({ ...args });
+  };
 
   render() {
     const { classes: styles } = this.props;
