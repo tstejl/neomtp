@@ -3,7 +3,6 @@
  * Note: Don't import log helper file from utils here
  */
 
-import { PATHS } from './paths';
 import { DEVICE_TYPE } from '../enums';
 
 export const OS_ARCH_TYPE = {
@@ -29,7 +28,7 @@ export const KALAM_MODE_MIN_MACOS_VERSION = `>=10.14`;
 
 export const DEVICES_DEFAULT_PATH = {
   [DEVICE_TYPE.mtp]: '/',
-  [DEVICE_TYPE.local]: PATHS.homeDir,
+  [DEVICE_TYPE.local]: '/',
 };
 
 export const DEVICES_LABEL = {

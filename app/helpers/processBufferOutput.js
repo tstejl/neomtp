@@ -1,13 +1,14 @@
 /* eslint-disable no-case-declarations */
 
-import { EOL } from 'node:os';
 import { replaceBulk, undefinedOrNull } from '../utils/funcs';
-import { log } from '../utils/log';
+import { log } from '../utils/rendererLog';
 import { isGoogleAndroidFileTransferActive } from '../utils/isGoogleAndroidFileTransferActive';
 import { DEVICES_LABEL } from '../constants';
 import { DEVICE_TYPE, MTP_MODE } from '../enums';
 import { checkIf } from '../utils/checkIf';
 import { MTP_ERROR } from '../enums/mtpError';
+
+const EOL = '\n';
 
 /**
  * Will return true if the error is a mtp detect error.

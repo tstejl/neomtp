@@ -16,12 +16,19 @@ const requiredFiles = [
   'bun.lock',
   'electron-builder-config.js',
   'electron.vite.config.js',
+  'scripts/no-device-main-e2e.js',
 ];
 
 const missingFiles = requiredFiles.filter(
   (file) => !fs.existsSync(path.join(root, file))
 );
-const requiredScripts = ['build', 'build-no-verify', 'dev', 'test:smoke'];
+const requiredScripts = [
+  'build',
+  'build-no-verify',
+  'dev',
+  'test:smoke',
+  'test:e2e:no-device',
+];
 const missingScripts = requiredScripts.filter(
   (script) => !packageJson.scripts[script]
 );

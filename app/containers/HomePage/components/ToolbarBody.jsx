@@ -22,7 +22,7 @@ import {
 import { DEVICE_TYPE, MTP_MODE } from '../../../enums';
 import { capitalize, isEmpty } from '../../../utils/funcs';
 import { imgsrc } from '../../../utils/imgsrc';
-import { isKalamModeSupported } from '../../../helpers/binaries';
+import { isKalamModeSupported } from '../../../helpers/rendererCapabilities';
 
 export default class ToolbarAreaPane extends PureComponent {
   activeToolbarList = ({ ...args }) => {

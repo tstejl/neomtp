@@ -15,7 +15,7 @@ import { openExternalUrl } from '../../utils/url';
 import { resetOverFlowY } from '../../utils/styleResets';
 import { PRIVACY_POLICY_PAGE_TITLE } from '../../templates/privacyPolicyPage';
 import { styles } from './styles';
-import { PATHS } from '../../constants/paths';
+import { rendererPaths } from '../../helpers/rendererPaths';
 
 class PrivacyPolicyPage extends Component {
   componentWillMount() {
@@ -324,9 +324,9 @@ class PrivacyPolicyPage extends Component {
             <span>
               The application stores diagnostic logs locally when errors occur.
               These log files can be accessed by navigating to &quot;
-              {PATHS.profileDir}/logs/&quot; folder. You may choose to send us
-              these log files by selecting the &quot;Help&quot; menu &gt;
-              &quot;Report Bugs&quot; and clicking on the &quot;EMAIL ERROR
+              {rendererPaths.profileDir}/logs/&quot; folder. You may choose to
+              send us these log files by selecting the &quot;Help&quot; menu
+              &gt; &quot;Report Bugs&quot; and clicking on the &quot;EMAIL ERROR
               LOGS&quot; buttons.
             </span>
           </p>

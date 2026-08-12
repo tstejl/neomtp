@@ -10,8 +10,23 @@ import { rootPath as root } from 'electron-root-path';
 import { isPackaged } from '../utils/isPackaged';
 import { IS_DEV } from './env';
 import { yearMonthNow } from '../utils/date';
-import { APP_NAME } from './meta';
-import { getAppDataPath } from '../utils/files';
+import { APP_BUNDLE_ID, APP_NAME } from './meta';
+
+const getAppDataPath = () => {
+  switch (process.platform) {
+    case 'darwin':
+      return join(homeDir, 'Library', 'Application Support', APP_BUNDLE_ID);
+
+    case 'win32':
+      return join(process.env.APPDATA, APP_BUNDLE_ID);
+
+    case 'linux':
+      return join(homeDir, APP_BUNDLE_ID);
+
+    default:
+      return join(homeDir, APP_BUNDLE_ID);
+  }
+};
 
 const appPath = join(root, `./app`);
 const rendererPath = join(appPath, `./dist/app.html`);

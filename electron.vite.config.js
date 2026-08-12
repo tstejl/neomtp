@@ -52,6 +52,32 @@ const cleanMainOutput = {
   },
 };
 
+const rendererBundleGuard = {
+  name: 'renderer-bundle-guard',
+  generateBundle(_options, bundle) {
+    const forbiddenPatterns = [
+      /(?:from|import)\s*["'](?:node:)?(?:assert|buffer|child_process|crypto|events|fs|module|os|path|process|stream|url|util|zlib)["']/u,
+      /require\(["'](?:node:)?(?:assert|buffer|child_process|crypto|events|fs|module|os|path|process|stream|url|util|zlib|electron|electron-is|koffi|usb-detection|node-mac-permissions)["']\)/u,
+    ];
+
+    Object.values(bundle).forEach((asset) => {
+      if (asset.type !== 'chunk') {
+        return;
+      }
+
+      forbiddenPatterns.forEach((pattern) => {
+        const match = asset.code.match(pattern);
+
+        if (match) {
+          this.error(
+            `Renderer bundle contains a main-process dependency in ${asset.fileName}: ${match[0]}`
+          );
+        }
+      });
+    });
+  },
+};
+
 export default defineConfig(({ mode }) => {
   const nodeEnv = mode === 'production' ? 'production' : 'development';
   const define = {
@@ -98,7 +124,11 @@ export default defineConfig(({ mode }) => {
       root: appRoot,
       base: './',
       define,
-      plugins: [externalizeNodeBuiltins, react({ include: /\.[jt]sx?$/ })],
+      plugins: [
+        externalizeNodeBuiltins,
+        rendererBundleGuard,
+        react({ include: /\.[jt]sx?$/ }),
+      ],
       esbuild: {
         loader: 'jsx',
         include: /app\/.*\.[jt]sx?$/,

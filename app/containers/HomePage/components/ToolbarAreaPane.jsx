@@ -31,11 +31,8 @@ import {
   makeMtpMode,
   makeShowLocalPaneOnLeftSide,
 } from '../../Settings/selectors';
-import {
-  BUY_ME_A_COFFEE_URL,
-  DEVICES_DEFAULT_PATH,
-  SUPPORT_PAYPAL_URL,
-} from '../../../constants';
+import { BUY_ME_A_COFFEE_URL, SUPPORT_PAYPAL_URL } from '../../../constants';
+import { DEVICES_DEFAULT_PATH } from '../../../helpers/rendererPaths';
 import { selectMtpMode, toggleSettings } from '../../Settings/actions';
 import { toggleWindowSizeOnDoubleClick } from '../../../helpers/titlebarDoubleClick';
 import ToolbarBody from './ToolbarBody';
@@ -43,8 +40,7 @@ import { openExternalUrl } from '../../../utils/url';
 import { APP_GITHUB_URL } from '../../../constants/meta';
 import { pathUp } from '../../../utils/files';
 import { DEVICE_TYPE } from '../../../enums';
-import { log } from '../../../utils/log';
-import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
+import { log } from '../../../utils/rendererLog';
 import { checkIf } from '../../../utils/checkIf';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { getOpenMtpApi } from '../../../helpers/electronApi';
@@ -394,7 +390,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: localError,
                   stderr: localStderr,
                   data: localData,
-                } = await fileExplorerController.deleteFiles({
+                } = await getOpenMtpApi().fileExplorer.deleteFiles({
                   deviceType,
                   fileList,
                   storageId: null,
@@ -426,7 +422,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: mtpError,
                   stderr: mtpStderr,
                   data: mtpData,
-                } = await fileExplorerController.deleteFiles({
+                } = await getOpenMtpApi().fileExplorer.deleteFiles({
                   deviceType,
                   fileList,
                   storageId,
