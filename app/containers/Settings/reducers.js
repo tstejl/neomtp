@@ -19,7 +19,6 @@ export const initialState = {
   enableBackgroundAutoUpdate: true,
   // if the freshly installed version is a prerelease version then save [enablePrereleaseUpdates] as true
   enablePrereleaseUpdates: isPrereleaseVersion() || false,
-  enableAnalytics: true,
   enableStatusBar: true,
   enableUsbHotplug: false,
   hideHiddenFiles: {

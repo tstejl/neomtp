@@ -16,7 +16,6 @@ import {
   actionChangeMtpStorage,
   getSelectedStorageIdFromState,
   reloadDirList,
-  getSelectedStorage,
 } from '../actions';
 import {
   makeDirectoryLists,
@@ -48,8 +47,6 @@ import { DEVICE_TYPE } from '../../../enums';
 import { log } from '../../../utils/log';
 import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
 import { checkIf } from '../../../utils/checkIf';
-import { analyticsService } from '../../../services/analytics';
-import { EVENT_TYPE } from '../../../enums/events';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 
 class ToolbarAreaPane extends PureComponent {
@@ -106,45 +103,21 @@ class ToolbarAreaPane extends PureComponent {
   };
 
   _handleToggleDeleteConfirmDialog = (status) => {
-    const { deviceType } = this.props;
-
-    const dialogStatus = status ? 'OPEN' : 'CLOSE';
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
     this.setState({
       toggleDeleteConfirmDialog: status,
     });
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${deviceTypeUpperCase}_DELETE_DIALOG_${dialogStatus}`],
-      {}
-    );
   };
 
   _handleToggleMtpStorageSelectionDialog = (status) => {
-    const dialogStatus = status ? 'OPEN' : 'CLOSE';
-
     this.setState({
       toggleMtpStorageSelectionDialog: status,
     });
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`MTP_TOOLBAR_STORAGE_DIALOG_${dialogStatus}`],
-      {}
-    );
   };
 
   _handleToggleMtpModeSelectionDialog = (status) => {
-    const dialogStatus = status ? 'OPEN' : 'CLOSE';
-
     this.setState({
       toggleMtpModeSelectionDialog: status,
     });
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`MTP_TOOLBAR_MTP_MODE_DIALOG_${dialogStatus}`],
-      {}
-    );
   };
 
   _handleMtpStoragesListClick = ({ ...args }) => {
@@ -156,13 +129,6 @@ class ToolbarAreaPane extends PureComponent {
     } = this.props;
 
     const { selectedValue, triggerChange } = args;
-
-    if (triggerChange) {
-      analyticsService.sendEvent(EVENT_TYPE.MTP_TOOLBAR_STORAGE_SELECTED, {
-        'Current Storage': getSelectedStorage(mtpStoragesList)?.data,
-        'Selected Storage': selectedValue,
-      });
-    }
 
     this._handleToggleMtpStorageSelectionDialog(false);
 
@@ -181,15 +147,8 @@ class ToolbarAreaPane extends PureComponent {
   };
 
   _handleMtpModeSelectionDialogClick = ({ ...args }) => {
-    const { actionCreateSelectMtpMode, deviceType, mtpMode } = this.props;
+    const { actionCreateSelectMtpMode, deviceType } = this.props;
     const { selectedValue, triggerChange } = args;
-
-    if (triggerChange) {
-      analyticsService.sendEvent(EVENT_TYPE.MTP_MODE_SELECTED, {
-        'Current MTP Mode': mtpMode,
-        'Selected MTP Mode': selectedValue,
-      });
-    }
 
     this._handleToggleMtpModeSelectionDialog(false);
 
@@ -240,18 +199,11 @@ class ToolbarAreaPane extends PureComponent {
     } = this.props;
 
     let filePath = '/';
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-    const actionOrigin = isAccelerator ? 'KEYMAP' : 'TOOLBAR';
 
     switch (itemType) {
       case 'up':
         filePath = pathUp(currentBrowsePath[deviceType]);
         this._handleListDirectory({ filePath, deviceType });
-
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_${actionOrigin}_FOLDER_UP`],
-          {}
-        );
 
         break;
 
@@ -262,11 +214,6 @@ class ToolbarAreaPane extends PureComponent {
           ignoreHidden: hideHiddenFiles[deviceType],
           deviceType,
         });
-
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_${actionOrigin}_REFRESH`],
-          {}
-        );
 
         break;
 
@@ -288,22 +235,14 @@ class ToolbarAreaPane extends PureComponent {
       case 'gitHub':
         this._handleOpenGitHubRepo();
 
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_${actionOrigin}_GITHUB_TAP`],
-          {}
-        );
         break;
 
       case 'buyMeACoffee':
         this._handleOpenBuyMeACoffee();
-        analyticsService.sendEvent(EVENT_TYPE.BUY_ME_A_COFFEE, {});
-
         break;
 
       case 'paypal':
         this._handleOpenSupportUsingPaypal();
-        analyticsService.sendEvent(EVENT_TYPE.SUPPORT_USING_PAYPAL, {});
-
         break;
 
       case 'mtpMode':
@@ -359,7 +298,6 @@ class ToolbarAreaPane extends PureComponent {
   _handleFaqsBtn = () => {
     ipcRenderer.send(IpcEvents.OPEN_FAQS_WINDOW);
 
-    analyticsService.sendEvent(EVENT_TYPE.LOCAL_TOOLBAR_FAQS, {});
   };
 
   render() {
@@ -565,7 +503,7 @@ const mapDispatchToProps = (dispatch, _) =>
           checkIf(deviceType, 'string');
 
           dispatch(
-            selectMtpMode({ value, reportEvent: false }, deviceType, getState)
+            selectMtpMode({ value }, deviceType, getState)
           );
         },
       actionCreateToggleSettings: (data) => (_, __) => {

@@ -72,7 +72,6 @@ import {
   USB_HOTPLUG_MAX_ATTEMPTS_TIMEOUT,
 } from '../../../constants';
 import {
-  arrayAverage,
   getPluralText,
   isArray,
   isEmpty,
@@ -106,8 +105,6 @@ import {
 import { log } from '../../../utils/log';
 import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
 import { checkIf } from '../../../utils/checkIf';
-import { analyticsService } from '../../../services/analytics';
-import { EVENT_TYPE } from '../../../enums/events';
 import {
   buyMeACoffeeText,
   supportUsingPayPal,
@@ -402,14 +399,6 @@ class FileExplorer extends Component {
 
       const _usbDeviceInfo = JSON.parse(device);
 
-      analyticsService.sendEvent(EVENT_TYPE.MTP_USB_HOTPLUG_RECEIVED, {
-        manufacturer: _usbDeviceInfo.manufacturer,
-        deviceName: _usbDeviceInfo.deviceName,
-        productId: _usbDeviceInfo.productId,
-        vendorId: _usbDeviceInfo.vendorId,
-        eventName,
-      });
-
       // if the mtp mode is not kalam then dont proceed.
       if (mtpMode !== MTP_MODE.kalam) {
         return;
@@ -463,14 +452,6 @@ class FileExplorer extends Component {
               _usbDeviceInfo.serialNumber ===
               mtpDevice?.info?.usbDeviceInfo?.SerialNumber
             ) {
-              analyticsService.sendEvent(EVENT_TYPE.MTP_USB_HOTPLUG_DETTACHED, {
-                manufacturer: _usbDeviceInfo.manufacturer,
-                deviceName: _usbDeviceInfo.deviceName,
-                productId: _usbDeviceInfo.productId,
-                vendorId: _usbDeviceInfo.vendorId,
-                eventName,
-              });
-
               actionCreateReloadDirList({
                 filePath: currentBrowsePath[deviceType],
                 ignoreHidden: hideHiddenFiles[deviceType],
@@ -486,14 +467,6 @@ class FileExplorer extends Component {
           // if an usb device was attached and mtp device is connected then
           // try to connect the mtp device
           if (!mtpDevice.isAvailable) {
-            analyticsService.sendEvent(EVENT_TYPE.MTP_USB_HOTPLUG_ATTACHED, {
-              manufacturer: _usbDeviceInfo.manufacturer,
-              deviceName: _usbDeviceInfo.deviceName,
-              productId: _usbDeviceInfo.productId,
-              vendorId: _usbDeviceInfo.vendorId,
-              eventName,
-            });
-
             actionCreateReloadDirList({
               filePath: currentBrowsePath[deviceType],
               ignoreHidden: hideHiddenFiles[deviceType],
@@ -651,8 +624,6 @@ class FileExplorer extends Component {
       return null;
     }
 
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
     switch (type) {
       case 'navigationLeft':
       case 'navigationRight':
@@ -691,11 +662,6 @@ class FileExplorer extends Component {
           break;
         }
 
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_COPY_FILES`],
-          {}
-        );
-
         actionCreateCopy({
           selected,
           deviceType,
@@ -706,11 +672,6 @@ class FileExplorer extends Component {
         if (selected.length < 1) {
           break;
         }
-
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_COPY_TO_QUEUE_FILES`],
-          {}
-        );
 
         actionCreateCopy({
           selected,
@@ -1147,8 +1108,6 @@ class FileExplorer extends Component {
   /* activate actions using mouse */
   _handleContextMenuListActions = ({ ...args }) => {
     const { deviceType, directoryLists, actionCreateCopy } = this.props;
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
     Object.keys(args).map((a) => {
       const item = args[a];
 
@@ -1171,11 +1130,6 @@ class FileExplorer extends Component {
 
           actionCreateCopy({ selected: selectedItemsToCopy, deviceType });
 
-          analyticsService.sendEvent(
-            EVENT_TYPE[`${deviceTypeUpperCase}_COPY_FILES`],
-            {}
-          );
-
           break;
 
         case 'copyToQueue':
@@ -1188,11 +1142,6 @@ class FileExplorer extends Component {
             deviceType,
             toQueue: true,
           });
-
-          analyticsService.sendEvent(
-            EVENT_TYPE[`${deviceTypeUpperCase}_COPY_TO_QUEUE_FILES`],
-            {}
-          );
 
           break;
 
@@ -1268,22 +1217,8 @@ class FileExplorer extends Component {
     const { data } = this.state.toggleDialog.rename;
     const { confirm, textFieldValue: newFilename } = args;
     const targetAction = 'rename';
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${deviceTypeUpperCase}_RENAME_STARTED`],
-      {}
-    );
-
     if (!confirm || newFilename === null) {
       this._handleClearEditDialog(targetAction);
-
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_RENAME_EXIT`],
-        {
-          Reason: 'EXIT',
-        }
-      );
 
       return null;
     }
@@ -1297,13 +1232,6 @@ class FileExplorer extends Component {
         targetAction
       );
 
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_RENAME_EXIT`],
-        {
-          Reason: 'ILLEGAL_CHARACTERS',
-        }
-      );
-
       return null;
     }
 
@@ -1315,13 +1243,6 @@ class FileExplorer extends Component {
 
     if (newFilepath === data.path) {
       this._handleClearEditDialog(targetAction);
-
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_RENAME_EXIT`],
-        {
-          Reason: 'NO_CHANGE',
-        }
-      );
 
       return null;
     }
@@ -1341,13 +1262,6 @@ class FileExplorer extends Component {
             message: `Error: The name "${sanitizedNewFilename}" is already taken.`,
           },
           targetAction
-        );
-
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_RENAME_EXIT`],
-          {
-            Reason: 'FILE_EXISTS',
-          }
         );
 
         return null;
@@ -1429,19 +1343,12 @@ class FileExplorer extends Component {
   }
 
   _handleFilesDragStart = (e, { sourceDeviceType }) => {
-    const sourceDeviceTypeUpperCase = sourceDeviceType?.toUpperCase();
-
     this._handleSetFilesDrag({
       sourceDeviceType,
       destinationDeviceType: null,
       enter: false,
       lock: false,
     });
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${sourceDeviceTypeUpperCase}_DRAG_FILES_STARTED`],
-      {}
-    );
 
     e.dataTransfer.setDragImage(this.filesDragGhostImg, 0, 0);
   };
@@ -1498,17 +1405,6 @@ class FileExplorer extends Component {
     const { sourceDeviceType } = filesDrag;
 
     const isExternalFiles = !isEmpty(externalFiles);
-    const sourceDeviceTypeUpperCase = isExternalFiles
-      ? 'EXTERNAL'
-      : sourceDeviceType?.toUpperCase();
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${sourceDeviceTypeUpperCase}_DRAG_FILES_DROPPED`],
-      {
-        isExternalFiles,
-      }
-    );
-
     // if files were dragged from the app pane itself
     if (!isExternalFiles) {
       return directoryLists[sourceDeviceType]?.queue?.selected ?? [];
@@ -1527,22 +1423,6 @@ class FileExplorer extends Component {
       sourceDeviceType === destinationDeviceType ||
       destinationDeviceType === null
     ) {
-      const isExternalFiles = !isEmpty(externalFiles);
-      const sourceDeviceTypeUpperCase = isExternalFiles
-        ? 'EXTERNAL'
-        : sourceDeviceType?.toUpperCase();
-
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${sourceDeviceTypeUpperCase}_DRAG_FILES_CANCELLED`],
-        {
-          'Is file drop allowed': allowFileDropFlag,
-          Reason:
-            sourceDeviceType === destinationDeviceType
-              ? 'Source and destination are same'
-              : false,
-        }
-      );
-
       return null;
     }
 
@@ -1602,22 +1482,8 @@ class FileExplorer extends Component {
     const { data } = this.state.toggleDialog.newFolder;
     const { confirm, textFieldValue: newFolderName } = args;
     const targetAction = 'newFolder';
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${deviceTypeUpperCase}_NEW_FOLDER_STARTED`],
-      {}
-    );
-
     if (!confirm) {
       this._handleClearEditDialog(targetAction);
-
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_NEW_FOLDER_EXIT`],
-        {
-          Reason: 'NO_CHANGE',
-        }
-      );
 
       return null;
     }
@@ -1631,13 +1497,6 @@ class FileExplorer extends Component {
         targetAction
       );
 
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_NEW_FOLDER_EXIT`],
-        {
-          Reason: 'EMPTY_FOLDER_NAME',
-        }
-      );
-
       return null;
     }
 
@@ -1648,13 +1507,6 @@ class FileExplorer extends Component {
           message: `Error: Illegal characters.`,
         },
         targetAction
-      );
-
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_NEW_FOLDER_EXIT`],
-        {
-          Reason: 'ILLEGAL_CHARACTERS',
-        }
       );
 
       return null;
@@ -1675,13 +1527,6 @@ class FileExplorer extends Component {
           message: `Error: The name "${newFolderName}" is already taken.`,
         },
         targetAction
-      );
-
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_RENAME_EXIT`],
-        {
-          Reason: 'FILE_EXISTS',
-        }
       );
 
       return null;
@@ -1713,8 +1558,6 @@ class FileExplorer extends Component {
     let { queue } = fileTransferClipboard;
     const destinationFolder = currentBrowsePath[deviceType];
     let invalidFileNameFlag = false;
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
     queue = queue.map((a) => {
       const _baseName = baseName(a);
       const fullPath = `${destinationFolder}/${_baseName}`;
@@ -1725,11 +1568,6 @@ class FileExplorer extends Component {
 
       return fullPath;
     });
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${deviceTypeUpperCase}_PASTE_FILES`],
-      {}
-    );
 
     if (invalidFileNameFlag) {
       actionCreateThrowError({
@@ -1746,13 +1584,6 @@ class FileExplorer extends Component {
         storageId,
       })
     ) {
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_PASTE_FILES_DIALOG_OPEN`],
-        {
-          Reason: 'FILES_EXIST',
-        }
-      );
-
       this._handleTogglePasteConfirmDialog(true);
 
       return null;
@@ -1773,16 +1604,7 @@ class FileExplorer extends Component {
     const destinationFolder = currentBrowsePath[deviceType];
 
     this._handleTogglePasteConfirmDialog(false);
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
     if (!confirm) {
-      analyticsService.sendEvent(
-        EVENT_TYPE[`${deviceTypeUpperCase}_PASTE_FILES_DIALOG_CLOSE`],
-        {
-          Reason: 'REPLACE_FILES_DENIED',
-        }
-      );
-
       return null;
     }
 
@@ -1884,16 +1706,9 @@ class FileExplorer extends Component {
   _handleTableDoubleClick = (item, deviceType) => {
     const { isFolder, path } = item;
 
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
     if (!isFolder) {
       if (deviceType === DEVICE_TYPE.local) {
         shell.openPath(path);
-
-        analyticsService.sendEvent(
-          EVENT_TYPE[`${deviceTypeUpperCase}_OPEN_FILE`],
-          {}
-        );
       }
 
       return null;
@@ -1904,10 +1719,6 @@ class FileExplorer extends Component {
       deviceType,
     });
 
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${deviceTypeUpperCase}_OPEN_DIRECTORY`],
-      {}
-    );
   };
 
   tableSort = ({ ...args }) => {
@@ -2080,12 +1891,6 @@ class FileExplorer extends Component {
                     <div
                       aria-label={a.label}
                       onClick={() => {
-                        analyticsService.sendEvent(
-                          EVENT_TYPE.SUPPORT_CTAS_DURING_TRANSFERRING,
-                          {
-                            name: a.name,
-                          }
-                        );
                         openExternalUrl(a.url);
                       }}
                       className={classnames(styles.supportBtnWrapper, {
@@ -2473,19 +2278,12 @@ const mapDispatchToProps = (dispatch, _) =>
       actionCreatePaste:
         ({ ...pasteArgs }, { ...listDirectoryArgs }, deviceType) =>
         (_, getState) => {
-          let sessionElapsedTime = 0;
-          const sessionTransferSpeeds = [];
-          let sessionTotalFiles = 0;
-          let sessionTransferDirection;
-
           try {
             const { mtpMode, filesPreprocessingBeforeTransfer } =
               getState().Settings;
 
             const { destinationFolder, storageId, fileTransferClipboard } =
               pasteArgs;
-
-            analyticsService.sendEvent(EVENT_TYPE.FILE_TRANSFER_STARTED, {});
 
             // on pre process callback for file transfer
             const onPreprocess = ({ fullPath }) => {
@@ -2532,10 +2330,6 @@ const mapDispatchToProps = (dispatch, _) =>
 
               let progressInfo = [];
 
-              sessionElapsedTime = elapsedTime;
-              sessionTotalFiles = totalFiles;
-              sessionTransferDirection = direction;
-
               /// file transfer progress on legacy mode
               if (mtpMode === MTP_MODE.legacy) {
                 bodyText1 = `${Math.floor(activeFileProgress)}% complete of "${
@@ -2545,8 +2339,6 @@ const mapDispatchToProps = (dispatch, _) =>
                   activeFileSize
                 )}`;
                 windowProgressBar = activeFileProgress / 100;
-
-                sessionTransferSpeeds.push(parseFloat(speed) / 1000 / 1000);
 
                 const _speed = speed ? `${niceBytes(speed)}` : `--`;
 
@@ -2561,8 +2353,6 @@ const mapDispatchToProps = (dispatch, _) =>
               } else {
                 checkIf(direction, 'string');
                 checkIf(direction, 'inObjectValues', FILE_TRANSFER_DIRECTION);
-
-                sessionTransferSpeeds.push(parseFloat(speed));
 
                 // active file progress
                 bodyText1 = `${Math.floor(activeFileProgress)}% complete of "${
@@ -2644,7 +2434,6 @@ const mapDispatchToProps = (dispatch, _) =>
                 })
               );
 
-              analyticsService.sendEvent(EVENT_TYPE.FILE_TRANSFER_ERROR, {});
             };
 
             // on completed callback for file transfer
@@ -2655,16 +2444,6 @@ const mapDispatchToProps = (dispatch, _) =>
                 listDirectory({ ...listDirectoryArgs }, deviceType, getState)
               );
 
-              analyticsService.sendEvent(EVENT_TYPE.FILE_TRANSFER_COMPLETED, {
-                'Transfer direction': sessionTransferDirection,
-                'Total files': sessionTotalFiles,
-                'Average transfer speed': `${arrayAverage(
-                  sessionTransferSpeeds
-                )} MB/s`,
-                'Elapsed time': sessionElapsedTime,
-                'Is files preprocessing enabled':
-                  filesPreprocessingBeforeTransfer[sessionTransferDirection],
-              });
             };
 
             switch (deviceType) {

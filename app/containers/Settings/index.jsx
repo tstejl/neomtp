@@ -98,16 +98,6 @@ class Settings extends Component {
     );
   };
 
-  _handleAnalyticsChange = (event, value, deviceType) => {
-    this._handleSetCommonSettingsChange(
-      {
-        key: 'enableAnalytics',
-        value,
-      },
-      deviceType
-    );
-  };
-
   _handleStatusBarChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -206,7 +196,6 @@ class Settings extends Component {
         toggleSettings={toggleSettings}
         styles={styles}
         enablePrereleaseUpdates={enablePrereleaseUpdates}
-        onAnalyticsChange={this._handleAnalyticsChange}
         onHiddenFilesChange={this._handleHiddenFilesChange}
         onFileExplorerListingType={this._handleFileExplorerListingType}
         onDialogBoxCloseBtnClick={this._handleDialogBoxCloseBtnClick}
@@ -269,7 +258,7 @@ const mapDispatchToProps = (dispatch, _) =>
           checkIf(deviceType, 'string');
 
           dispatch(
-            selectMtpMode({ value, reportEvent: true }, deviceType, getState)
+            selectMtpMode({ value }, deviceType, getState)
           );
         },
 

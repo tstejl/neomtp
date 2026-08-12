@@ -75,14 +75,12 @@ export default class SettingsDialog extends PureComponent {
       enableAutoUpdateCheck,
       enableBackgroundAutoUpdate,
       enablePrereleaseUpdates,
-      enableAnalytics,
       enableStatusBar,
       showLocalPane,
       showLocalPaneOnLeftSide,
       showDirectoriesFirst,
       mtpMode,
       filesPreprocessingBeforeTransfer,
-      onAnalyticsChange,
       onHiddenFilesChange,
       onFileExplorerListingType,
       onDialogBoxCloseBtnClick,
@@ -573,32 +571,14 @@ export default class SettingsDialog extends PureComponent {
               </SettingsDialogTabContainer>
             )}
 
-            {/* ----- Privacy Tab ----- */}
-
             {tabIndex === this.tabBodyRenderTabIndex(3) && (
               <SettingsDialogTabContainer>
                 <div className={styles.tabContainer}>
                   <FormGroup>
-                    <Typography variant="subtitle2" className={styles.subtitle}>
-                      Enable anonymous usage statistics gathering
-                    </Typography>
-
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enableAnalytics}
-                          onChange={(e) =>
-                            onAnalyticsChange(e, !enableAnalytics)
-                          }
-                        />
-                      }
-                      label={enableAnalytics ? `Enabled` : `Disabled`}
-                    />
                     <Typography variant="caption">
-                      We do not gather any kind of personal information and
-                      neither do we sell your data. We use this information only
-                      to improve the User Experience and squash some bugs.&nbsp;
+                      OpenMTP does not send usage analytics or crash reports.
+                      Local logs remain on this device unless you choose to
+                      attach them to a support request.&nbsp;
                       <a
                         className={styles.a}
                         onClick={() => {

@@ -5,7 +5,6 @@
 import path from 'path';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import merge from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
@@ -247,14 +246,6 @@ export default merge(baseConfig, {
     //   openAnalyzer: process.env.OPEN_ANALYZER === 'true',
     // }),
 
-    new SentryWebpackPlugin({
-      include: 'app/dist',
-      ignore: ['node_modules', 'webpack'],
-      urlPrefix: '~/app/dist',
-      configFile: 'sentry.properties',
-      rewrite: false,
-      release: pkginfo.version,
-    }),
   ],
 
   /**

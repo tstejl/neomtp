@@ -24,28 +24,10 @@ definitions:
       - mac_release
 
   scripts:
-    - &create_sentry_cli_rc_file
-      name: Creating `~/.sentryclirc` file
-      script: |
-        sh -c "cat >> .sentryclirc << 'EOL'
-          [auth]
-          token=$SENTRY_TOKEN_ID
-        EOL"
-
-    - &create_sentry_properties_file
-      script: |
-        sh -c "cat >> sentry.properties << 'EOL'
-          [auth]
-          defaults.url=$SENTRY_URL
-          defaults.org=$SENTRY_ORG
-          defaults.project=$SENTRY_PROJECT
-          auth.token=$SENTRY_TOKEN_ID
-        EOL"
-
     - &install_global_packages
       name: Installing global packages
       script: |
-        npm install -g yarn @sentry/cli node-gyp zx yarn --force
+        npm install -g yarn node-gyp zx --force
 
     - &install_app_packages
       name: Installing app packages
@@ -106,8 +88,6 @@ definitions:
 
   scripts_instance_mac_mini_m1: &scripts_instance_mac_mini_m1
     scripts:
-      - *create_sentry_cli_rc_file
-      - *create_sentry_properties_file
       - *install_global_packages
       - *install_app_packages
       - *build_package
@@ -115,8 +95,6 @@ definitions:
 
   scripts_instance_mac_intel_x64: &scripts_instance_mac_intel_x64
     scripts:
-      - *create_sentry_cli_rc_file
-      - *create_sentry_properties_file
       - *install_global_packages
       - *install_app_packages
       - *build_package

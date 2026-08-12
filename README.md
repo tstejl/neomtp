@@ -94,15 +94,13 @@ Requirements: [Node.js v16](https://nodejs.org/en/download/ 'Install Node.js v16
 ### Clone
 
 ```shell
-$ git clone https://github.com/ganeshrvel/openmtp.git
+$ git clone https://github.com/tstejl/openmtp.git
 
 $ cd openmtp
 
 # install yarn
 npm install -g yarn
 
-# install sentry cli
-npm -g i @sentry/cli
 ```
 
 ```shell
@@ -156,12 +154,6 @@ $ "/path/to/OpenMTP.app/Contents/MacOS/OpenMTP" --remote-debugging-port=6363
     - `APPLE_TEAM_ID`: `<Apple Team ID>`
       - To get Team ID, go to your [Apple Developer Account](https://developer.apple.com/account#MembershipDetailsCard)
       - Then click on "Membership details", and there you will find your Team ID.
-    - `SENTRY_URL`: `https://sentry.io/`
-    - `SENTRY_ORG`: `<Sentry Organization Name>`
-    - `SENTRY_PROJECT`: `<Sentry Project>`
-    - `SENTRY_TOKEN_ID`: `<Sentry Auth Token>`
-      - Find it from here: [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens)
-      - Scopes: `event:admin, event:read, member:read, org:read, project:read, project:releases, team:read`
     - `GITHUB_TOKEN`: `Personal access token`
       - There are two options available:
         1. **Fine-grained personal access tokens**
@@ -224,21 +216,6 @@ security add-generic-password -a "<apple-developer-account-username>" -w <app-sp
 - Log into your [Apple App Store Connect Account](https://appstoreconnect.apple.com/agreements/# 'Apple App Store Connect Account') and accept the presented terms and conditions
 - The statuses shall turn _Active_
 
-**Sentry**
-
-- Auth Tokens Settings page: [https://sentry.io/settings/account/api/auth-tokens/](https://sentry.io/settings/account/api/auth-tokens/)
-
-```shell
-npm install -g @sentry/wizard
-sentry-wizard --integration electron
-
-# Upload Debug Information
-# Everytime the electron.js version is upgraded run:
-node sentry-symbols.js
-
-sentry-cli login
-```
-
 **Packaging**
 Instructions: [https://www.electron.build/code-signing](https://www.electron.build/code-signing 'https://www.electron.build/code-signing')
 
@@ -268,7 +245,6 @@ $ yarn package-all
 
 - _config/env/env.dev.js_ and _config/env/env.prod.js_ contain the PORT number of the app.
 - _config/dev-app-update.yml_ file holds the GitHub repo variables required by _electron-updater_.
-- _config/google-analytics-key.js_ file contains the Google Analytics Tracking ID.
 - _package.json_ **build.publish** object holds the values for publishing the packaged application.
 - _app/constants_ folder contains all the constants required by the app.
 

@@ -11,7 +11,6 @@ import fileExplorerController from '../../data/file-explorer/controllers/FileExp
 import { checkIf } from '../../utils/checkIf';
 import { MTP_ERROR } from '../../enums/mtpError';
 import { DEVICES_DEFAULT_PATH } from '../../constants';
-import { analyticsService } from '../../services/analytics';
 
 const prefix = '@@Home';
 const actionTypesList = [
@@ -271,8 +270,6 @@ function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
             mtpMode,
             onSuccess: ({ _, __, data }) => {
               dispatch(actionSetMtpStatus({ info: data }));
-
-              analyticsService.sendDeviceInfo();
 
               return resolve({
                 error: null,

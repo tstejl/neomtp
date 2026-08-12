@@ -71,7 +71,6 @@ source ~/.zshrc
 
 
 
-- In case of permission error with sentry follow this url: https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally#manually-change-npms-default-directory
 
 
 # Do not follow the instructions below. These are old commands are they are maintained just for the sake of documentation

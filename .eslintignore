@@ -71,7 +71,6 @@ app/dll
 
 
 package-lock.json
-sentry.properties
 
 app/certs/*.pem
 certs/*

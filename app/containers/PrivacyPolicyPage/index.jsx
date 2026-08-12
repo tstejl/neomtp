@@ -117,43 +117,21 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              <u>Usage Data</u>: We may also collect anonymous information on
-              how the Service is accessed and used (&quot;Usage Data&quot;).
-              This Usage Data may include information such as your
-              computer&#39;s Internet Protocol address (e.g. IP address),
-              browser type, browser version, the pages of our Service that you
-              visit, the time and date of your visit, the time spent on those
-              pages, &quot;encrypted&quot; unique device identifiers and other
-              diagnostic data.
+              <u>Usage Data</u>: The application does not send usage analytics
+              or crash reports to remote services.
             </span>
           </p>
           <p>
             <span>
-              <u>LocalStorage Data</u>: We use &quot;LocalStorage&quot; and
-              similar technologies to gather information about the activity on
-              our Service and hold very limited information. LocalStorages are
-              files with small amount of data which may include an anonymous
-              unique identifier.
-            </span>
-          </p>
-          <p>
-            <span>
-              You may always &quot;Opt-Out&quot; of sharing anonymous usage data
-              with us by navigating to &quot;Settings&quot; option and disabling
-              the &quot;Enable anonymous usage statistics gathering&quot;
-              button.
+              <u>LocalStorage Data</u>: The application uses local storage to
+              remember your preferences and settings. These files remain on
+              your device.
             </span>
           </p>
           <p>
             <span>LocalStorage files we used in the app:</span>
           </p>
           <ul>
-            <li>
-              <span>
-                Analytics File. We use Analytics Storage to operate our
-                analytics Service.
-              </span>
-            </li>
             <li>
               <span>
                 Settings File. We use Settings Files to remember your
@@ -174,7 +152,8 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              {APP_NAME} uses the collected data for various purposes:
+              {APP_NAME} uses local data only to provide and maintain the
+              Service:
             </span>
           </p>
           <ul>
@@ -192,15 +171,6 @@ class PrivacyPolicyPage extends Component {
             </li>
             <li>
               <span>To provide customer care and support</span>
-            </li>
-            <li>
-              <span>
-                To provide analysis or valuable information so that we can
-                improve the Service
-              </span>
-            </li>
-            <li>
-              <span>To monitor the usage of the Service</span>
             </li>
             <li>
               <span>To detect, prevent and address technical issues</span>
@@ -292,119 +262,6 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              <strong>Service Providers</strong>
-            </span>
-          </p>
-          <p>
-            <span>
-              We may employ third party companies and individuals to facilitate
-              our Service (&quot;Service Providers&quot;), to provide the
-              Service on our behalf, to perform Service-related services or to
-              assist us in analyzing how our Service is used.
-            </span>
-          </p>
-          <p>
-            <span>
-              These third parties have access to your Personal Data only to
-              perform these tasks on our behalf and are obligated not to
-              disclose or use it for any other purpose.
-            </span>
-          </p>
-          <p>
-            <span>
-              <strong>Analytics</strong>
-            </span>
-          </p>
-          <p>
-            <span>
-              We may use third-party Service Providers to monitor and analyze
-              the use of our Service. These information will be help us squash
-              some bugs and improve the user experience.
-            </span>
-          </p>
-          <p>
-            <span>
-              {`We don't send any of your personal information to these third party services. We send an anonymized, hashed and irreversible token to these services to analyze
-              the use of our Service.`}
-            </span>
-          </p>
-          <p>
-            <span>Google Analytics</span>
-          </p>
-          <p>
-            <span>
-              Google Analytics is a web analytics service offered by Google that
-              tracks and reports website/app traffic. Google uses the data
-              collected to track and monitor the use of our Service. We respect
-              the privacy of our users and we have chosen to &quot;Opt-Out&quot;
-              of sharing the data with other Google products &amp; services. We
-              will never allow Google to remarket or use your data for its
-              advertising, benchmarking and other internal services.
-            </span>
-          </p>
-          <p>
-            <span>
-              For more information visit:&nbsp;
-              <a
-                onClick={(events) => {
-                  openExternalUrl(
-                    'https://policies.google.com/privacy?hl=en',
-                    events
-                  );
-                }}
-              >
-                https://policies.google.com/privacy?hl=en
-              </a>
-            </span>
-          </p>
-          <p>
-            <span>Mixpanel</span>
-          </p>
-          <p>
-            <span>
-              Mixpanel is a web analytics service offered by Mixpanel Inc. that
-              tracks and reports website/app traffic. Mixpanel uses the data
-              collected to track and monitor the use of our Service.
-            </span>
-          </p>
-          <p>
-            <span>
-              For more information visit:&nbsp;
-              <a
-                onClick={(events) => {
-                  openExternalUrl(
-                    'https://mixpanel.com/legal/privacy-policy/',
-                    events
-                  );
-                }}
-              >
-                https://mixpanel.com/legal/privacy-policy/
-              </a>
-            </span>
-          </p>
-          <p>
-            <span>Sentry</span>
-          </p>
-          <p>
-            <span>
-              Sentry is a service that will help us to monitor and fix
-              bugs/crashes in the app.
-            </span>
-          </p>
-          <p>
-            <span>
-              For more information visit:&nbsp;
-              <a
-                onClick={(events) => {
-                  openExternalUrl('https://sentry.io/privacy/', events);
-                }}
-              >
-                https://sentry.io/privacy/
-              </a>
-            </span>
-          </p>
-          <p>
-            <span>
               <strong>Links To Other Sites</strong>
             </span>
           </p>
@@ -460,25 +317,12 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              <strong>Plugins or Add-ons</strong>
-            </span>
-          </p>
-          <p>
-            <span>
-              We have used &quot;google-ga&quot; npm package to facilitate the
-              Google analytics feature inside the app.
-            </span>
-          </p>
-          <p>
-            <span>
               <strong>Crash Reports</strong>
             </span>
           </p>
           <p>
             <span>
-              We have implemented a very powerful diagnostic tool to capture and
-              report the Crash Reports and bug encountered by the application.
-              The Crash Reports are stored inside your device as log files.
+              The application stores diagnostic logs locally when errors occur.
               These log files can be accessed by navigating to &quot;
               {PATHS.profileDir}/logs/&quot; folder. You may choose to send us
               these log files by selecting the &quot;Help&quot; menu &gt;
