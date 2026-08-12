@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 import { replaceBulk, undefinedOrNull } from '../utils/funcs';
 import { log } from '../utils/log';
 import { isGoogleAndroidFileTransferActive } from '../utils/isGoogleAndroidFileTransferActive';

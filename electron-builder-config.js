@@ -62,8 +62,9 @@ module.exports = () => {
     ],
     files: [
       'app/dist/',
-      'app/app.html',
       'app/preload.js',
+      'app/main-*.js',
+      'app/main-*.js.map',
       'app/main.prod.js',
       'app/main.prod.js.map',
       'package.json',

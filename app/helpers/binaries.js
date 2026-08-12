@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import macosVersion from 'macos-version';
 import {
   getPlatform,

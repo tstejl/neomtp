@@ -3,12 +3,12 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron';
 import electronIs from 'electron-is';
 import usbDetect from 'usb-detection';
-import process from 'process';
+import process from 'node:process';
 import MenuBuilder from './menu';
 import { log } from './utils/log';
 import { DEBUG_PROD, ENV_FLAVOR, IS_DEV, IS_PROD } from './constants/env';
 import AppUpdate from './classes/AppUpdate';
-import { PATHS } from './constants/paths';
+import { getRendererUrl, PATHS } from './constants/paths';
 import { settingsStorage } from './helpers/storageHelper';
 import { AUTO_UPDATE_CHECK_FIREUP_DELAY } from './constants';
 import { appEvents } from './utils/eventHandling';
@@ -138,7 +138,7 @@ async function createWindow() {
       backgroundColor: getWindowBackgroundColor(),
     });
 
-    mainWindow?.loadURL(`${PATHS.loadUrlPath}`);
+    mainWindow?.loadURL(getRendererUrl());
 
     mainWindow?.webContents?.on('did-finish-load', () => {
       if (!mainWindow) {

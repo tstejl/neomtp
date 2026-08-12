@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import path from 'path';
+import path from 'node:path';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';

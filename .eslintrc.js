@@ -14,9 +14,10 @@ module.exports = {
     react: {
       version: '16.7',
     },
+    'import/core-modules': ['@electron/notarize', '@vitejs/plugin-react'],
     'import/resolver': {
-      webpack: {
-        config: 'webpack/config.eslint.js',
+      node: {
+        extensions: ['.js', '.jsx', '.json'],
       },
     },
   },

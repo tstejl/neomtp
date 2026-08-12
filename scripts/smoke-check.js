@@ -11,24 +11,23 @@ const requiredFiles = [
   'app/app.html',
   'app/index.js',
   'app/main.dev.js',
-  'app/preload.js',
+  'app/preload-src.js',
   '.bunfig.toml',
   'bun.lock',
   'electron-builder-config.js',
-  'webpack/config.main.prod.babel.js',
-  'webpack/config.renderer.prod.babel.js',
+  'electron.vite.config.js',
 ];
 
 const missingFiles = requiredFiles.filter(
   (file) => !fs.existsSync(path.join(root, file))
 );
-const requiredScripts = ['build', 'build-main', 'build-renderer', 'test:smoke'];
+const requiredScripts = ['build', 'build-no-verify', 'dev', 'test:smoke'];
 const missingScripts = requiredScripts.filter(
   (script) => !packageJson.scripts[script]
 );
 const packagedFiles = new Set((builderConfig.files || []).map(String));
 const missingPackagedFiles = [
-  'app/app.html',
+  'app/dist/',
   'app/preload.js',
   'app/main.prod.js',
 ].filter((file) => !packagedFiles.has(file));
@@ -36,7 +35,7 @@ const secureElectronFiles = [
   'app/main.dev.js',
   'app/classes/AppUpdate.js',
   'app/helpers/createWindows.js',
-  'app/preload.js',
+  'app/preload-src.js',
   'app/services/ipc-events/IpcEventHandler.js',
 ];
 const secureElectronSource = secureElectronFiles
@@ -91,9 +90,9 @@ if (!appHtml.includes('id="root"')) {
   failures.push('app/app.html does not contain the renderer root element');
 }
 
-if (!appHtml.includes('renderer.prod.js')) {
+if (!appHtml.includes('type="module"') || !appHtml.includes('./index.js')) {
   failures.push(
-    'app/app.html does not reference the production renderer bundle'
+    'app/app.html does not reference the Vite renderer entry point'
   );
 }
 

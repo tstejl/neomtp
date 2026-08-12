@@ -1,7 +1,7 @@
 /* eslint no-case-declarations: off */
 
 import React, { Component, Fragment } from 'react';
-import * as path from 'path';
+import * as path from 'node:path';
 import classnames from 'classnames';
 import Typography from '@material-ui/core/Typography';
 import {

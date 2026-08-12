@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { PATHS } from '../constants/paths';
+import { getRendererUrl, PATHS } from '../constants/paths';
 import { log } from '../utils/log';
 import { loadProfileErrorHtml } from '../templates/loadProfileError';
 import { APP_TITLE } from '../constants/meta';
@@ -132,7 +132,7 @@ export const reportBugsWindow = (focus = true) => {
     }
 
     _reportBugsWindow = windowObj;
-    _reportBugsWindow.loadURL(`${PATHS.loadUrlPath}#reportBugsPage`);
+    _reportBugsWindow.loadURL(`${getRendererUrl()}#reportBugsPage`);
     showWindowAfterLoad(_reportBugsWindow, focus);
 
     _reportBugsWindow.onerror = (error) => {
@@ -196,7 +196,7 @@ export const privacyPolicyWindow = (focus = true) => {
     }
 
     _privacyPolicyWindow = windowObj;
-    _privacyPolicyWindow.loadURL(`${PATHS.loadUrlPath}#privacyPolicyPage`);
+    _privacyPolicyWindow.loadURL(`${getRendererUrl()}#privacyPolicyPage`);
     showWindowAfterLoad(_privacyPolicyWindow, focus);
 
     _privacyPolicyWindow.onerror = (error) => {
@@ -244,7 +244,7 @@ export const appUpdateAvailableWindow = () => {
     }
 
     _appUpdateAvailableWindow.loadURL(
-      `${PATHS.loadUrlPath}#appUpdatePage/updateAvailable`
+      `${getRendererUrl()}#appUpdatePage/updateAvailable`
     );
     showWindowAfterLoad(_appUpdateAvailableWindow, true);
 
@@ -306,7 +306,7 @@ export const appFeaturesWindow = (focus = true) => {
     }
 
     _appFeaturesWindow = windowObj;
-    _appFeaturesWindow.loadURL(`${PATHS.loadUrlPath}#appFeaturesPage`);
+    _appFeaturesWindow.loadURL(`${getRendererUrl()}#appFeaturesPage`);
     showWindowAfterLoad(_appFeaturesWindow, focus);
 
     _appFeaturesWindow.onerror = (error) => {
@@ -371,7 +371,7 @@ export const keyboardShortcutsWindow = (focus = true) => {
 
     _keyboardShortcutsWindow = windowObj;
     _keyboardShortcutsWindow.loadURL(
-      `${PATHS.loadUrlPath}#keyboardShortcutsPage`
+      `${getRendererUrl()}#keyboardShortcutsPage`
     );
     showWindowAfterLoad(_keyboardShortcutsWindow, focus);
 
@@ -436,7 +436,7 @@ export const faqsWindow = (focus = true) => {
     }
 
     _faqsWindow = windowObj;
-    _faqsWindow.loadURL(`${PATHS.loadUrlPath}#faqsPage`);
+    _faqsWindow.loadURL(`${getRendererUrl()}#faqsPage`);
     showWindowAfterLoad(_faqsWindow, focus);
 
     _faqsWindow.onerror = (error) => {
@@ -501,7 +501,7 @@ export const helpPhoneNotConnectingWindow = (focus = true) => {
 
     _helpPhoneIsNotConnectingWindow = windowObj;
     _helpPhoneIsNotConnectingWindow.loadURL(
-      `${PATHS.loadUrlPath}#helpPhoneNotConnectingPage`
+      `${getRendererUrl()}#helpPhoneNotConnectingPage`
     );
     showWindowAfterLoad(_helpPhoneIsNotConnectingWindow, focus);
 

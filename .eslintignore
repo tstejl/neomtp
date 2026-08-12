@@ -88,3 +88,6 @@ tmp/*
 *.js.map
 *.js.LICENSE.txt
 *.prod.js.LICENSE.txt
+app/main-*.js
+app/preload.js
+app/preload-*.js

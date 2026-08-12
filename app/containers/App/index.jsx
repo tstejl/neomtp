@@ -1,4 +1,3 @@
-import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
@@ -182,4 +181,4 @@ const mapStateToProps = (state) => {
 export default withReducer(
   'App',
   reducers
-)(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(hot(App))));
+)(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(App)));

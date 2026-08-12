@@ -3,9 +3,9 @@
  * Note: Don't import log helper file from utils here
  */
 
-import { join, resolve } from 'path';
-import { homedir as homedirOs } from 'os';
-import url from 'url';
+import { join, resolve } from 'node:path';
+import { homedir as homedirOs } from 'node:os';
+import url from 'node:url';
 import { rootPath as root } from 'electron-root-path';
 import { isPackaged } from '../utils/isPackaged';
 import { IS_DEV } from './env';
@@ -14,6 +14,7 @@ import { APP_NAME } from './meta';
 import { getAppDataPath } from '../utils/files';
 
 const appPath = join(root, `./app`);
+const rendererPath = join(appPath, `./dist/app.html`);
 const configDir = join(root, `./config`);
 const homeDir = homedirOs();
 const profileDir = getAppDataPath();
@@ -55,8 +56,9 @@ export const PATHS = {
   loadUrlPath: url.format({
     protocol: 'file',
     slashes: true,
-    pathname: !isPackaged
-      ? join(appPath, './app.html')
-      : join(__dirname, './app.html'),
+    pathname: !isPackaged ? rendererPath : join(__dirname, './dist/app.html'),
   }),
 };
+
+export const getRendererUrl = () =>
+  process.env.ELECTRON_RENDERER_URL || PATHS.loadUrlPath;

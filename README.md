@@ -233,7 +233,8 @@ $ bun run package-all
 
 ### Technical Features
 
-- Built using Electron v17 and React v18
+- Built using Electron v43 and React v17
+- The desktop application uses electron-vite for the main, preload, and renderer builds
 - Loadables, Dynamic Reducer Injection, Selectors for code splitting and performance optimization
 - Hot module reload (HMR) for instant feedback
 - Inbuilt error logging and profile/settings management
@@ -279,8 +280,7 @@ $ set UPGRADE_EXTENSIONS=1 && bun run dev
 - On macOS <= 10.14.x (mojave) the `bun install` will throw a npm-rebuild error
 - To "test" or "debug" the app on macOS mojave:
   - remove the `node-mac-permissions` dependency from `package.json`
-  - Add the ignorePlugin line to `default.plugins` in the file `webpack/config.base.js`
-    - `new webpack.IgnorePlugin({ resourceRegExp: /^(node-mac-permissions)$/u }),`
+  - run `bun run build-no-verify`
   - WARNING: **DO NOT commit** these changes to the upstream!!
 - The `NODE_MAC_PERMISSIONS_MIN_OS` constant defines the minimum os version that is required to show the macos usage access permission popup
 - For distribution make sure to build the app on a machine which is at least macOS 11 (Big Sur)

@@ -1,9 +1,7 @@
-'use strict';
+import path from 'node:path';
+import extensions from './index.json';
 
-var path = require('path');
-
-var extensions = require('./index.json');
-var unknown = extensions[''];
+const unknown = extensions[''];
 
 function isString(value) {
   return (typeof value === 'string') ||
@@ -28,7 +26,8 @@ function getIcon(filename, type) {
   return (extensions[ext] || unknown) + type;
 }
 
-module.exports.getIcon = getIcon;
-
-module.exports.unknown = unknown;
-module.exports.extensions = extensions;
+export default {
+  getIcon,
+  unknown,
+  extensions,
+};

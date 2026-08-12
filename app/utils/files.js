@@ -1,5 +1,5 @@
-import { join, parse } from 'path';
-import { homedir as homedirOs } from 'os';
+import { join, parse } from 'node:path';
+import { homedir as homedirOs } from 'node:os';
 import { APP_BUNDLE_ID } from '../constants/meta';
 
 const homeDir = homedirOs();
