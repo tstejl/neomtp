@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
+	"kalam/mtp"
+	"kalam/mtpx"
 	"os"
 )
 

@@ -16,8 +16,8 @@ package send_to_js
 */
 import "C"
 import (
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
+	"kalam/mtp"
+	"kalam/mtpx"
 	"os"
 	"time"
 )

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
+	"kalam/mtp"
+	"kalam/mtpx"
 	"log"
 )
 

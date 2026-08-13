@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/ganeshrvel/go-mtpx"
 	jsoniter "github.com/json-iterator/go"
+	"kalam/mtpx"
 	"kalam/send_to_js"
 	"log"
 	"os"
