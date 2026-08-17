@@ -12,12 +12,14 @@ package send_to_js
 		if(cb != 0 && cb != NULL){
 			cb(json);
 		}
+
+		free(json);
 	}
 */
 import "C"
 import (
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
+	"kalam/mtp"
+	"kalam/mtpx"
 	"os"
 	"time"
 )
