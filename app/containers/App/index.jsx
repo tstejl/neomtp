@@ -22,7 +22,7 @@ import {
   makeMtpMode,
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
-import { getOpenMtpApi } from '../../helpers/electronApi';
+import { getNeoMtpApi } from '../../helpers/electronApi';
 import { log } from '../../utils/rendererLog';
 import { rendererSettings } from '../../helpers/rendererSettings';
 import { makeMtpDevice, makeMtpStoragesList } from '../HomePage/selectors';
@@ -48,12 +48,9 @@ class App extends Component {
 
   componentDidMount() {
     try {
-      getOpenMtpApi().ipc.on(
-        'nativeThemeUpdated',
-        this.nativeThemeUpdatedEvent
-      );
+      getNeoMtpApi().ipc.on('nativeThemeUpdated', this.nativeThemeUpdatedEvent);
 
-      getOpenMtpApi().app.cleanRotationFiles();
+      getNeoMtpApi().app.cleanRotationFiles();
     } catch (e) {
       log.error(e, `App -> componentDidMount`);
     }
@@ -61,7 +58,7 @@ class App extends Component {
 
   componentWillUnmount() {
     this.deregisterAccelerators();
-    getOpenMtpApi().ipc.removeListener(
+    getNeoMtpApi().ipc.removeListener(
       'nativeThemeUpdated',
       this.nativeThemeUpdatedEvent
     );

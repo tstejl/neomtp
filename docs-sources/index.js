@@ -14,9 +14,7 @@ class Docs {
     this.selectors = {
       spinner: `.spinner`,
       appScreenshotFileExplorerImageWrapper: `#app-screenshot-file-explorer-wrapper`,
-      appScreenshotFileTransferImageWrapper: `#app-screenshot-file-transfer-wrapper`,
       appScreenshotFileExplorerId: `app-screenshot-file-explorer`,
-      appScreenshotFileTransferId: `app-screenshot-file-transfer`,
       downloadBtnGitHubArm64: `#download-btn-github-arm64`,
       downloadBtnGitHubX64: `#download-btn-github-x64`,
       navigateToGitHub: `#navigate-to-github`,
@@ -26,9 +24,6 @@ class Docs {
     this.$el = {
       appScreenshotFileExplorerImageWrapper: document.querySelector(
         this.selectors.appScreenshotFileExplorerImageWrapper
-      ),
-      appScreenshotFileTransferImageWrapper: document.querySelector(
-        this.selectors.appScreenshotFileTransferImageWrapper
       ),
       downloadBtnGitHubArm64: document.querySelector(
         this.selectors.downloadBtnGitHubArm64
@@ -48,12 +43,6 @@ class Docs {
         imgSrc: 'file-explorer.png',
         parentSelector: this.$el.appScreenshotFileExplorerImageWrapper,
         id: this.selectors.appScreenshotFileExplorerId,
-        loader: this.selectors.spinner,
-      },
-      fileTransfer: {
-        imgSrc: 'file-transfer.png',
-        parentSelector: this.$el.appScreenshotFileTransferImageWrapper,
-        id: this.selectors.appScreenshotFileTransferId,
         loader: this.selectors.spinner,
       },
     };
@@ -89,15 +78,15 @@ class Docs {
 
   _generateDownloadLatestGitHubReleaseUrl = (data, status) => {
     const downloadableAssets = {
-      latest: data ? data.name : `OpenMTP`,
+      latest: data && data.name ? data.name : `NeoMTP`,
       downloadUrls: {
         [`mac-arm64`]: {
           desc: `Apple Silicon`,
-          url: `https://github.com/ganeshrvel/openmtp/releases/`,
+          url: `https://github.com/tstejl/neomtp/releases/`,
         },
         [`mac-x64`]: {
           desc: `Intel Silicon`,
-          url: `https://github.com/ganeshrvel/openmtp/releases/`,
+          url: `https://github.com/tstejl/neomtp/releases/`,
         },
       },
     };
@@ -150,7 +139,7 @@ class Docs {
     return null;
   };
 
-  // used for handling the download requests originating from OpenMTP's README file
+  // Used for handling download requests originating from NeoMTP's README.
   _checkDownloadRequestUrl = () => {
     const { downloadApp, release, platform, arch } = urls.get({});
 

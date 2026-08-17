@@ -1,12 +1,12 @@
 {
-  "name": "openmtp",
-  "productName": "OpenMTP",
+  "name": "neomtp",
+  "productName": "NeoMTP",
   "version": "3.2.25",
   "packageManager": "bun@1.3.11",
   "engines": {
     "node": ">=22.12.0"
   },
-  "description": "OpenMTP | Android File Transfer for macOS",
+  "description": "NeoMTP | Android File Transfer for macOS",
   "scripts": {
     "build": "bun run lint && electron-vite build",
     "build-no-verify": "electron-vite build",
@@ -46,25 +46,24 @@
   "main": "./app/main.prod.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tstejl/openmtp.git"
+    "url": "git+https://github.com/tstejl/neomtp.git"
   },
   "author": {
-    "name": "Ganesh Rathinavel",
-    "email": "ganeshrvel@outlook.com",
-    "url": "https://www.linkedin.com/in/ganeshrvel/"
+    "name": "NeoMTP contributors",
+    "url": "https://github.com/tstejl/neomtp"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tstejl/openmtp/issues/"
+    "url": "https://github.com/tstejl/neomtp/issues/"
   },
   "keywords": [
-    "openmtp",
+    "neomtp",
     "android",
     "file-transfer",
     "macOS",
     "mtp"
   ],
-  "homepage": "https://github.com/tstejl/openmtp",
+  "homepage": "https://github.com/tstejl/neomtp",
   "browserslist": {
     "production": [
       "last 2 Chrome versions"
@@ -187,7 +186,6 @@
     "pkg-dir": "^6.0.1",
     "postcss": "8.4.31",
     "prettier": "^2.7.1",
-    "prettier-stylelint": "https://github.com/ganeshrvel/prettier-stylelint.git",
     "redux-logger": "^3.0.6",
     "regenerator-runtime": "^0.13.10",
     "replace": "^1.2.1",

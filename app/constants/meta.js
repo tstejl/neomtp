@@ -5,26 +5,14 @@
 
 import { pkginfo } from '../utils/pkginfo';
 
-const {
-  productName,
-  description,
-  name,
-  author,
-  version,
-  repository,
-  homepage,
-  bugs,
-} = pkginfo;
+const { productName, description, name, version, repository, homepage, bugs } =
+  pkginfo;
 
-export const APP_BUNDLE_ID = 'io.ganeshrvel.openmtp';
+export const APP_BUNDLE_ID = 'io.github.tstejl.neomtp';
 
 export const APP_NAME = `${productName}`;
 
 export const APP_VERSION = `${version}`;
-
-export const AUTHOR_EMAIL = author?.email ?? null;
-
-export const AUTHOR_NAME = author?.name ?? null;
 
 export const APP_DESC = `${description}`;
 

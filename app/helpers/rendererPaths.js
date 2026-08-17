@@ -1,6 +1,6 @@
-import { getOpenMtpApi } from './electronApi';
+import { getNeoMtpApi } from './electronApi';
 
-export const rendererPaths = getOpenMtpApi().app.getPaths();
+export const rendererPaths = getNeoMtpApi().app.getPaths();
 
 export const DEVICES_DEFAULT_PATH = {
   mtp: '/',

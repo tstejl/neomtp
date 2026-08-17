@@ -1,4 +1,4 @@
-import { getOpenMtpApi } from '../helpers/electronApi';
+import { getNeoMtpApi } from '../helpers/electronApi';
 
 const toLogValue = (value) => {
   if (value instanceof Error) {
@@ -25,7 +25,7 @@ const writeLog = ({
   isError,
 }) => {
   try {
-    getOpenMtpApi().log.write({
+    getNeoMtpApi().log.write({
       message: toLogValue(message),
       title,
       customError: toLogValue(customError),

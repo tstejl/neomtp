@@ -29,9 +29,9 @@ import KeyboadShortcuts from '../../KeyboardShortcutsPage/components/KeyboadShor
 import Features from '../../Onboarding/components/Features';
 import { helpPhoneNotConnecting } from '../../../templates/fileExplorer';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
-import { APP_NAME } from '../../../constants/meta';
+import { APP_GITHUB_ISSUES_URL, APP_NAME } from '../../../constants/meta';
 import { openExternalUrl } from '../../../utils/url';
-import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { getNeoMtpApi } from '../../../helpers/electronApi';
 
 class FileExplorerTableBodyEmptyRender extends PureComponent {
   constructor(props) {
@@ -58,7 +58,7 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
   };
 
   _handleHelpPhoneNotRecognizedBtn = () => {
-    getOpenMtpApi().ipc.send(IpcEvents.OPEN_HELP_PHONE_NOT_CONNECTING_WINDOW);
+    getNeoMtpApi().ipc.send(IpcEvents.OPEN_HELP_PHONE_NOT_CONNECTING_WINDOW);
   };
 
   render() {
@@ -144,7 +144,7 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
                               <a
                                 onClick={(events) => {
                                   openExternalUrl(
-                                    'https://github.com/ganeshrvel/openmtp/issues/276',
+                                    APP_GITHUB_ISSUES_URL,
                                     events
                                   );
                                 }}

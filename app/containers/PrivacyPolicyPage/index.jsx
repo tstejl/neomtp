@@ -6,10 +6,9 @@ import { bindActionCreators } from 'redux';
 import { Helmet } from 'react-helmet';
 import {
   APP_GITHUB_URL,
+  APP_GITHUB_ISSUES_URL,
   APP_NAME,
   APP_TITLE,
-  AUTHOR_EMAIL,
-  AUTHOR_NAME,
 } from '../../constants/meta';
 import { openExternalUrl } from '../../utils/url';
 import { resetOverFlowY } from '../../utils/styleResets';
@@ -49,9 +48,7 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              {AUTHOR_NAME} built the &quot;{APP_NAME}&quot; app as an Open
-              Source app. This SERVICE is provided by {AUTHOR_NAME} at no cost
-              and is intended for use as is.
+              NeoMTP contributors provide this open-source application as is.
             </span>
           </p>
           <p>
@@ -184,8 +181,8 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              You can choose to send diagnostic logs by email with a problem
-              report.
+              You can choose to attach diagnostic logs to a problem report on
+              GitHub.
             </span>
           </p>
           <p>
@@ -314,7 +311,9 @@ class PrivacyPolicyPage extends Component {
           <p>
             <span>
               Open the &quot;Help&quot; menu, then select &quot;Report
-              Bugs&quot;. Select the &quot;EMAIL ERROR LOGS&quot; button.
+              Bugs&quot;. Select &quot;GENERATE ERROR LOGS&quot;. NeoMTP creates
+              a local archive, reveals it in Finder, and opens the issue
+              tracker.
             </span>
           </p>
           <p>
@@ -364,13 +363,13 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              By email:&nbsp;
+              In the NeoMTP issue tracker:&nbsp;
               <a
                 onClick={(events) => {
-                  openExternalUrl(`mailto:${AUTHOR_EMAIL}`, events);
+                  openExternalUrl(APP_GITHUB_ISSUES_URL, events);
                 }}
               >
-                {AUTHOR_EMAIL}
+                {APP_GITHUB_ISSUES_URL}
               </a>
             </span>
           </p>

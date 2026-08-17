@@ -7,9 +7,9 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const { app } = require('electron');
 
-if (process.env.OPENMTP_DEVICE_E2E !== 'true') {
+if (process.env.NEOMTP_DEVICE_E2E !== 'true') {
   throw new Error(
-    'Refusing to run the device UI E2E without OPENMTP_DEVICE_E2E=true'
+    'Refusing to run the device UI E2E without NEOMTP_DEVICE_E2E=true'
   );
 }
 
@@ -19,19 +19,19 @@ if (process.platform !== 'darwin') {
 
 const root = path.resolve(__dirname, '..');
 const temporaryRoot = fs.mkdtempSync(
-  path.join(os.tmpdir(), 'openmtp-device-ui-e2e-')
+  path.join(os.tmpdir(), 'neomtp-device-ui-e2e-')
 );
 const temporaryHome = path.join(temporaryRoot, 'home');
 const fixtureRoot = path.join(temporaryHome, 'fixtures');
 const downloadRoot = path.join(temporaryHome, 'downloads');
 const nativeOutput = path.join(temporaryRoot, 'native');
 const nativeLibrary = path.join(nativeOutput, 'kalam.dylib');
-const screenshotPath = path.join(os.tmpdir(), 'openmtp-device-ui-e2e.png');
+const screenshotPath = path.join(os.tmpdir(), 'neomtp-device-ui-e2e.png');
 const failureScreenshotPath = path.join(
   os.tmpdir(),
-  'openmtp-device-ui-e2e-failure.png'
+  'neomtp-device-ui-e2e-failure.png'
 );
-const remoteName = `OpenMTP-UI-E2E-${crypto.randomUUID()}`;
+const remoteName = `NeoMTP-UI-E2E-${crypto.randomUUID()}`;
 const remoteRoot = `/${remoteName}`;
 const onboardingSource = fs.readFileSync(
   path.join(root, 'app/constants/onboarding.js'),
@@ -61,7 +61,7 @@ const fixtures = {
   single: writeFixture('single.bin', Buffer.alloc(3 * 1024 * 1024 + 17, 0x5a)),
   multiA: writeFixture(
     'multi-a.txt',
-    'OpenMTP click-driven multiple-file E2E\n'.repeat(30000)
+    'NeoMTP click-driven multiple-file E2E\n'.repeat(30000)
   ),
   multiB: writeFixture('multi-b.bin', Buffer.alloc(6 * 1024 * 1024 + 31, 0xa5)),
 };
@@ -70,7 +70,7 @@ const settingsPath = path.join(
   temporaryHome,
   'Library',
   'Application Support',
-  'io.ganeshrvel.openmtp',
+  'io.github.tstejl.neomtp',
   'settings.json'
 );
 
@@ -119,7 +119,7 @@ execFileSync(
 );
 
 process.env.HOME = temporaryHome;
-process.env.OPENMTP_KALAM_LIB_PATH = nativeLibrary;
+process.env.NEOMTP_KALAM_LIB_PATH = nativeLibrary;
 
 app.setPath('userData', path.join(temporaryRoot, 'chromium'));
 app.disableHardwareAcceleration();
@@ -458,7 +458,7 @@ const installDomDriver = () => {
     };
   };
 
-  window.__openmtpUiE2e = {
+  window.__neomtpUiE2e = {
     rect,
     resetTransferObservations() {
       state.progressTitles = [];
@@ -508,7 +508,7 @@ const execute = (expression) =>
 
 const domCall = (method, ...args) =>
   execute(
-    `window.__openmtpUiE2e.${method}(${args
+    `window.__neomtpUiE2e.${method}(${args
       .map((argument) => JSON.stringify(argument))
       .join(',')})`
   );
@@ -765,7 +765,7 @@ const captureScreenshot = async (targetPath) => {
 
 const fallbackCleanup = async () =>
   execute(`(async () => {
-    const api = window.openmtp;
+    const api = window.neomtp;
     const errors = [];
     let storagesResponse = await api.fileExplorer.listStorages({ deviceType: 'mtp' });
 
@@ -830,7 +830,7 @@ const runUiWorkflow = async () => {
   mainWindow.webContents.setIgnoreMenuShortcuts(true);
   await waitFor('preload and React root', () =>
     execute(
-      `Boolean(window.openmtp && document.querySelector('#root')?.children.length)`
+      `Boolean(window.neomtp && document.querySelector('#root')?.children.length)`
     )
   );
 
@@ -1029,7 +1029,7 @@ const runUiWorkflow = async () => {
   );
 
   const remoteDeleteVerification = await execute(`(async () => {
-    const api = window.openmtp;
+    const api = window.neomtp;
     const storages = await api.fileExplorer.listStorages({ deviceType: 'mtp' });
 
     if (storages?.error || storages?.stderr) {

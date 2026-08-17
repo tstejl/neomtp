@@ -1,21 +1,8 @@
 /* eslint no-case-declarations: off */
 
 import React, { Component, Fragment } from 'react';
-import classnames from 'classnames';
-import Typography from '@material-ui/core/Typography';
-import {
-  faGithub,
-  faTwitter,
-  faFacebook,
-  faReddit,
-} from '@fortawesome/free-brands-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import { styles } from '../styles/FileExplorer';
 import {
   TextFieldEdit as TextFieldEditDialog,
   ProgressBar as ProgressBarDialog,
@@ -62,9 +49,7 @@ import {
   makeShowDirectoriesFirst,
 } from '../../Settings/selectors';
 import {
-  BUY_ME_A_COFFEE_URL,
   DEVICES_LABEL,
-  SUPPORT_PAYPAL_URL,
   USB_HOTPLUG_MAX_ATTEMPTS,
   USB_HOTPLUG_MAX_ATTEMPTS_TIMEOUT,
 } from '../../../constants';
@@ -83,13 +68,6 @@ import {
 import { throwAlert } from '../../Alerts/actions';
 import { imgsrc } from '../../../utils/imgsrc';
 import FileExplorerBodyRender from './FileExplorerBodyRender';
-import { openExternalUrl } from '../../../utils/url';
-import { APP_GITHUB_URL, APP_NAME } from '../../../constants/meta';
-import {
-  fbShareUrl,
-  redditShareUrl,
-  twitterShareUrl,
-} from '../../../templates/socialMediaShareBtns';
 import { baseName, pathInfo, pathUp, sanitizePath } from '../../../utils/files';
 import {
   DEVICE_TYPE,
@@ -100,67 +78,11 @@ import {
 } from '../../../enums';
 import { log } from '../../../utils/rendererLog';
 import { checkIf } from '../../../utils/checkIf';
-import {
-  buyMeACoffeeText,
-  supportUsingPayPal,
-} from '../../../templates/fileExplorer';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
-import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { getNeoMtpApi } from '../../../helpers/electronApi';
 
 let allowFileDropFlag = false;
 let multipleSelectDirection = null;
-
-const supportBtnsList = [
-  {
-    enabled: true,
-    label: buyMeACoffeeText,
-    url: BUY_ME_A_COFFEE_URL,
-    image: 'FileExplorer/buymeacoffee-button.png',
-    icon: null,
-    invert: false,
-    name: 'buymeacoffee',
-  },
-  {
-    enabled: true,
-    label: supportUsingPayPal,
-    image: 'FileExplorer/paypal-logo.png',
-    icon: null,
-    url: SUPPORT_PAYPAL_URL,
-    invert: false,
-    name: 'paypal',
-  },
-];
-
-const socialMediaShareBtnsList = [
-  {
-    enabled: true,
-    label: 'Find us on GitHub',
-    icon: faGithub,
-    url: APP_GITHUB_URL,
-    invert: false,
-  },
-  {
-    enabled: true,
-    label: 'Share it on Twitter',
-    icon: faTwitter,
-    url: twitterShareUrl,
-    invert: false,
-  },
-  {
-    enabled: true,
-    label: 'Share it on Facebook',
-    icon: faFacebook,
-    url: fbShareUrl,
-    invert: false,
-  },
-  {
-    enabled: true,
-    label: 'Share it on Reddit',
-    icon: faReddit,
-    url: redditShareUrl,
-    invert: false,
-  },
-];
 
 class FileExplorer extends Component {
   constructor(props) {
@@ -255,15 +177,15 @@ class FileExplorer extends Component {
 
     this.deregisterAccelerators();
 
-    getOpenMtpApi().ipc.removeListener('isFileTransferActiveSeek', () => {});
-    getOpenMtpApi().ipc.removeListener('isFileTransferActiveReply', () => {});
+    getNeoMtpApi().ipc.removeListener('isFileTransferActiveSeek', () => {});
+    getNeoMtpApi().ipc.removeListener('isFileTransferActiveReply', () => {});
 
     if (deviceType === DEVICE_TYPE.mtp) {
-      getOpenMtpApi().ipc.removeListener(
+      getNeoMtpApi().ipc.removeListener(
         IpcEvents.REPORT_BUGS_DISPOSE_MTP,
         this._reportBugsDisposeMtpEvent
       );
-      getOpenMtpApi().ipc.removeListener(
+      getNeoMtpApi().ipc.removeListener(
         IpcEvents.USB_HOTPLUG,
         this._handleUsbHotplugEvent
       );
@@ -303,7 +225,7 @@ class FileExplorer extends Component {
      */
 
     if (deviceType === DEVICE_TYPE.local) {
-      getOpenMtpApi().ipc.on(
+      getNeoMtpApi().ipc.on(
         'isFileTransferActiveSeek',
         (event, { ...args }) => {
           const { check: checkIsFileTransferActiveSeek } = args;
@@ -315,7 +237,7 @@ class FileExplorer extends Component {
           const { fileTransferProgess } = this.props;
           const { toggle: isActiveFileTransferProgess } = fileTransferProgess;
 
-          getOpenMtpApi().ipc.send('isFileTransferActiveReply', {
+          getNeoMtpApi().ipc.send('isFileTransferActiveReply', {
             isActive: isActiveFileTransferProgess,
           });
         }
@@ -327,7 +249,7 @@ class FileExplorer extends Component {
     const { deviceType } = this.props;
 
     if (deviceType === DEVICE_TYPE.mtp) {
-      getOpenMtpApi().ipc.on(
+      getNeoMtpApi().ipc.on(
         IpcEvents.REPORT_BUGS_DISPOSE_MTP,
         this._reportBugsDisposeMtpEvent
       );
@@ -338,28 +260,25 @@ class FileExplorer extends Component {
     const { deviceType } = this.props;
 
     if (deviceType === DEVICE_TYPE.mtp) {
-      getOpenMtpApi().ipc.on(
-        IpcEvents.USB_HOTPLUG,
-        this._handleUsbHotplugEvent
-      );
+      getNeoMtpApi().ipc.on(IpcEvents.USB_HOTPLUG, this._handleUsbHotplugEvent);
     }
   };
 
   _reportBugsDisposeMtpEvent = async (_, { logFileZippedPath }) => {
     // dispose the mtp before generating the report
-    await getOpenMtpApi().fileExplorer.dispose({ deviceType: DEVICE_TYPE.mtp });
+    await getNeoMtpApi().fileExplorer.dispose({ deviceType: DEVICE_TYPE.mtp });
 
-    await getOpenMtpApi().fileExplorer.fetchDebugReport({
+    await getNeoMtpApi().fileExplorer.fetchDebugReport({
       deviceType: DEVICE_TYPE.mtp,
     });
 
-    const { error } = await getOpenMtpApi().fileExplorer.deleteFiles({
+    const { error } = await getNeoMtpApi().fileExplorer.deleteFiles({
       deviceType: DEVICE_TYPE.local,
       fileList: [logFileZippedPath],
       storageId: null,
     });
 
-    getOpenMtpApi().ipc.send(IpcEvents.REPORT_BUGS_DISPOSE_MTP_REPLY, {
+    getNeoMtpApi().ipc.send(IpcEvents.REPORT_BUGS_DISPOSE_MTP_REPLY, {
       error,
     });
   };
@@ -688,14 +607,14 @@ class FileExplorer extends Component {
           break;
         }
 
-        getOpenMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
+        getNeoMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
           type,
           deviceType: _focussedFileExplorerDeviceType,
         });
         break;
 
       case 'refresh':
-        getOpenMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
+        getNeoMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
           type,
           deviceType: _focussedFileExplorerDeviceType,
         });
@@ -706,7 +625,7 @@ class FileExplorer extends Component {
           break;
         }
 
-        getOpenMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
+        getNeoMtpApi().ipc.send('fileExplorerToolbarActionCommunication', {
           type,
           deviceType: _focussedFileExplorerDeviceType,
         });
@@ -945,7 +864,7 @@ class FileExplorer extends Component {
   };
 
   fireElectronMenu(menuItems) {
-    const { menu } = getOpenMtpApi();
+    const { menu } = getNeoMtpApi();
 
     return menu
       .popup(
@@ -1257,7 +1176,7 @@ class FileExplorer extends Component {
     // if the new filename and the existing filename are just case different then skip the edit dialog
     if (sanitizedNewFilename.toLowerCase() !== filename.toLowerCase()) {
       if (
-        await getOpenMtpApi().fileExplorer.filesExist({
+        await getNeoMtpApi().fileExplorer.filesExist({
           deviceType,
           fileList: [newFilepath],
           storageId,
@@ -1323,7 +1242,7 @@ class FileExplorer extends Component {
       }
 
       if (
-        !(await getOpenMtpApi().fileExplorer.filesExist({
+        !(await getNeoMtpApi().fileExplorer.filesExist({
           deviceType: DEVICE_TYPE.local,
           fileList: [filePath],
           storageId: null,
@@ -1332,7 +1251,7 @@ class FileExplorer extends Component {
         return;
       }
 
-      getOpenMtpApi().shell.showItemInFolder(filePath);
+      getNeoMtpApi().shell.showItemInFolder(filePath);
     } catch (e) {
       log.error(e, 'FileExplorer._handleShowInEnclosingFolder');
     }
@@ -1530,7 +1449,7 @@ class FileExplorer extends Component {
     const newFolderPath = sanitizePath(`${data.path}/${newFolderName}`);
 
     if (
-      await getOpenMtpApi().fileExplorer.filesExist({
+      await getNeoMtpApi().fileExplorer.filesExist({
         deviceType,
         fileList: [newFolderPath],
         storageId,
@@ -1594,7 +1513,7 @@ class FileExplorer extends Component {
     }
 
     if (
-      await getOpenMtpApi().fileExplorer.filesExist({
+      await getNeoMtpApi().fileExplorer.filesExist({
         deviceType,
         fileList: queue,
         storageId,
@@ -1724,7 +1643,7 @@ class FileExplorer extends Component {
 
     if (!isFolder) {
       if (deviceType === DEVICE_TYPE.local) {
-        getOpenMtpApi().shell.openPath(path);
+        getNeoMtpApi().shell.openPath(path);
       }
 
       return null;
@@ -1820,7 +1739,6 @@ class FileExplorer extends Component {
 
   render() {
     const {
-      classes: styles,
       deviceType,
       hideColList,
       currentBrowsePath,
@@ -1893,85 +1811,7 @@ class FileExplorer extends Component {
           fullWidthDialog
           maxWidthDialog="sm"
           helpText="If the progress bar freezes while transferring the files, restart the app and reconnect the device. This is a known Android MTP bug."
-        >
-          <div className={styles.socialMediaShareContainer}>
-            <Typography className={styles.supportBtnsTitle}>
-              {`I've invested a significant amount of my time and energy into developing and maintaining this OpenSource application.`}
-              <span className={styles.supportBtnsTitleNewLine}>
-                {`I hate to run ads.`}&nbsp;Help me keep {APP_NAME}
-                &nbsp;
-                <span className={styles.supportBtnsBoldText}>Free</span>
-                &nbsp;and&nbsp;
-                <span className={styles.supportBtnsBoldText}>Open</span>!
-              </span>
-            </Typography>
-            <div className={styles.supportBtnsContainer}>
-              {supportBtnsList.map((a, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Tooltip key={index} title={a.label}>
-                  <div>
-                    <div
-                      aria-label={a.label}
-                      onClick={() => {
-                        openExternalUrl(a.url);
-                      }}
-                      className={classnames(styles.supportBtnWrapper, {
-                        [styles.supportBtnWrapperForImage]: !!a.image,
-                      })}
-                    >
-                      {a.image && (
-                        <img
-                          alt={a.label}
-                          src={imgsrc(a.image, false)}
-                          className={classnames(styles.supportBtnImages, {
-                            [`${a.name}`]: true,
-                          })}
-                        />
-                      )}
-                    </div>
-                  </div>
-                </Tooltip>
-              ))}
-            </div>
-
-            <Typography className={styles.socialMediaShareTitle}>
-              Liked using the App?
-            </Typography>
-            <div className={styles.socialMediaShareBtnsContainer}>
-              {socialMediaShareBtnsList.map((a, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Tooltip key={index} title={a.label}>
-                  <div>
-                    <IconButton
-                      aria-label={a.label}
-                      disabled={!a.enabled}
-                      onClick={() => openExternalUrl(a.url)}
-                      className={classnames(styles.socialMediaBtnWrapper, {
-                        [styles.socialMediaBtnWrapperForImage]: !!a.image,
-                      })}
-                    >
-                      {a.image && (
-                        <img
-                          alt={a.label}
-                          src={imgsrc(a.image, false)}
-                          className={styles.socialMediaShareBtnImages}
-                        />
-                      )}
-
-                      {a.icon && (
-                        <FontAwesomeIcon
-                          icon={a.icon}
-                          className={styles.socialMediaShareBtn}
-                          title={a.label}
-                        />
-                      )}
-                    </IconButton>
-                  </div>
-                </Tooltip>
-              ))}
-            </div>
-          </div>
-        </ProgressBarDialog>
+        />
         <ConfirmDialog
           fullWidthDialog
           maxWidthDialog="xs"
@@ -2123,7 +1963,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: localError,
                   stderr: localStderr,
                   data: localData,
-                } = await getOpenMtpApi().fileExplorer.renameFile({
+                } = await getNeoMtpApi().fileExplorer.renameFile({
                   deviceType,
                   filePath,
                   newFilename,
@@ -2156,7 +1996,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: mtpError,
                   stderr: mtpStderr,
                   data: mtpData,
-                } = await getOpenMtpApi().fileExplorer.renameFile({
+                } = await getNeoMtpApi().fileExplorer.renameFile({
                   deviceType,
                   filePath,
                   newFilename,
@@ -2202,7 +2042,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: localError,
                   stderr: localStderr,
                   data: localData,
-                } = await getOpenMtpApi().fileExplorer.makeDirectory({
+                } = await getNeoMtpApi().fileExplorer.makeDirectory({
                   deviceType,
                   filePath: newFolderPath,
                   storageId: null,
@@ -2234,7 +2074,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: mtpError,
                   stderr: mtpStderr,
                   data: mtpData,
-                } = await getOpenMtpApi().fileExplorer.makeDirectory({
+                } = await getNeoMtpApi().fileExplorer.makeDirectory({
                   deviceType,
                   filePath: newFolderPath,
                   storageId,
@@ -2313,7 +2153,7 @@ const mapDispatchToProps = (dispatch, _) =>
                 springTruncate(fullPath, 45).truncatedText
               }"`;
 
-              getOpenMtpApi().window.setProgressBar(0);
+              getNeoMtpApi().window.setProgressBar(0);
               dispatch(
                 setFileTransferProgress({
                   titleText: `Copying files to ${DEVICES_LABEL[deviceType]}...`,
@@ -2422,7 +2262,7 @@ const mapDispatchToProps = (dispatch, _) =>
                 }
               }
 
-              getOpenMtpApi().window.setProgressBar(windowProgressBar);
+              getNeoMtpApi().window.setProgressBar(windowProgressBar);
               dispatch(
                 setFileTransferProgress({
                   titleText: `Copying files to ${DEVICES_LABEL[deviceType]}...`,
@@ -2443,7 +2283,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   data,
                   mtpMode,
                   onSuccess: () => {
-                    getOpenMtpApi().window.setProgressBar(-1);
+                    getNeoMtpApi().window.setProgressBar(-1);
                     dispatch(clearFileTransfer());
                     dispatch(
                       listDirectory(
@@ -2459,7 +2299,7 @@ const mapDispatchToProps = (dispatch, _) =>
 
             // on completed callback for file transfer
             const onCompleted = () => {
-              getOpenMtpApi().window.setProgressBar(-1);
+              getNeoMtpApi().window.setProgressBar(-1);
               dispatch(clearFileTransfer());
               dispatch(
                 listDirectory({ ...listDirectoryArgs }, deviceType, getState)
@@ -2468,7 +2308,7 @@ const mapDispatchToProps = (dispatch, _) =>
 
             switch (deviceType) {
               case DEVICE_TYPE.local:
-                getOpenMtpApi().fileExplorer.transferFiles({
+                getNeoMtpApi().fileExplorer.transferFiles({
                   deviceType: DEVICE_TYPE.mtp,
                   destination: destinationFolder,
                   storageId,
@@ -2482,7 +2322,7 @@ const mapDispatchToProps = (dispatch, _) =>
 
                 break;
               case DEVICE_TYPE.mtp:
-                getOpenMtpApi().fileExplorer.transferFiles({
+                getNeoMtpApi().fileExplorer.transferFiles({
                   deviceType: DEVICE_TYPE.mtp,
                   destination: destinationFolder,
                   storageId,
@@ -2570,6 +2410,4 @@ const mapStateToProps = (state, _) => {
 export default withReducer(
   'Home',
   reducers
-)(
-  connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FileExplorer))
-);
+)(connect(mapStateToProps, mapDispatchToProps)(FileExplorer));

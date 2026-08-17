@@ -73,7 +73,7 @@ const reportInfo = () => {
 };
 
 const isMtpUnavailable = async () => {
-  if (process.env.OPENMTP_NO_DEVICE_E2E === 'true') {
+  if (process.env.NEOMTP_NO_DEVICE_E2E === 'true') {
     return true;
   }
 

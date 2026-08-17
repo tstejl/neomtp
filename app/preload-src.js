@@ -251,7 +251,7 @@ const sanitizeMenuItems = (items) => {
   }));
 };
 
-contextBridge.exposeInMainWorld('openmtp', {
+contextBridge.exposeInMainWorld('neomtp', {
   ipc: {
     send,
     on: (channel, listener) => addListener('on', channel, listener),

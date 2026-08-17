@@ -85,8 +85,8 @@ export const kalamDebugReportCli = path.resolve(
 );
 
 const kalamLibOverride =
-  !isPackaged && process.env.OPENMTP_DEVICE_E2E === 'true'
-    ? process.env.OPENMTP_KALAM_LIB_PATH
+  !isPackaged && process.env.NEOMTP_DEVICE_E2E === 'true'
+    ? process.env.NEOMTP_KALAM_LIB_PATH
     : null;
 
 if (
@@ -96,7 +96,7 @@ if (
     !fs.statSync(kalamLibOverride).isFile())
 ) {
   throw new Error(
-    'OPENMTP_KALAM_LIB_PATH must point to an existing absolute file during the device E2E test'
+    'NEOMTP_KALAM_LIB_PATH must point to an existing absolute file during the device E2E test'
   );
 }
 

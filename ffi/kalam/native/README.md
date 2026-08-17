@@ -1,150 +1,63 @@
-## Initial setup
+# NeoMTP native MTP module
+
+This module contains the native MTP implementation used by NeoMTP:
+
+- `mtp` provides the MTP protocol and USB transport.
+- `mtpx` provides file operations that use `mtp`.
+
+The code is stored in this repository. It does not load the external
+`go-mtpfs` or `go-mtpx` modules at build time. Read each package's
+`PROVENANCE.md` file before you copy or publish its code.
+
+## Prerequisites
+
+Install the Xcode command-line tools, Go, Bun, and the root project
+dependencies. The native build also requires `libusb` and `pkg-config`.
 
 ```shell
-# Install Node.js 16 or later.
-npm -g i nvm
-
-# Use Node.js 16 or later.
-nvm use 16
-
-# Install zx.
-npm -g i zx
-```
-
-```shell script
 xcode-select --install
-brew install llvm gcc pkg-config libusb
-nano ~/.zshrc
+brew install go libusb pkg-config
+bun install --frozen-lockfile
 ```
 
-Add these lines to `~/.zshrc`:
+## Test
+
+Run the tests that do not require hardware:
 
 ```shell
-export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
-```
-
-```shell
-source ~/.zshrc
-```
-
-
-## Local MTP packages
-
-OpenMTP keeps its MTP code in this module:
-
-- `mtp` contains the MTP protocol and USB transport.
-- `mtpx` contains the file operations that use `mtp`.
-
-The module does not use the external `go-mtpfs` or `go-mtpx` modules.
-Read each package's `PROVENANCE.md` file before you copy or publish its code.
-
-## Build
-
-Download the remaining Go dependencies:
-
-```shell script
 cd ffi/kalam/native
 go mod download
-```
-
-Run the native tests:
-
-```shell
-cd ffi/kalam/native
 go test ./...
 ```
 
-Run the device test only with an unlocked device in File Transfer mode:
+Run the device integration test only when an unlocked Android device is in
+File Transfer mode:
 
 ```shell
 cd ffi/kalam/native
-OPENMTP_MTP_DEVICE_TEST=1 go test ./mtpx -run TestDeviceRoundTrip -v
+NEOMTP_MTP_DEVICE_TEST=1 go test ./mtpx -run TestDeviceRoundTrip -v
 ```
 
-The device test uses a unique `OpenMTP-Audit-*` directory.
-It removes this directory when the test ends.
+The device test creates a unique `NeoMTP-Audit-*` directory on the device.
+It removes that directory when the test ends.
 
-Build the native binaries from the repository root:
+## Build
+
+From the repository root, build the native libraries and helper binaries:
 
 ```shell
-cd </path/to/openmtp/>
-zx ./ffi/kalam/native/scripts/build.mjs
+bun run dev-kalam-ffi
 ```
 
-
-
-## Troubleshooting
-
-If the build reports `fatal error: 'stdlib.h' file not found xcode`, add this line to `~/.zshrc`:
+That command rebuilds the native artifacts and starts the Electron development
+application. To rebuild only the native artifacts, run:
 
 ```shell
-export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
+bunx zx ./ffi/kalam/native/scripts/build.mjs
 ```
+
+If the compiler cannot find `stdlib.h`, set the active macOS SDK:
 
 ```shell
-source ~/.zshrc
-```
-
-
-
-
-
-# Do not use the commands below. OpenMTP keeps them only for historical reference.
-
-- Remove libusb `brew remove libusb`
-- Download the required versions of the `libusb`.
-  - Refer `Brew download for another OS version` for more
-- Copy the `/path/to/libusb/arm64_big_sur/1.0.25/lib/libusb-1.0.0.dylib` to the `build/mac/bin/libusb.dylib`
-- Make a backup copy of `/path/to/libusb/arm64_big_sur/1.0.25/lib/libusb-1.0.0.dylib`
-- change the `rpath` using: `install_name_tool -id @loader_path/libusb.dylib /path/to/libusb/arm64_big_sur/1.0.25/lib/libusb-1.0.0.dylib`
-- Open `/path/to/libusb/arm64_big_sur/1.0.25/lib/pkgconfig/libusb-1.0.pc`
-  - Edit `prefix=@@HOMEBREW_CELLAR@@/libusb/1.0.25` as `prefix=/path/to/libusb/amd64_mojave/1.0.25`
-  - Save it
-- Example commands to build the kalam go binaries:
-
-##### Examples:
-```shell
-(
-        cd ./ffi/kalam/native && CGO_ENABLED=1 \
-        PKG_CONFIG_PATH='/path/to/libusb/arm64_big_sur/1.0.25/lib/pkgconfig' \
-        CGO_CFLAGS='-Wno-deprecated-declarations' \
-        GOARCH=arm64 GOOS=darwin \
-        go build \
-        -v -a -trimpath \
-        -o ../../../build/mac/bin/arm64/kalam.dylib -buildmode=c-shared ./*.go
-    )
-```
-
-```shell
-(
-        cd ./ffi/kalam/native && CGO_ENABLED=1 \
-        PKG_CONFIG_PATH='/path/to/libusb/arm64_big_sur/1.0.25/lib/pkgconfig' \
-        CGO_CFLAGS='-Wno-deprecated-declarations' \
-        GOARCH=arm64 GOOS=darwin \
-        go build \
-        -v -a -trimpath \
-        -o ../../../build/mac/bin/arm64/kalam_debug_report kalam_debug_report/*.go
-    )
-```
-
-
-## Do not follow the sections below anymore. These commands are deprecated
-### libusb otool commands:
-
-Build:
-```shell
-brew install libusb
-brew info libusb
-```
-
-- Copy the path in the terminal; eg: `/opt/homebrew/Cellar/libusb/1.0.25`
-
-```shell script
-sudo install_name_tool -id "@loader_path/libusb.dylib" <libusb-path>/lib/libusb-1.0.0.dylib
-
-# eg: sudo install_name_tool -id "@loader_path/libusb.dylib" /opt/homebrew/Cellar/libusb/1.0.25/lib/libusb-1.0.0.dylib
-
-cp /opt/homebrew/Cellar/libusb/1.0.25/lib/libusb-1.0.dylib  ./build/mac/bin/libusb.dylib
+export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
 ```

@@ -430,16 +430,19 @@ section.second {
       @include item-align();
     }
 
-    .image-wrapper {
-      text-align: center;
+    .feature-copy {
+      color: $whiteColor;
+      max-width: 420px;
+      padding: 20px;
 
-      #app-screenshot-file-transfer {
-        @include box-shadow-1($boxShadow2);
-        @include border-radius(5px);
+      h2 {
+        font-size: 32px;
+        line-height: 40px;
+      }
 
-        max-width: 400px;
-        width: 80%;
-        height: auto;
+      p {
+        font-size: 18px;
+        line-height: 28px;
       }
     }
   }

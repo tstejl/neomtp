@@ -31,7 +31,6 @@ import {
   makeMtpMode,
   makeShowLocalPaneOnLeftSide,
 } from '../../Settings/selectors';
-import { BUY_ME_A_COFFEE_URL, SUPPORT_PAYPAL_URL } from '../../../constants';
 import { DEVICES_DEFAULT_PATH } from '../../../helpers/rendererPaths';
 import { selectMtpMode, toggleSettings } from '../../Settings/actions';
 import { toggleWindowSizeOnDoubleClick } from '../../../helpers/titlebarDoubleClick';
@@ -43,7 +42,7 @@ import { DEVICE_TYPE } from '../../../enums';
 import { log } from '../../../utils/rendererLog';
 import { checkIf } from '../../../utils/checkIf';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
-import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { getNeoMtpApi } from '../../../helpers/electronApi';
 
 class ToolbarAreaPane extends PureComponent {
   constructor(props) {
@@ -60,14 +59,14 @@ class ToolbarAreaPane extends PureComponent {
   }
 
   componentWillMount() {
-    getOpenMtpApi().ipc.on(
+    getNeoMtpApi().ipc.on(
       'fileExplorerToolbarActionCommunication',
       this.fileExplorerToolbarActionCommunicationEvent
     );
   }
 
   componentWillUnmount() {
-    getOpenMtpApi().ipc.removeListener(
+    getNeoMtpApi().ipc.removeListener(
       'fileExplorerToolbarActionCommunication',
       this.fileExplorerToolbarActionCommunicationEvent
     );
@@ -176,14 +175,6 @@ class ToolbarAreaPane extends PureComponent {
     openExternalUrl(APP_GITHUB_URL);
   };
 
-  _handleOpenBuyMeACoffee = () => {
-    openExternalUrl(BUY_ME_A_COFFEE_URL);
-  };
-
-  _handleOpenSupportUsingPaypal = () => {
-    openExternalUrl(SUPPORT_PAYPAL_URL);
-  };
-
   _handleToolbarAction = (itemType, isAccelerator = false) => {
     checkIf(isAccelerator, 'boolean');
 
@@ -231,14 +222,6 @@ class ToolbarAreaPane extends PureComponent {
       case 'gitHub':
         this._handleOpenGitHubRepo();
 
-        break;
-
-      case 'buyMeACoffee':
-        this._handleOpenBuyMeACoffee();
-        break;
-
-      case 'paypal':
-        this._handleOpenSupportUsingPaypal();
         break;
 
       case 'mtpMode':
@@ -292,7 +275,7 @@ class ToolbarAreaPane extends PureComponent {
   };
 
   _handleFaqsBtn = () => {
-    getOpenMtpApi().ipc.send(IpcEvents.OPEN_FAQS_WINDOW);
+    getNeoMtpApi().ipc.send(IpcEvents.OPEN_FAQS_WINDOW);
   };
 
   render() {
@@ -390,7 +373,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: localError,
                   stderr: localStderr,
                   data: localData,
-                } = await getOpenMtpApi().fileExplorer.deleteFiles({
+                } = await getNeoMtpApi().fileExplorer.deleteFiles({
                   deviceType,
                   fileList,
                   storageId: null,
@@ -422,7 +405,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: mtpError,
                   stderr: mtpStderr,
                   data: mtpData,
-                } = await getOpenMtpApi().fileExplorer.deleteFiles({
+                } = await getNeoMtpApi().fileExplorer.deleteFiles({
                   deviceType,
                   fileList,
                   storageId,

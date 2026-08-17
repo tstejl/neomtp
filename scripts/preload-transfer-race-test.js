@@ -35,7 +35,7 @@ const loadPreload = (invokeHandler) => {
   const electron = {
     contextBridge: {
       exposeInMainWorld(name, value) {
-        assert.equal(name, 'openmtp');
+        assert.equal(name, 'neomtp');
         api = value;
       },
     },
