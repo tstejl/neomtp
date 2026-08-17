@@ -23,17 +23,6 @@ const nativeOutput = path.join(temporaryUserData, 'native');
 const nativeLibrary = path.join(nativeOutput, 'kalam.dylib');
 const screenshotPath = path.join(os.tmpdir(), 'neomtp-device-main-e2e.png');
 const remoteRoot = `/NeoMTP-E2E-${crypto.randomUUID()}`;
-const onboardingSource = fs.readFileSync(
-  path.join(root, 'app/constants/onboarding.js'),
-  'utf8'
-);
-const onboardingVersion = onboardingSource.match(
-  /latestUpdatePushVersion\s*=\s*['"]([^'"]+)['"]/
-)?.[1];
-
-if (!onboardingVersion) {
-  throw new Error('Could not read the current onboarding version');
-}
 
 const writeFixture = (name, data) => {
   const filePath = path.join(fixtureRoot, name);
@@ -67,7 +56,6 @@ fs.writeFileSync(
   settingsPath,
   JSON.stringify({
     freshInstall: 0,
-    onboarding: { lastFiredVersion: onboardingVersion },
     enableAutoUpdateCheck: false,
     enableBackgroundAutoUpdate: false,
     enablePrereleaseUpdates: false,
@@ -521,7 +509,6 @@ const rendererWorkflow = async (input) => {
       phonePaneVisible: rootItems.some(
         (item) => item.name && renderedText.includes(item.name)
       ),
-      onboardingDismissed: !renderedText.includes('Release at a Glance!'),
       deviceInfo,
       storageCount: storageEntries.length,
       reopenedStorageCount: Object.keys(reopenedStorages || {}).length,
@@ -694,7 +681,6 @@ const run = async () => {
     !result.rootHasContent ||
     !result.localPaneVisible ||
     !result.phonePaneVisible ||
-    !result.onboardingDismissed ||
     result.renderedTextLength < 1
   ) {
     throw new Error(

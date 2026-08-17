@@ -5,8 +5,7 @@
 
 import { pkginfo } from '../utils/pkginfo';
 
-const { productName, description, name, version, repository, homepage, bugs } =
-  pkginfo;
+const { productName, description, name, version, repository, bugs } = pkginfo;
 
 export const APP_BUNDLE_ID = 'io.github.tstejl.neomtp';
 
@@ -24,8 +23,4 @@ export const APP_GITHUB_URL = repository?.url
   ? repository.url.replace(/^git\+|\.git/g, '')
   : null;
 
-export const APP_GITHUB_RELEASES_URL = `${APP_GITHUB_URL}/releases`;
-
 export const APP_GITHUB_ISSUES_URL = bugs?.url ?? null;
-
-export const APP_WEBSITE = `${homepage}`;

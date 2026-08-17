@@ -40,17 +40,6 @@ const remoteRoot = `/NeoMTP-Packaged-E2E-${crypto.randomUUID()}`;
 const uiRemoteRoot = `/NeoMTP-Packaged-UI-E2E-${crypto.randomUUID()}`;
 const uiRemoteName = path.basename(uiRemoteRoot);
 const debuggingPort = 20000 + crypto.randomInt(20000);
-const onboardingSource = fs.readFileSync(
-  path.join(root, 'app/constants/onboarding.js'),
-  'utf8'
-);
-const onboardingVersion = onboardingSource.match(
-  /latestUpdatePushVersion\s*=\s*['"]([^'"]+)['"]/
-)?.[1];
-
-if (!onboardingVersion) {
-  throw new Error('Could not read the current onboarding version');
-}
 
 const writeFixture = (name, data) => {
   const filePath = path.join(fixtureRoot, name);
@@ -87,7 +76,6 @@ fs.writeFileSync(
   settingsPath,
   JSON.stringify({
     freshInstall: 0,
-    onboarding: { lastFiredVersion: onboardingVersion },
     enableAutoUpdateCheck: false,
     enableBackgroundAutoUpdate: false,
     enablePrereleaseUpdates: false,
@@ -471,7 +459,6 @@ const rendererWorkflow = async (input) => {
       rootHasContent: document.querySelector('#root')?.children.length > 0,
       renderedTextLength: renderedText.length,
       localPaneVisible: renderedText.includes('fixtures'),
-      onboardingDismissed: !renderedText.includes('Release at a Glance!'),
       deviceInfo,
       storageCount: storageEntries.length,
       rootItemCount: rootItems.length,
@@ -1209,7 +1196,6 @@ const timeout = setTimeout(async () => {
     !result.apiShape ||
     !result.rootHasContent ||
     !result.localPaneVisible ||
-    !result.onboardingDismissed ||
     result.storageCount < 1 ||
     result.reopenedStorageCount !== result.storageCount
   ) {

@@ -1,11 +1,10 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import FileExplorer from './components/FileExplorer';
 import ToolbarAreaPane from './components/ToolbarAreaPane';
 import { styles } from './styles';
-import Onboarding from '../Onboarding';
 import { DEVICE_TYPE, MTP_MODE } from '../../enums';
 import {
   makeMtpMode,
@@ -65,12 +64,9 @@ class Home extends PureComponent {
     }
 
     return (
-      <Fragment>
-        <Onboarding />
-        <div className={styles.root}>
-          <div className={styles.grid}>{panes}</div>
-        </div>
-      </Fragment>
+      <div className={styles.root}>
+        <div className={styles.grid}>{panes}</div>
+      </div>
     );
   }
 }

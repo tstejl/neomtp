@@ -11,9 +11,6 @@ import { isPrereleaseVersion } from '../../utils/funcs';
 
 export const initialState = {
   freshInstall: 0,
-  onboarding: {
-    lastFiredVersion: null,
-  },
   toggleSettings: false,
   enableAutoUpdateCheck: true,
   enableBackgroundAutoUpdate: true,
@@ -47,15 +44,6 @@ export default function Settings(state = initialState, action) {
   switch (type) {
     case actionTypes.FRESH_INSTALL:
       return { ...state, freshInstall: payload };
-
-    case actionTypes.SET_ONBOARDING:
-      return {
-        ...state,
-        onboarding: {
-          ...state.onboarding,
-          ...payload,
-        },
-      };
 
     case actionTypes.TOGGLE_SETTINGS:
       return { ...state, toggleSettings: payload };

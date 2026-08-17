@@ -10,7 +10,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
-import StarRateIcon from '@material-ui/icons/StarRate';
 import WarningIcon from '@material-ui/icons/Warning';
 import CloseIcon from '@material-ui/icons/Close';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
@@ -26,7 +25,6 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { styles } from '../styles/FileExplorerTableBodyEmptyRender';
 import KeyboadShortcuts from '../../KeyboardShortcutsPage/components/KeyboadShortcuts';
-import Features from '../../Onboarding/components/Features';
 import { helpPhoneNotConnecting } from '../../../templates/fileExplorer';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { APP_GITHUB_ISSUES_URL, APP_NAME } from '../../../constants/meta';
@@ -41,7 +39,6 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
       expansionPanel: {
         noMtpInstructions: true,
         keyboardNavigation: false,
-        features: false,
       },
     };
   }
@@ -257,43 +254,6 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
                       </div>
                     </ListItem>
                   </List>
-                </Collapse>
-
-                <Divider className={styles.divider} />
-
-                <ListItem
-                  button
-                  onClick={() =>
-                    this._handleExpansionPanel({
-                      key: 'features',
-                    })
-                  }
-                >
-                  <ListItemIcon>
-                    <StarRateIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Features"
-                    secondary={
-                      expansionPanel.features
-                        ? 'Click here to hide the available features'
-                        : 'Click here to view the available features'
-                    }
-                  />
-                  {expansionPanel.features ? (
-                    <ExpandLessIcon />
-                  ) : (
-                    <ExpandMoreIcon />
-                  )}
-                </ListItem>
-                <Collapse
-                  in={expansionPanel.features}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <div className={styles.nestedPanel}>
-                    <Features hideTitle />
-                  </div>
                 </Collapse>
               </List>
             </Paper>

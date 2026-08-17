@@ -10,7 +10,6 @@ const prefix = '@@Settings';
 const actionTypesList = [
   'TOGGLE_SETTINGS',
   'FRESH_INSTALL',
-  'SET_ONBOARDING',
   'HIDE_HIDDEN_FILES',
   'FILE_EXPLORER_LISTING_TYPE',
   'SET_FILES_PREPROCESSING_BEFORE_TRANSFER',
@@ -36,17 +35,6 @@ export function freshInstall({ ...data }, getState) {
     dispatch({
       type: actionTypes.FRESH_INSTALL,
       payload: isFreshInstall,
-    });
-
-    dispatch(copySettingsToJsonFile(getState));
-  };
-}
-
-export function setOnboarding({ ...data }, getState) {
-  return (dispatch) => {
-    dispatch({
-      type: actionTypes.SET_ONBOARDING,
-      payload: data,
     });
 
     dispatch(copySettingsToJsonFile(getState));

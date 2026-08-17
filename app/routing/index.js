@@ -6,7 +6,6 @@ import ReportBugsPage from '../containers/ReportBugsPage/Loadable';
 import AppUpdatePageUpdateAvailable from '../containers/AppUpdatePage/UpdateAvailable';
 import AppUpdatePageUpdateProgress from '../containers/AppUpdatePage/UpdateProgress';
 import PrivacyPolicyPage from '../containers/PrivacyPolicyPage/Loadable';
-import AppFeaturesPage from '../containers/AppFeaturesPage/Loadable';
 import KeyboardShortcutsPage from '../containers/KeyboardShortcutsPage/Loadable';
 import NotFoundPage from '../containers/NotFoundPage/Loadable';
 import FaqsPage from '../containers/HelpFaqsPage/Loadable';
@@ -49,11 +48,6 @@ export const routes = {
     props: {
       showPhoneNotRecognizedNote: true,
     },
-  },
-  AppFeaturesPage: {
-    path: '/appFeaturesPage',
-    exact: true,
-    component: AppFeaturesPage,
   },
   KeyboardShortcutsPage: {
     path: '/keyboardShortcutsPage',

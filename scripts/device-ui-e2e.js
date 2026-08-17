@@ -33,17 +33,6 @@ const failureScreenshotPath = path.join(
 );
 const remoteName = `NeoMTP-UI-E2E-${crypto.randomUUID()}`;
 const remoteRoot = `/${remoteName}`;
-const onboardingSource = fs.readFileSync(
-  path.join(root, 'app/constants/onboarding.js'),
-  'utf8'
-);
-const onboardingVersion = onboardingSource.match(
-  /latestUpdatePushVersion\s*=\s*['"]([^'"]+)['"]/
-)?.[1];
-
-if (!onboardingVersion) {
-  throw new Error('Could not read the current onboarding version');
-}
 
 const writeFixture = (name, data) => {
   const filePath = path.join(fixtureRoot, name);
@@ -79,7 +68,6 @@ fs.writeFileSync(
   settingsPath,
   JSON.stringify({
     freshInstall: 0,
-    onboarding: { lastFiredVersion: onboardingVersion },
     enableAutoUpdateCheck: false,
     enableBackgroundAutoUpdate: false,
     enablePrereleaseUpdates: false,

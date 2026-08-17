@@ -1,6 +1,5 @@
 import { app, Menu, shell } from 'electron';
 import {
-  appFeaturesWindow,
   keyboardShortcutsWindow,
   privacyPolicyWindow,
   reportBugsWindow,
@@ -197,12 +196,6 @@ export default class MenuBuilder {
           },
         },
         {
-          label: 'New Features And Updates',
-          click: () => {
-            appFeaturesWindow();
-          },
-        },
-        {
           label: 'Privacy Policy',
           click: () => {
             privacyPolicyWindow();
@@ -302,12 +295,6 @@ export default class MenuBuilder {
             label: 'Keyboard Shortcuts',
             click: () => {
               keyboardShortcutsWindow();
-            },
-          },
-          {
-            label: 'New Features And Updates',
-            click: () => {
-              appFeaturesWindow();
             },
           },
           {

@@ -9,7 +9,6 @@ import {
   FAQS_PAGE_TITLE,
   HELP_PHONE_IS_NOT_CONNECTING,
 } from '../templates/helpFaqsPage';
-import { APP_FEATURES_PAGE_TITLE } from '../templates/appFeaturesPage';
 import { KEYBOARD_SHORTCUTS_PAGE_TITLE } from '../templates/keyboardShortcutsPage';
 import { getWindowBackgroundColor } from './mainWindowHelper';
 import { REPORT_BUGS_PAGE_TITLE } from '../templates/generateErrorReport';
@@ -20,7 +19,6 @@ let _privacyPolicyWindow = null;
 let _faqsWindow = null;
 let _helpPhoneIsNotConnectingWindow = null;
 let _appUpdateAvailableWindow = null;
-let _appFeaturesWindow = null;
 let _keyboardShortcutsWindow = null;
 
 const createBrowserWindow = (config) =>
@@ -259,67 +257,6 @@ export const appUpdateAvailableWindow = () => {
     return _appUpdateAvailableWindow;
   } catch (e) {
     log.error(e, `createWindows -> appUpdateAvailableWindow`);
-  }
-};
-
-/**
- * App Features Window
- */
-const appFeaturesCreateWindow = () => {
-  const config = {
-    width: 800,
-    height: 630,
-    show: false,
-    resizable: false,
-    title: `${APP_TITLE}`,
-    minimizable: true,
-    fullscreenable: false,
-    backgroundColor: getWindowBackgroundColor(),
-  };
-
-  const existingWindow = loadExistingWindow(
-    BrowserWindow.getAllWindows(),
-    APP_FEATURES_PAGE_TITLE
-  );
-
-  return {
-    windowObj: existingWindow ?? createBrowserWindow(config),
-    isExisting: !!existingWindow,
-  };
-};
-
-export const appFeaturesWindow = (focus = true) => {
-  try {
-    if (_appFeaturesWindow) {
-      if (focus) {
-        _appFeaturesWindow.focus();
-        _appFeaturesWindow.show();
-      }
-
-      return _appFeaturesWindow;
-    }
-
-    const { windowObj, isExisting } = appFeaturesCreateWindow();
-
-    if (isExisting) {
-      return windowObj;
-    }
-
-    _appFeaturesWindow = windowObj;
-    _appFeaturesWindow.loadURL(`${getRendererUrl()}#appFeaturesPage`);
-    showWindowAfterLoad(_appFeaturesWindow, focus);
-
-    _appFeaturesWindow.onerror = (error) => {
-      log.error(error, `createWindows -> appFeaturesWindow -> onerror`);
-    };
-
-    _appFeaturesWindow.on('closed', () => {
-      _appFeaturesWindow = null;
-    });
-
-    return _appFeaturesWindow;
-  } catch (e) {
-    log.error(e, `createWindows -> appFeaturesWindow`);
   }
 };
 

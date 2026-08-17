@@ -106,7 +106,6 @@ The native device test is opt-in. Read [`ffi/kalam/native/README.md`](ffi/kalam/
 - `ffi/kalam/` contains the JavaScript native bridge.
 - `ffi/kalam/native/` contains the vendored Go module, including the `mtp`, `mtpx`, and `send_to_js` packages.
 - `scripts/` contains smoke checks and Electron end-to-end tests.
-- `docs-sources/` contains the documentation site source.
 - `electron-builder-config.js` contains packaging configuration.
 
 The desktop bundles use [electron-vite](https://electron-vite.org/). `package.json` records Electron 43 and React 17. Bun is the package manager and script runner.
