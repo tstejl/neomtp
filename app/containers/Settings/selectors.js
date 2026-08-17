@@ -47,10 +47,6 @@ export const makeEnablePrereleaseUpdates = createSelector(make, (state) => {
     : initialState.enablePrereleaseUpdates;
 });
 
-export const makeEnableAnalytics = createSelector(make, (state) =>
-  state ? state.enableAnalytics : initialState.enableAnalytics
-);
-
 export const makeEnableStatusBar = createSelector(make, (state) =>
   state ? state.enableStatusBar : initialState.enableStatusBar
 );

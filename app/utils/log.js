@@ -5,7 +5,6 @@ import { APP_NAME, APP_VERSION } from '../constants/meta';
 import { PATHS } from '../constants/paths';
 import { appendFileAsync } from '../helpers/fileOps';
 import { dateTimeUnixTimestampNow } from './date';
-import { sentryService } from '../services/sentry';
 import { getDeviceInfo } from '../helpers/deviceInfo';
 import { isEmpty } from './funcs';
 import { getMtpModeSetting } from '../helpers/settings';
@@ -58,7 +57,7 @@ export const log = {
    * @param title - Title
    * @param logError - should log the error to the log file
    * @param allowInProd - display the error in production
-   * @param report - should report the error to crashanalytics services
+   * @param report - retained for backwards-compatible call sites; reports stay local
    */
   error(e, title = `Log`, logError = true, allowInProd = false, report = true) {
     this.doLog(e, title, null, logError, report, true);
@@ -86,7 +85,7 @@ export const log = {
    * @param {any} e - error
    * @param {boolean} logError - should log the error to the log file
    * @param {string|null}  customError
-   * @param {any} report - should report the error to crashanalytics services
+   * @param {any} report - retained for backwards-compatible call sites; reports stay local
    * @param {string|null} title
    * @param {boolean} isError - is an error or info
    */ async doLog(
@@ -94,7 +93,7 @@ export const log = {
     title = null,
     customError = null,
     logError = true,
-    report = true,
+    _report = true,
     isError = true
   ) {
     if (logError === false) {
@@ -140,18 +139,5 @@ export const log = {
     const _error = `${sectionSeperator}${EOL}${_appInfo}${EOL}${_mtpMode}${EOL}${_date}${EOL}${_osInfo}${EOL}${_deviceInfoStrigified}${logType}: ${err}${EOL}${sectionSeperator}${EOL}`;
 
     appendFileAsync(logFile, _error);
-
-    if (report) {
-      let errorToReport = e;
-
-      if (e && !isConsoleError(e)) {
-        // [Privacy] redact home directory path from the error log
-        const _e = redactHomeDirectory(e);
-
-        errorToReport = new Error(_e);
-      }
-
-      await sentryService.report({ error: errorToReport, title, mtpMode });
-    }
   },
 };

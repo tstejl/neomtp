@@ -2,7 +2,7 @@ import { PATHS } from '../constants/paths';
 import { undefinedOrNull } from '../utils/funcs';
 
 /**
- * Description - Strip user home directory path from the error before it is sent to sentry
+ * Description - Strip the user home directory path before writing local logs
  * @param s
  * @return {string|string}
  */

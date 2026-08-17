@@ -55,7 +55,7 @@ module.exports = () => {
     publish: [
       {
         provider: 'github',
-        owner: 'ganeshrvel',
+        owner: 'tstejl',
         repo: 'openmtp',
         private: false,
       },

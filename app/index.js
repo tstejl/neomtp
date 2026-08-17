@@ -1,7 +1,5 @@
 /* eslint global-require: off */
 
-import './services/sentry';
-
 import React from 'react';
 import { render } from 'react-dom';
 import Root from './containers/App/Root';

@@ -1,7 +1,5 @@
 /* eslint global-require: off */
 
-import './services/sentry/index';
-
 import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron';
 import electronIs from 'electron-is';
 import usbDetect from 'usb-detection';

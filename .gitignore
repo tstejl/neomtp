@@ -52,7 +52,6 @@ main.js.map
 npm-debug.log.*
 package-lock.json
 .env*
-sentry.properties
 
 app/certs/*.pem
 certs/*

@@ -8,12 +8,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { quickHash } from '../../utils/funcs';
 import { styles } from './styles';
 import { sanitizePath } from '../../utils/files';
-import { analyticsService } from '../../services/analytics';
-import { EVENT_TYPE } from '../../enums/events';
 
 class Breadcrumb extends PureComponent {
   _handleClickPath = (enabled, value, event) => {
-    const { onBreadcrumbPathClick, deviceType } = this.props;
+    const { onBreadcrumbPathClick } = this.props;
 
     event.preventDefault();
 
@@ -22,13 +20,6 @@ class Breadcrumb extends PureComponent {
     }
 
     onBreadcrumbPathClick({ path: value });
-
-    const deviceTypeUpperCase = deviceType.toUpperCase();
-
-    analyticsService.sendEvent(
-      EVENT_TYPE[`${deviceTypeUpperCase}_BREADCRUMB_PATH_TAP`],
-      {}
-    );
   };
 
   tokenizeCurrentBrowsePath(currentBrowsePath) {
