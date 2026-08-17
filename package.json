@@ -175,6 +175,7 @@
     "node-abi": "^3.24.0",
     "pkg-dir": "^6.0.1",
     "postcss": "8.4.31",
+    "postcss-scss": "^4.0.9",
     "prettier": "^2.7.1",
     "redux-logger": "^3.0.6",
     "regenerator-runtime": "^0.13.10",
