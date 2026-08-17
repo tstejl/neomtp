@@ -420,12 +420,17 @@ export class Kalam {
         const onDonePtr = this.callbackDictionary.onCbResult;
         const rawOnDonePtr = koffi.register((result) => {
           const json = JSON.parse(result);
+          const { error, data, stderr } = this._getData(json);
 
-          if (onCompleted) {
-            onCompleted();
+          if (!undefinedOrNull(error)) {
+            onError({ error, data: null, stderr });
+
+            return resolve({ error, stderr, data: null });
           }
 
-          return resolve(this._getData(json));
+          onCompleted();
+
+          return resolve({ error, stderr, data });
         }, koffi.pointer(onDonePtr));
 
         let TransferFiles;

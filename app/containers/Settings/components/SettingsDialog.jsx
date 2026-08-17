@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import electronIs from 'electron-is';
 import classNames from 'classnames';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -26,10 +25,11 @@ import {
 } from '../../../enums';
 import { capitalize, isPrereleaseVersion } from '../../../utils/funcs';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
-import { isKalamModeSupported } from '../../../helpers/binaries';
+import {
+  isKalamModeSupported,
+  isMas,
+} from '../../../helpers/rendererCapabilities';
 import { getOpenMtpApi } from '../../../helpers/electronApi';
-
-const isMas = electronIs.mas();
 
 export default class SettingsDialog extends PureComponent {
   constructor(props) {
@@ -49,15 +49,15 @@ export default class SettingsDialog extends PureComponent {
   };
 
   shoudThisTabHeadRender = (position) => {
-    return !(isMas && this.isMasHidePosition === position);
+    return !(isMas() && this.isMasHidePosition === position);
   };
 
   tabBodyRenderTabIndex = (position) => {
-    if (isMas && this.isMasHidePosition === position) {
+    if (isMas() && this.isMasHidePosition === position) {
       return null;
     }
 
-    if (isMas && position > this.isMasHidePosition) {
+    if (isMas() && position > this.isMasHidePosition) {
       return position - 1 < 1 ? 0 : position - 1;
     }
 

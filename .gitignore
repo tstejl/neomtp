@@ -43,6 +43,7 @@ app/main-*.js
 app/main-*.js.map
 app/preload.js
 app/preload-*.js
+!app/preload-src.js
 app/renderer.prod.js
 app/renderer.prod.js.map
 app/style.css

@@ -10,11 +10,29 @@ import { rootPath as root } from 'electron-root-path';
 import { isPackaged } from '../utils/isPackaged';
 import { IS_DEV } from './env';
 import { yearMonthNow } from '../utils/date';
-import { APP_NAME } from './meta';
-import { getAppDataPath } from '../utils/files';
+import { APP_BUNDLE_ID, APP_NAME } from './meta';
+
+const getAppDataPath = () => {
+  switch (process.platform) {
+    case 'darwin':
+      return join(homeDir, 'Library', 'Application Support', APP_BUNDLE_ID);
+
+    case 'win32':
+      return join(process.env.APPDATA, APP_BUNDLE_ID);
+
+    case 'linux':
+      return join(homeDir, APP_BUNDLE_ID);
+
+    default:
+      return join(homeDir, APP_BUNDLE_ID);
+  }
+};
 
 const appPath = join(root, `./app`);
 const rendererPath = join(appPath, `./dist/app.html`);
+const preloadPath = isPackaged
+  ? join(__dirname, './preload.js')
+  : join(appPath, './preload.js');
 const configDir = join(root, `./config`);
 const homeDir = homedirOs();
 const profileDir = getAppDataPath();
@@ -35,7 +53,7 @@ const devAppUpdateFile = join(configDir, `./dev-app-update.yml`);
 export const PATHS = {
   root: resolve(root),
   app: resolve(appPath),
-  preloadPath: resolve(join(appPath, `./preload.js`)),
+  preloadPath: resolve(preloadPath),
   dist: resolve(join(appPath, `./dist`)),
   nodeModules: resolve(join(root, `./node_modules`)),
   homeDir: resolve(homeDir),

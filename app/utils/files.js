@@ -1,24 +1,27 @@
-import { join, parse } from 'node:path';
-import { homedir as homedirOs } from 'node:os';
-import { APP_BUNDLE_ID } from '../constants/meta';
-
-const homeDir = homedirOs();
-
-export const getAppDataPath = () => {
-  switch (process.platform) {
-    case 'darwin':
-      return join(homeDir, 'Library', 'Application Support', APP_BUNDLE_ID);
-
-    case 'win32':
-      return join(process.env.APPDATA, APP_BUNDLE_ID);
-
-    case 'linux':
-      return join(homeDir, APP_BUNDLE_ID);
-
-    default: {
-      process.exit(1);
-    }
+const parsePath = (filePath) => {
+  if (typeof filePath !== 'string') {
+    return null;
   }
+
+  const normalizedPath = filePath.replace(/\\/g, '/');
+  const lastSlashIndex = normalizedPath.lastIndexOf('/');
+  const root = normalizedPath.startsWith('/') ? '/' : '';
+  const dir =
+    lastSlashIndex > -1 ? normalizedPath.slice(0, lastSlashIndex) || root : '';
+  const base = normalizedPath.slice(lastSlashIndex + 1);
+  const extensionIndex = base.lastIndexOf('.');
+  const ext =
+    extensionIndex > 0 && extensionIndex < base.length - 1
+      ? base.slice(extensionIndex)
+      : '';
+
+  return {
+    root,
+    dir,
+    base,
+    ext,
+    name: ext ? base.slice(0, -ext.length) : base,
+  };
 };
 
 export const pathUp = (filePath) => {
@@ -50,5 +53,5 @@ export const getExtension = (fileName, isFolder) => {
 };
 
 export const pathInfo = (filePath) => {
-  return parse(filePath);
+  return parsePath(filePath);
 };

@@ -1,12 +1,13 @@
-### Initial setup
+## Initial setup
+
 ```shell
-#install node 16 or above
+# Install Node.js 16 or later.
 npm -g i nvm
 
-#use node 16 or above
+# Use Node.js 16 or later.
 nvm use 16
 
-#install zx globally
+# Install zx.
 npm -g i zx
 ```
 
@@ -16,7 +17,7 @@ brew install llvm gcc pkg-config libusb
 nano ~/.zshrc
 ```
 
-- Add these line to the ~/.zshrc file
+Add these lines to `~/.zshrc`:
 
 ```shell
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
@@ -29,37 +30,54 @@ source ~/.zshrc
 ```
 
 
-### Build
+## Local MTP packages
 
-- Add the required changes to the kalam kernel (./openmtp/ffi/kalam/native)
+OpenMTP keeps its MTP code in this module:
+
+- `mtp` contains the MTP protocol and USB transport.
+- `mtpx` contains the file operations that use `mtp`.
+
+The module does not use the external `go-mtpfs` or `go-mtpx` modules.
+Read each package's `PROVENANCE.md` file before you copy or publish its code.
+
+## Build
+
+Download the remaining Go dependencies:
 
 ```shell script
 cd ffi/kalam/native
-go get -u
+go mod download
 ```
 
-- Upgrade a go package
+Run the native tests:
+
 ```shell
 cd ffi/kalam/native
-
-# go get github.com/<org-name>/<package-name>@<git-commit-hash>
-
-#example: go get github.com/ganeshrvel/go-mtpfs@<git-commit-hash>
-#example: go get github.com/ganeshrvel/go-mtpx@<git-commit-hash>
+go test ./...
 ```
 
+Run the device test only with an unlocked device in File Transfer mode:
+
 ```shell
-# cd  to the project root (ie ./openmtp)
+cd ffi/kalam/native
+OPENMTP_MTP_DEVICE_TEST=1 go test ./mtpx -run TestDeviceRoundTrip -v
+```
+
+The device test uses a unique `OpenMTP-Audit-*` directory.
+It removes this directory when the test ends.
+
+Build the native binaries from the repository root:
+
+```shell
 cd </path/to/openmtp/>
 zx ./ffi/kalam/native/scripts/build.mjs
 ```
 
 
 
-**Troubleshooting**
+## Troubleshooting
 
-- If you keep getting `fatal error: 'stdlib.h' file not found xcode`, then:
-- Add these line to the ~/.zshrc file (`nano ~/.zshrc`)
+If the build reports `fatal error: 'stdlib.h' file not found xcode`, add this line to `~/.zshrc`:
 
 ```shell
 export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
@@ -73,7 +91,7 @@ source ~/.zshrc
 
 
 
-# Do not follow the instructions below. These are old commands are they are maintained just for the sake of documentation
+# Do not use the commands below. OpenMTP keeps them only for historical reference.
 
 - Remove libusb `brew remove libusb`
 - Download the required versions of the `libusb`.

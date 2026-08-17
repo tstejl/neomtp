@@ -1,11 +1,10 @@
-import omitLodash from 'lodash/omit';
 import { disposeMtp, initializeMtp } from '../HomePage/actions';
 import prefixer from '../../helpers/reducerPrefixer';
-import { settingsStorage } from '../../helpers/storageHelper';
+import { rendererSettings } from '../../helpers/rendererSettings';
 import { initialState } from './reducers';
 import { checkIf } from '../../utils/checkIf';
 import { MTP_MODE } from '../../enums';
-import { DEVICES_DEFAULT_PATH } from '../../constants';
+import { DEVICES_DEFAULT_PATH } from '../../helpers/rendererPaths';
 
 const prefix = '@@Settings';
 const actionTypesList = [
@@ -199,14 +198,15 @@ export function setCommonSettings(
 }
 
 export function copySettingsToJsonFile(getState, onSuccess) {
-  return (_) => {
+  return async (_) => {
     const settingsState = getState().Settings ? getState().Settings : {};
-    const filteredSettings = omitLodash(
-      settingsState,
-      excludeItemsFromSettingsFile
+    const filteredSettings = Object.fromEntries(
+      Object.entries(settingsState).filter(
+        ([key]) => !excludeItemsFromSettingsFile.includes(key)
+      )
     );
 
-    settingsStorage.setAll({ ...filteredSettings });
+    await rendererSettings.setAll({ ...filteredSettings });
 
     if (onSuccess) {
       onSuccess();

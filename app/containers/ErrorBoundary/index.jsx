@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import { styles } from './styles';
 import { imgsrc } from '../../utils/imgsrc';
 import GenerateErrorReport from './components/GenerateErrorReport';
-import { log } from '../../utils/log';
+import { log } from '../../utils/rendererLog';
 import { getOpenMtpApi } from '../../helpers/electronApi';
 
 class ErrorBoundary extends Component {

@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import macosVersion from 'macos-version';
 import {
@@ -83,8 +84,25 @@ export const kalamDebugReportCli = path.resolve(
   )
 );
 
+const kalamLibOverride =
+  !isPackaged && process.env.OPENMTP_DEVICE_E2E === 'true'
+    ? process.env.OPENMTP_KALAM_LIB_PATH
+    : null;
+
+if (
+  kalamLibOverride &&
+  (!path.isAbsolute(kalamLibOverride) ||
+    !fs.existsSync(kalamLibOverride) ||
+    !fs.statSync(kalamLibOverride).isFile())
+) {
+  throw new Error(
+    'OPENMTP_KALAM_LIB_PATH must point to an existing absolute file during the device E2E test'
+  );
+}
+
 export const kalamLibPath = path.resolve(
-  path.join(binariesPath({ includeArchDirectory: true }), './kalam.dylib')
+  kalamLibOverride ||
+    path.join(binariesPath({ includeArchDirectory: true }), './kalam.dylib')
 );
 
 // We have now officially retired the support for `Kalam` Kernel on macOS 10.13 (OS X El High Sierra) and lower. Only the "Legacy" MTP mode will continue working on these outdated machines.

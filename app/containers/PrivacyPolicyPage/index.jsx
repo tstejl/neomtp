@@ -15,7 +15,7 @@ import { openExternalUrl } from '../../utils/url';
 import { resetOverFlowY } from '../../utils/styleResets';
 import { PRIVACY_POLICY_PAGE_TITLE } from '../../templates/privacyPolicyPage';
 import { styles } from './styles';
-import { PATHS } from '../../constants/paths';
+import { rendererPaths } from '../../helpers/rendererPaths';
 
 class PrivacyPolicyPage extends Component {
   componentWillMount() {
@@ -38,7 +38,7 @@ class PrivacyPolicyPage extends Component {
             <span>Effective date: December 28, 2018</span>
           </p>
           <p>
-            <span>Updated date: January 3, 2021</span>
+            <span>Updated date: August 17, 2026</span>
           </p>
           <p>
             <span>
@@ -56,16 +56,13 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              This page informs you of our policies regarding the collection,
-              use, and disclosure of personal data when you use our Service and
-              the choices you have associated with that data.
+              This page describes how {APP_NAME} handles data in the Service.
             </span>
           </p>
           <p>
             <span>
-              We use your data to provide, study and improve the Service. By
-              using the Service, you agree to the collection and use of
-              information in accordance with this policy.
+              {APP_NAME} uses local data to provide and maintain the Service.
+              The app does not collect telemetry, analytics, or usage data.
             </span>
           </p>
           <p>
@@ -75,12 +72,9 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              We take your privacy very seriously and we DO NOT gather or
-              transfer any sort of personal data out of your device in any form.
-              We gather a very limited amount of ANONYMOUS information from you
-              which will be used for various purposes such as providing and
-              improving our Service to you. You may always choose not to share
-              such ANONYMOUS information with us.
+              {APP_NAME} does not collect personal data, anonymous usage data,
+              or telemetry. The app does not automatically send your data or
+              diagnostic logs to remote services.
             </span>
           </p>
           <p>
@@ -91,28 +85,22 @@ class PrivacyPolicyPage extends Component {
           <p>
             <span>Personal Data</span>
             <span>
-              While using our Service, we DO NOT ask you to provide us with any
-              kind of personally identifiable information that can be used to
-              contact or identify you (&quot;Personal Data&quot;).
+              {APP_NAME} does not ask you to provide personally identifiable
+              information that can contact or identify you (&quot;Personal
+              Data&quot;).
             </span>
           </p>
           <p>
             <span>
-              <u>Cookies</u>: Cookies are files with a small amount of data that
-              are commonly used as anonymous unique identifiers. These are sent
-              to your browser from the websites that you visit and are stored on
-              your device&#39;s internal memory.
+              <u>Cookies</u>: Cookies are small data files that websites can
+              store in a browser.
             </span>
           </p>
           <p>
             <span>
-              This Service does not use these &quot;cookies&quot; explicitly.
-              However, the app may use third party code and libraries that use
-              &ldquo;cookies&rdquo; to collect information and improve their
-              services. You have the option to either accept or refuse these
-              cookies and know when a cookie is being sent to your device. If
-              you choose to refuse our cookies, you may not be able to use some
-              portions of this Service.
+              This Service does not use cookies. {APP_NAME} does not use
+              third-party cookies, analytics, or tracking tools to collect
+              information.
             </span>
           </p>
           <p>
@@ -129,7 +117,7 @@ class PrivacyPolicyPage extends Component {
             </span>
           </p>
           <p>
-            <span>LocalStorage files we used in the app:</span>
+            <span>LocalStorage files we use in the app:</span>
           </p>
           <ul>
             <li>
@@ -140,8 +128,9 @@ class PrivacyPolicyPage extends Component {
             </li>
             <li>
               <span>
-                Log Files. We use Log Files to collect the crash reports for
-                other diagnostic reasons.
+                Log Files. The application stores diagnostic logs locally after
+                errors occur. The application does not send these logs to remote
+                services.
               </span>
             </li>
           </ul>
@@ -165,8 +154,7 @@ class PrivacyPolicyPage extends Component {
             </li>
             <li>
               <span>
-                To allow you to participate in interactive features of our
-                Service when you choose to do so
+                To allow you to use interactive features of our Service
               </span>
             </li>
             <li>
@@ -183,26 +171,21 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              Your information may be transferred to &mdash; and maintained on
-              &mdash; computers located outside of your state, province, country
-              or other governmental jurisdiction where the data protection laws
-              may differ than those from your jurisdiction.
+              {APP_NAME} keeps local data on your device. The app does not
+              transfer personal data, usage data, analytics, telemetry, or
+              diagnostic logs to remote services.
             </span>
           </p>
           <p>
             <span>
-              Your consent to this Privacy Policy followed by your submission of
-              such information represents your agreement to that transfer.
+              The app transfers files only between your computer and the
+              connected Android device that you select.
             </span>
           </p>
           <p>
             <span>
-              {APP_NAME} will take all steps reasonably necessary to ensure that
-              your data is treated securely and in accordance with this Privacy
-              Policy and no transfer of your Personal Data will take place to an
-              organization or a country unless there are adequate controls in
-              place including the security of your data and other personal
-              information.
+              You can choose to send diagnostic logs by email with a problem
+              report.
             </span>
           </p>
           <p>
@@ -212,40 +195,10 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              <u>Legal Requirements</u>
+              {APP_NAME} does not receive or keep your personal data, files,
+              usage data, or diagnostic logs.
             </span>
           </p>
-          <p>
-            <span>
-              {APP_NAME} may disclose your data in the good faith belief that
-              such action is necessary to:
-            </span>
-          </p>
-          <ul>
-            <li>
-              <span>To comply with a legal obligation</span>
-            </li>
-            <li>
-              <span>
-                To protect and defend the rights or property of {APP_NAME}
-              </span>
-            </li>
-            <li>
-              <span>
-                To prevent or investigate possible wrongdoing in connection with
-                the Service
-              </span>
-            </li>
-            <li>
-              <span>
-                To protect the personal safety of users of the Service or the
-                public
-              </span>
-            </li>
-            <li>
-              <span>To protect against legal liability</span>
-            </li>
-          </ul>
           <p>
             <span>
               <strong>Security Of Data</strong>
@@ -253,11 +206,25 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              The security of your data is important to us, but remember that no
-              method of transmission over the Internet, or method of electronic
-              storage is 100% secure. While we strive to use commercially
-              acceptable means to protect your Personal Data, we cannot
-              guarantee its absolute security.
+              {APP_NAME} stores local data on your device. No method of
+              electronic storage is completely secure.
+            </span>
+          </p>
+          <p>
+            <span>
+              <strong>Service Providers</strong>
+            </span>
+          </p>
+          <p>
+            <span>
+              {APP_NAME} does not use third-party services to collect, analyze,
+              or store your usage data.
+            </span>
+          </p>
+          <p>
+            <span>
+              The app does not send personal data, files, or diagnostic logs to
+              third-party services.
             </span>
           </p>
           <p>
@@ -267,16 +234,17 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              Our Service may contain links to other sites that are not operated
-              by us. If you click on a third party link, you will be directed to
-              that third party&#39;s site. We strongly advise you to review the
-              Privacy Policy of every site you visit.
+              Our Service contains links to sites that we do not operate.
+              Selecting a third-party link opens that site in your browser.
             </span>
+          </p>
+          <p>
+            <span>Review the Privacy Policy of each site that you visit.</span>
           </p>
           <p>
             <span>
               We have no control over and assume no responsibility for the
-              content, privacy policies or practices of any third party sites or
+              content, privacy policies, or practices of third-party sites or
               services.
             </span>
           </p>
@@ -287,16 +255,21 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              We periodically send out requests to GitHub.com servers to check
-              for the latest app updates and to determine whether an internet
-              connection is available.
+              The app sends requests to GitHub.com to check for updates and to
+              test the internet connection.
             </span>
           </p>
           <p>
             <span>
-              You may &quot;Opt-Out&quot; of the &quot;Auto App-update
-              checks&quot; by navigating to &quot;Settings&quot; option and
-              disabling the &quot;Enable auto-update check&quot; button.
+              These requests do not include your files, usage data, or
+              diagnostic logs.
+            </span>
+          </p>
+          <p>
+            <span>
+              You can disable automatic update checks. Open
+              &quot;Settings&quot;, then turn off &quot;Enable auto-update
+              check&quot;.
             </span>
           </p>
           <p>
@@ -322,12 +295,26 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              The application stores diagnostic logs locally when errors occur.
-              These log files can be accessed by navigating to &quot;
-              {PATHS.profileDir}/logs/&quot; folder. You may choose to send us
-              these log files by selecting the &quot;Help&quot; menu &gt;
-              &quot;Report Bugs&quot; and clicking on the &quot;EMAIL ERROR
-              LOGS&quot; buttons.
+              The application stores diagnostic logs locally after errors occur.
+            </span>
+          </p>
+          <p>
+            <span>The application does not send these logs automatically.</span>
+          </p>
+          <p>
+            <span>
+              {`You can access the logs in "${rendererPaths.profileDir}/logs/".`}
+            </span>
+          </p>
+          <p>
+            <span>
+              You can choose to send these logs with a problem report.
+            </span>
+          </p>
+          <p>
+            <span>
+              Open the &quot;Help&quot; menu, then select &quot;Report
+              Bugs&quot;. Select the &quot;EMAIL ERROR LOGS&quot; button.
             </span>
           </p>
           <p>
@@ -343,13 +330,8 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              We do not knowingly collect personally identifiable information
-              from anyone under the age of 18. If you are a parent or guardian
-              and you are aware that your Children has provided us with Personal
-              Data, please contact us. If we become aware that we have collected
-              Personal Data from children without verification of parental
-              consent, we take steps to remove that information from our
-              servers.
+              {APP_NAME} does not knowingly collect personal data from anyone,
+              including children under 18.
             </span>
           </p>
           <p>
@@ -359,15 +341,14 @@ class PrivacyPolicyPage extends Component {
           </p>
           <p>
             <span>
-              We may update our Privacy Policy from time to time. We will notify
-              you of any changes by posting the new Privacy Policy on this page.
+              We update this Privacy Policy from time to time. We post the new
+              Privacy Policy on this page.
             </span>
           </p>
           <p>
             <span>
-              You are advised to review this Privacy Policy periodically for any
-              changes. Changes to this Privacy Policy are effective when they
-              are posted on this page.
+              Review this Privacy Policy periodically for changes. Changes to
+              this Privacy Policy take effect on the date of posting.
             </span>
           </p>
           <p>

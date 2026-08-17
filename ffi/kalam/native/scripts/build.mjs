@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import 'zx/globals';
+import crypto from 'node:crypto';
 import fs from 'fs-extra';
 import { packageDirectory } from 'pkg-dir';
 import replace from 'replace';
@@ -18,6 +19,7 @@ const TEMP_ROOT_DIR = `${PKG_ROOT_DIR}/tmp`;
 const LIBUSB_BOTTLE_TEMP_DIR = `${TEMP_ROOT_DIR}/libusb_cache`;
 const KALAM_NATIVE_DIR = `${PKG_ROOT_DIR}/ffi/kalam/native`;
 const BUILD_BASE_DIR = `${PKG_ROOT_DIR}/build`;
+const MACOS_DEPLOYMENT_TARGET = '11.0';
 
 const orangeChalk = chalk.bold.hex('#FFA500');
 
@@ -192,13 +194,31 @@ async function runPrerequisites({ bottles }) {
     );
 
     const bottlePath = getLibusbBottleCachePath({ bottle });
+    const temporaryTarball = `${bottlePath.tarball}.download`;
+
+    await fs.remove(temporaryTarball);
+
     if (bottle.customFilePath) {
       console.info(`downloading the libusb tar file from custom url`);
 
-      await $`curl -L -o ${bottlePath.tarball} ${bottle.customFilePath.url}`;
+      await $`curl --fail --location --retry 3 -o ${temporaryTarball} ${bottle.customFilePath.url}`;
     } else {
-      await $`curl -L -H "Authorization: Bearer QQ==" -o ${bottlePath.tarball} https://ghcr.io/v2/homebrew/core/libusb/blobs/sha256:${bottle.sha256}`;
+      await $`curl --fail --location --retry 3 -H "Authorization: Bearer QQ==" -o ${temporaryTarball} https://ghcr.io/v2/homebrew/core/libusb/blobs/sha256:${bottle.sha256}`;
     }
+
+    const downloadedSha256 = crypto
+      .createHash('sha256')
+      .update(await fs.readFile(temporaryTarball))
+      .digest('hex');
+
+    if (downloadedSha256 !== bottle.sha256) {
+      await fs.remove(temporaryTarball);
+      throw new Error(
+        `libusb bottle checksum mismatch for ${bottlePath.identifier}: expected ${bottle.sha256}, received ${downloadedSha256}`
+      );
+    }
+
+    await fs.move(temporaryTarball, bottlePath.tarball, { overwrite: true });
   }
 
   // unarchiving the 'libusb' Brew bottles
@@ -249,7 +269,16 @@ async function runPrerequisites({ bottles }) {
     }
 
     if (bottle.customFilePath?.shouldProcessLibusbDylibConfig !== false) {
-      // copying the libusb-1.0.0.dylib to the build directory
+      // fixing the rpath in the libusb-1.0.0.dylib
+      console.info(
+        `[${bottlePath.identifier}] fixing the rpath in the libusb-1.0.0.dylib...\n`
+      );
+
+      // todo: FIXME
+      //  strangely the `install_name_tool` command doesnt work on a macos monterey dylib file
+      await $`install_name_tool -id ${bottlePath.rpath} ${bottlePath.libusbDylib}`;
+
+      // copying the patched libusb-1.0.0.dylib to the build directory
       console.info(
         `[${bottlePath.identifier}] attempting to copy the libusb-1.0.0.dylib to the build directory...\n`
       );
@@ -259,15 +288,6 @@ async function runPrerequisites({ bottles }) {
         bottlePath.libusbDylib,
         bottlePath.libusbDylibInBuildDir
       );
-
-      // fixing the rpath in the libusb-1.0.0.dylib
-      console.info(
-        `[${bottlePath.identifier}] fixing the rpath in the libusb-1.0.0.dylib...\n`
-      );
-
-      // todo: FIXME
-      //  strangely the `install_name_tool` command doesnt work on a macos monterey dylib file
-      await $`install_name_tool -id ${bottlePath.rpath} ${bottlePath.libusbDylib}`;
     } else {
       console.info(
         `skipping the processing of the libusb dylib which was downloaded from the custom file path`
@@ -298,24 +318,28 @@ for await (const [, bottle] of Object.entries(chosenBottlesForBuilding)) {
   // building kalam
   console.info(`building kalam...\n`);
   await $`(
-  cd ${KALAM_NATIVE_DIR} && CGO_ENABLED=1 \
+  cd ${KALAM_NATIVE_DIR} && MACOSX_DEPLOYMENT_TARGET=${MACOS_DEPLOYMENT_TARGET} \
+        CGO_ENABLED=1 \
         PKG_CONFIG_PATH=${bottlePath.pkgconfigBaseDir} \
-        CGO_CFLAGS='-Wno-deprecated-declarations' \
+        CGO_CFLAGS='-Wno-deprecated-declarations -mmacosx-version-min=${MACOS_DEPLOYMENT_TARGET}' \
+        CGO_LDFLAGS='-mmacosx-version-min=${MACOS_DEPLOYMENT_TARGET}' \
         GOARCH=${bottle.arch} GOOS=${bottle.os} \
         go build \
-        -v -a -trimpath \
+        -v -a -trimpath -buildvcs=false \
         -o ${bottlePath.kalamDylibInBuildDir} -buildmode=c-shared ./*.go
         )`;
 
   // building kalam_debug_report
   console.info(`building kalam_debug_report...\n`);
   await $`(
-  cd ${KALAM_NATIVE_DIR} && CGO_ENABLED=1 \
+  cd ${KALAM_NATIVE_DIR} && MACOSX_DEPLOYMENT_TARGET=${MACOS_DEPLOYMENT_TARGET} \
+        CGO_ENABLED=1 \
         PKG_CONFIG_PATH=${bottlePath.pkgconfigBaseDir} \
-        CGO_CFLAGS='-Wno-deprecated-declarations' \
+        CGO_CFLAGS='-Wno-deprecated-declarations -mmacosx-version-min=${MACOS_DEPLOYMENT_TARGET}' \
+        CGO_LDFLAGS='-mmacosx-version-min=${MACOS_DEPLOYMENT_TARGET}' \
         GOARCH=${bottle.arch} GOOS=${bottle.os} \
         go build \
-        -v -a -trimpath \
+        -v -a -trimpath -buildvcs=false \
         -o ${bottlePath.kalamDebugReportInBuildDir} kalam_debug_report/*.go
         )`;
 }

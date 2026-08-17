@@ -2,9 +2,9 @@ package send_to_js
 
 import (
 	"fmt"
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
 	jsoniter "github.com/json-iterator/go"
+	"kalam/mtp"
+	"kalam/mtpx"
 	"strings"
 )
 

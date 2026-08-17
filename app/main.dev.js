@@ -33,6 +33,9 @@ import { fileExistsSync } from './helpers/fileOps';
 const isSingleInstance = app.requestSingleInstanceLock();
 const isDeviceBootable = bootTheDevice();
 const isMas = electronIs.mas();
+const isNoDeviceE2e = process.env.OPENMTP_NO_DEVICE_E2E === 'true';
+const isDeviceE2e = process.env.OPENMTP_DEVICE_E2E === 'true';
+const isAutomatedE2e = isNoDeviceE2e || isDeviceE2e;
 let mainWindow = null;
 
 if (IS_PROD) {
@@ -250,7 +253,7 @@ if (!isDeviceBootable) {
       try {
         await createWindow();
 
-        let appUpdaterEnable = true;
+        let appUpdaterEnable = !isAutomatedE2e;
 
         if (isPackaged && process.platform === 'darwin') {
           appUpdaterEnable = !isMas && app.isInApplicationsFolder();
@@ -265,14 +268,16 @@ if (!isDeviceBootable) {
           autoUpdateCheckSettings.enableAutoUpdateCheck !== false;
         const isPrereleaseUpdatesEnabled = getEnablePrereleaseUpdatesSetting();
 
-        const autoAppUpdate = new AppUpdate({
-          autoUpdateCheck,
-          autoDownload:
-            autoUpdateCheckSettings.enableBackgroundAutoUpdate !== false,
-          allowPrerelease: isPrereleaseUpdatesEnabled === true,
-        });
+        const autoAppUpdate = isAutomatedE2e
+          ? null
+          : new AppUpdate({
+              autoUpdateCheck,
+              autoDownload:
+                autoUpdateCheckSettings.enableBackgroundAutoUpdate !== false,
+              allowPrerelease: isPrereleaseUpdatesEnabled === true,
+            });
 
-        autoAppUpdate.init();
+        autoAppUpdate?.init();
 
         const menuBuilder = new MenuBuilder({
           mainWindow,
@@ -282,10 +287,14 @@ if (!isDeviceBootable) {
 
         menuBuilder.buildMenu();
 
-        if (autoUpdateCheck && appUpdaterEnable) {
+        if (autoUpdateCheck && appUpdaterEnable && autoAppUpdate) {
           setTimeout(() => {
             autoAppUpdate.checkForUpdates();
           }, AUTO_UPDATE_CHECK_FIREUP_DELAY);
+        }
+
+        if (isAutomatedE2e) {
+          return;
         }
 
         // send attach and detach events to the renderer
@@ -347,7 +356,9 @@ if (!isDeviceBootable) {
         log.error(e, `main.dev -> before-quit`);
       });
 
-    usbDetect.stopMonitoring();
+    if (!isAutomatedE2e) {
+      usbDetect.stopMonitoring();
+    }
 
     app.quitting = true;
   });
