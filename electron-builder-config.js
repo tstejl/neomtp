@@ -1,43 +1,14 @@
-const OS_ARCH_TYPE = {
-  amd64: 'amd64',
-  arm64: 'arm64',
-};
-
-const getBinariesSupportedSystemArchitecture = () => {
-  if (process.arch === 'arm64') {
-    return OS_ARCH_TYPE.arm64;
-  }
-
-  return OS_ARCH_TYPE.amd64;
-};
+const isCodeSigningDisabled =
+  process.env.CSC_IDENTITY_AUTO_DISCOVERY === 'false';
+const isLocalMacBuild = process.env.ELECTRON_NOTARIZE === 'NO';
 
 module.exports = () => {
-  const getExtraFiles = () => {
-    const currentSystemArch = getBinariesSupportedSystemArchitecture();
-
-    let macResourceBinFilter;
-
-    switch (currentSystemArch) {
-      case OS_ARCH_TYPE.arm64:
-        macResourceBinFilter = [`${OS_ARCH_TYPE.arm64}/**/*`, `mtp-cli`];
-        break;
-
-      case OS_ARCH_TYPE.amd64:
-      default:
-        macResourceBinFilter = [
-          `${OS_ARCH_TYPE.amd64}/**/*`,
-          `medieval/${OS_ARCH_TYPE.amd64}/**/*`,
-          `mtp-cli`,
-        ];
-
-        break;
-    }
-
+  const getMacExtraFiles = () => {
     return [
       {
         from: 'build/mac/bin',
         to: 'Resources/bin',
-        filter: macResourceBinFilter,
+        filter: ['arm64/**/*', 'amd64/**/*', 'mtp-cli'],
       },
     ];
   };
@@ -45,7 +16,7 @@ module.exports = () => {
   return {
     productName: 'OpenMTP',
     appId: 'io.ganeshrvel.openmtp',
-    forceCodeSigning: true,
+    forceCodeSigning: !isCodeSigningDisabled,
     // eslint-disable-next-line no-template-curly-in-string
     artifactName: '${name}-${version}-${os}-${arch}.${ext}',
     copyright: '© Ganesh Rathinavel',
@@ -69,9 +40,10 @@ module.exports = () => {
       'app/main.prod.js.map',
       'package.json',
     ],
-    extraFiles: getExtraFiles(),
     mac: {
-      type: 'distribution',
+      ...(isCodeSigningDisabled ? { identity: null } : {}),
+      extraFiles: getMacExtraFiles(),
+      type: isLocalMacBuild ? 'development' : 'distribution',
       icon: 'build/icon.icns',
       category: 'public.app-category.productivity',
       hardenedRuntime: true,

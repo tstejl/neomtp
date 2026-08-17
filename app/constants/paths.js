@@ -30,6 +30,9 @@ const getAppDataPath = () => {
 
 const appPath = join(root, `./app`);
 const rendererPath = join(appPath, `./dist/app.html`);
+const preloadPath = isPackaged
+  ? join(__dirname, './preload.js')
+  : join(appPath, './preload.js');
 const configDir = join(root, `./config`);
 const homeDir = homedirOs();
 const profileDir = getAppDataPath();
@@ -50,7 +53,7 @@ const devAppUpdateFile = join(configDir, `./dev-app-update.yml`);
 export const PATHS = {
   root: resolve(root),
   app: resolve(appPath),
-  preloadPath: resolve(join(appPath, `./preload.js`)),
+  preloadPath: resolve(preloadPath),
   dist: resolve(join(appPath, `./dist`)),
   nodeModules: resolve(join(root, `./node_modules`)),
   homeDir: resolve(homeDir),

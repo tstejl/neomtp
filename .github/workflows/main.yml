@@ -8,8 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
       - name: Setup build environment
         uses: actions/setup-node@v4
         with:
@@ -18,27 +20,35 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.11'
-      - run: npm install -g create-dmg
-      - name: Cloning Git repository
-        uses: actions/checkout@v4
-      - name: Attempt to build OpenMTP
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Test OpenMTP
+        run: bun run test
+      - name: Build unsigned macOS artifacts
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          ELECTRON_NOTARIZE: 'NO'
         run: |
-          bun install --frozen-lockfile
-          bun run test:smoke
-          bun run build
-      - name: Attempt to generate unsigned macOS app
+          bun run package-mac-without-notarize
+      - name: Verify generated macOS artifacts
         run: |
-          export CSC_IDENTITY_AUTO_DISCOVERY=false
-          bun run package-mac-without-notarize 2>&1 || true
-      - name: Check if macOS app was generated
-        run: test -e dist/mac/OpenMTP.app
-      - name: Attempt to create disk image for generated macOS app
-        run: |
-          mkdir dist/dmg
-          create-dmg dist/mac/OpenMTP.app dist/dmg 2>&1 || true
-          shasum dist/dmg/* >> dist/dmg/CHECKSUM_SHA256.txt
-      - name: Upload disk image and checksum as artifact
+          test -d dist/mac/OpenMTP.app
+          test ! -e dist/mac/OpenMTP.app/Contents/Resources/bin/arm64
+          lipo -verify_arch x86_64 dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam.dylib
+          lipo -verify_arch x86_64 dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/libusb.dylib
+          lipo -verify_arch x86_64 dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam_debug_report
+          otool -L dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam.dylib | grep -F '@loader_path/libusb.dylib'
+          otool -D dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/libusb.dylib | grep -F '@loader_path/libusb.dylib'
+          vtool -show-build dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam.dylib | grep -F 'minos 11.0'
+          test -n "$(find dist -maxdepth 1 -name '*-mac-x64.dmg' -print -quit)"
+          test -n "$(find dist -maxdepth 1 -name '*-mac-x64.zip' -print -quit)"
+          shasum -a 256 dist/*-mac-x64.dmg dist/*-mac-x64.zip > dist/CHECKSUM_SHA256.txt
+      - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: 'Disk Image'
-          path: dist/dmg/
+          name: macOS-x64
+          path: |
+            dist/*-mac-x64.dmg
+            dist/*-mac-x64.zip
+            dist/*.blockmap
+            dist/CHECKSUM_SHA256.txt

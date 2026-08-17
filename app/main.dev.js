@@ -34,6 +34,8 @@ const isSingleInstance = app.requestSingleInstanceLock();
 const isDeviceBootable = bootTheDevice();
 const isMas = electronIs.mas();
 const isNoDeviceE2e = process.env.OPENMTP_NO_DEVICE_E2E === 'true';
+const isDeviceE2e = process.env.OPENMTP_DEVICE_E2E === 'true';
+const isAutomatedE2e = isNoDeviceE2e || isDeviceE2e;
 let mainWindow = null;
 
 if (IS_PROD) {
@@ -251,7 +253,7 @@ if (!isDeviceBootable) {
       try {
         await createWindow();
 
-        let appUpdaterEnable = !isNoDeviceE2e;
+        let appUpdaterEnable = !isAutomatedE2e;
 
         if (isPackaged && process.platform === 'darwin') {
           appUpdaterEnable = !isMas && app.isInApplicationsFolder();
@@ -266,7 +268,7 @@ if (!isDeviceBootable) {
           autoUpdateCheckSettings.enableAutoUpdateCheck !== false;
         const isPrereleaseUpdatesEnabled = getEnablePrereleaseUpdatesSetting();
 
-        const autoAppUpdate = isNoDeviceE2e
+        const autoAppUpdate = isAutomatedE2e
           ? null
           : new AppUpdate({
               autoUpdateCheck,
@@ -291,7 +293,7 @@ if (!isDeviceBootable) {
           }, AUTO_UPDATE_CHECK_FIREUP_DELAY);
         }
 
-        if (isNoDeviceE2e) {
+        if (isAutomatedE2e) {
           return;
         }
 
@@ -354,7 +356,7 @@ if (!isDeviceBootable) {
         log.error(e, `main.dev -> before-quit`);
       });
 
-    if (!isNoDeviceE2e) {
+    if (!isAutomatedE2e) {
       usbDetect.stopMonitoring();
     }
 

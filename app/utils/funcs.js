@@ -1,6 +1,6 @@
 import { isObject } from 'nice-utils';
 import semver from 'semver';
-import { APP_TITLEBAR_DOM_ID } from '../constants/dom';
+import { FILE_EXPLORER_BODY_WRAPPER_ID } from '../constants/dom';
 import { APP_VERSION } from '../constants/meta';
 
 export const isArraysEqual = (a, b) => {
@@ -246,7 +246,30 @@ export const toggleFileExplorerDeviceType = (
 };
 
 export const isFileExplorerOnFocus = () => {
-  return document.elementFromPoint(3, 2).id === APP_TITLEBAR_DOM_ID;
+  const focussedFileExplorer = document.activeElement?.closest(
+    `[id^="${FILE_EXPLORER_BODY_WRAPPER_ID}-"]`
+  );
+
+  if (!focussedFileExplorer) {
+    return false;
+  }
+
+  const overlays = document.querySelectorAll(
+    '[role="dialog"], [aria-modal="true"], .MuiModal-root'
+  );
+
+  return ![...overlays].some((element) => {
+    if (
+      element.getClientRects().length === 0 ||
+      element.closest('[aria-hidden="true"]')
+    ) {
+      return false;
+    }
+
+    const style = window.getComputedStyle(element);
+
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  });
 };
 
 export const isString = (variable) => {

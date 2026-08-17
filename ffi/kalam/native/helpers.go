@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
+	"kalam/mtp"
+	"kalam/mtpx"
 	"log"
 )
 
@@ -188,16 +188,20 @@ func _dispose() error {
 	return nil
 }
 
+// mtpLock is a one-token channel used as a non-blocking mutex.
+var mtpLock = make(chan struct{}, 1)
+
 func lockMtp() error {
-	if container.locked {
+	// A send succeeds only when the token is available, preserving the
+	// non-blocking ErrorMtpLockExists behavior.
+	select {
+	case mtpLock <- struct{}{}:
+		return nil
+	default:
 		return fmt.Errorf("ErrorMtpLockExists")
 	}
+}
 
-	container.locked = true
-
-	defer func() {
-		container.locked = false
-	}()
-
-	return nil
+func unlockMtp() {
+	<-mtpLock
 }

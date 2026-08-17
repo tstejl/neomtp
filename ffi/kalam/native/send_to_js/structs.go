@@ -1,8 +1,8 @@
 package send_to_js
 
 import (
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
+	"kalam/mtp"
+	"kalam/mtpx"
 )
 
 type ErrorType string
