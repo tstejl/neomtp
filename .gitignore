@@ -39,6 +39,11 @@ flow-typed/npm/*
 release
 app/main.prod.js
 app/main.prod.js.map
+app/main-*.js
+app/main-*.js.map
+app/preload.js
+app/preload-*.js
+!app/preload-src.js
 app/renderer.prod.js
 app/renderer.prod.js.map
 app/style.css

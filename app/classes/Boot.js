@@ -5,7 +5,7 @@
  * Note: Don't import log helper file from utils here
  */
 
-import { readdirSync } from 'fs';
+import { readdirSync } from 'node:fs';
 import { PATHS } from '../constants/paths';
 import {
   fileExistsSync,

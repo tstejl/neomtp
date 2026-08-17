@@ -1,36 +1,9 @@
 import { FileExplorerRepository } from '../repositories/FileExplorerRepository';
 import { checkIf } from '../../../utils/checkIf';
-import {
-  processLocalBuffer,
-  processMtpBuffer,
-} from '../../../helpers/processBufferOutput';
-import { getMtpModeSetting } from '../../../helpers/settings';
-import { DEVICE_TYPE } from '../../../enums';
 
 class FileExplorerController {
   constructor() {
     this.repository = new FileExplorerRepository();
-  }
-
-  async _processResult({ result, deviceType }) {
-    checkIf(deviceType, 'inObjectValues', DEVICE_TYPE);
-
-    if (deviceType === DEVICE_TYPE.local) {
-      await processLocalBuffer({
-        error: result?.error,
-        stderr: result?.stderr,
-      });
-
-      return;
-    }
-
-    const mtpMode = getMtpModeSetting();
-
-    await processMtpBuffer({
-      error: result?.error,
-      stderr: result?.stderr,
-      mtpMode,
-    });
   }
 
   /**
@@ -42,8 +15,6 @@ class FileExplorerController {
     checkIf(deviceType, 'string');
 
     const result = await this.repository.initialize({ deviceType });
-
-    this._processResult({ result, deviceType });
 
     return result;
   }
@@ -58,8 +29,6 @@ class FileExplorerController {
 
     const result = await this.repository.dispose({ deviceType });
 
-    this._processResult({ result, deviceType });
-
     return result;
   }
 
@@ -72,8 +41,6 @@ class FileExplorerController {
     checkIf(deviceType, 'string');
 
     const result = await this.repository.listStorages({ deviceType });
-
-    this._processResult({ result, deviceType });
 
     return result;
   }
@@ -99,8 +66,6 @@ class FileExplorerController {
       storageId,
     });
 
-    this._processResult({ result, deviceType });
-
     return result;
   }
 
@@ -125,8 +90,6 @@ class FileExplorerController {
       storageId,
     });
 
-    this._processResult({ result, deviceType });
-
     return result;
   }
 
@@ -147,8 +110,6 @@ class FileExplorerController {
       fileList,
       storageId,
     });
-
-    this._processResult({ result, deviceType });
 
     return result;
   }
@@ -171,8 +132,6 @@ class FileExplorerController {
       storageId,
     });
 
-    this._processResult({ result, deviceType });
-
     return result;
   }
 
@@ -193,8 +152,6 @@ class FileExplorerController {
       fileList,
       storageId,
     });
-
-    this._processResult({ result, deviceType });
 
     return result;
   }
@@ -246,8 +203,6 @@ class FileExplorerController {
       onPreprocess,
     });
 
-    this._processResult({ result, deviceType });
-
     return result;
   };
 
@@ -261,8 +216,6 @@ class FileExplorerController {
     checkIf(deviceType, 'string');
 
     const result = await this.repository.fetchDebugReport({ deviceType });
-
-    this._processResult({ result, deviceType });
 
     return result;
   }

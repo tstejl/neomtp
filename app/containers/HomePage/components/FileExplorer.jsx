@@ -1,7 +1,6 @@
 /* eslint no-case-declarations: off */
 
 import React, { Component, Fragment } from 'react';
-import * as path from 'path';
 import classnames from 'classnames';
 import Typography from '@material-ui/core/Typography';
 import {
@@ -12,7 +11,6 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { withStyles } from '@material-ui/core/styles';
-import lodashSortBy from 'lodash/sortBy';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import IconButton from '@material-ui/core/IconButton';
@@ -100,14 +98,12 @@ import {
   MTP_MODE,
   USB_HOTPLUG_EVENTS,
 } from '../../../enums';
-import { log } from '../../../utils/log';
-import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
+import { log } from '../../../utils/rendererLog';
 import { checkIf } from '../../../utils/checkIf';
 import {
   buyMeACoffeeText,
   supportUsingPayPal,
 } from '../../../templates/fileExplorer';
-import { fileExistsSync } from '../../../helpers/fileOps';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { getOpenMtpApi } from '../../../helpers/electronApi';
 
@@ -351,13 +347,13 @@ class FileExplorer extends Component {
 
   _reportBugsDisposeMtpEvent = async (_, { logFileZippedPath }) => {
     // dispose the mtp before generating the report
-    await fileExplorerController.dispose({ deviceType: DEVICE_TYPE.mtp });
+    await getOpenMtpApi().fileExplorer.dispose({ deviceType: DEVICE_TYPE.mtp });
 
-    await fileExplorerController.fetchDebugReport({
+    await getOpenMtpApi().fileExplorer.fetchDebugReport({
       deviceType: DEVICE_TYPE.mtp,
     });
 
-    const { error } = await fileExplorerController.deleteFiles({
+    const { error } = await getOpenMtpApi().fileExplorer.deleteFiles({
       deviceType: DEVICE_TYPE.local,
       fileList: [logFileZippedPath],
       storageId: null,
@@ -1248,7 +1244,9 @@ class FileExplorer extends Component {
     const filePath = data.path;
     const filename = data.name;
 
-    const newFilepath = path.join(pathUp(filePath), sanitizedNewFilename);
+    const newFilepath = sanitizePath(
+      `${pathUp(filePath)}/${sanitizedNewFilename}`
+    );
 
     if (newFilepath === data.path) {
       this._handleClearEditDialog(targetAction);
@@ -1259,7 +1257,7 @@ class FileExplorer extends Component {
     // if the new filename and the existing filename are just case different then skip the edit dialog
     if (sanitizedNewFilename.toLowerCase() !== filename.toLowerCase()) {
       if (
-        await fileExplorerController.filesExist({
+        await getOpenMtpApi().fileExplorer.filesExist({
           deviceType,
           fileList: [newFilepath],
           storageId,
@@ -1324,7 +1322,13 @@ class FileExplorer extends Component {
         return;
       }
 
-      if (!fileExistsSync(filePath)) {
+      if (
+        !(await getOpenMtpApi().fileExplorer.filesExist({
+          deviceType: DEVICE_TYPE.local,
+          fileList: [filePath],
+          storageId: null,
+        }))
+      ) {
         return;
       }
 
@@ -1526,7 +1530,7 @@ class FileExplorer extends Component {
     const newFolderPath = sanitizePath(`${data.path}/${newFolderName}`);
 
     if (
-      await fileExplorerController.filesExist({
+      await getOpenMtpApi().fileExplorer.filesExist({
         deviceType,
         fileList: [newFolderPath],
         storageId,
@@ -1590,7 +1594,7 @@ class FileExplorer extends Component {
     }
 
     if (
-      await fileExplorerController.filesExist({
+      await getOpenMtpApi().fileExplorer.filesExist({
         deviceType,
         fileList: queue,
         storageId,
@@ -1740,17 +1744,24 @@ class FileExplorer extends Component {
       return [];
     }
 
-    let _sortedNode = [];
+    let _sortedNode = [...nodes].sort((left, right) => {
+      const leftValue = this._lodashSortConstraints({
+        value: left,
+        orderBy,
+      });
+      const rightValue = this._lodashSortConstraints({
+        value: right,
+        orderBy,
+      });
 
-    if (order === 'asc') {
-      _sortedNode = lodashSortBy(nodes, [
-        (value) => this._lodashSortConstraints({ value, orderBy }),
-      ]);
-    } else {
-      _sortedNode = lodashSortBy(nodes, [
-        (value) => this._lodashSortConstraints({ value, orderBy }),
-      ]).reverse();
-    }
+      if (leftValue === rightValue) {
+        return 0;
+      }
+
+      const comparison = leftValue < rightValue ? -1 : 1;
+
+      return order === 'asc' ? comparison : -comparison;
+    });
 
     const _folders = [];
     const _files = [];
@@ -1783,7 +1794,7 @@ class FileExplorer extends Component {
     if (isNumber(item)) {
       if (isInt(item)) {
         _primer = parseInt(item, 10);
-      } else if (isFloat) {
+      } else if (isFloat(item)) {
         _primer = parseFloat(item);
       }
     }
@@ -2112,7 +2123,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: localError,
                   stderr: localStderr,
                   data: localData,
-                } = await fileExplorerController.renameFile({
+                } = await getOpenMtpApi().fileExplorer.renameFile({
                   deviceType,
                   filePath,
                   newFilename,
@@ -2145,7 +2156,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: mtpError,
                   stderr: mtpStderr,
                   data: mtpData,
-                } = await fileExplorerController.renameFile({
+                } = await getOpenMtpApi().fileExplorer.renameFile({
                   deviceType,
                   filePath,
                   newFilename,
@@ -2191,7 +2202,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: localError,
                   stderr: localStderr,
                   data: localData,
-                } = await fileExplorerController.makeDirectory({
+                } = await getOpenMtpApi().fileExplorer.makeDirectory({
                   deviceType,
                   filePath: newFolderPath,
                   storageId: null,
@@ -2223,7 +2234,7 @@ const mapDispatchToProps = (dispatch, _) =>
                   error: mtpError,
                   stderr: mtpStderr,
                   data: mtpData,
-                } = await fileExplorerController.makeDirectory({
+                } = await getOpenMtpApi().fileExplorer.makeDirectory({
                   deviceType,
                   filePath: newFolderPath,
                   storageId,
@@ -2457,7 +2468,7 @@ const mapDispatchToProps = (dispatch, _) =>
 
             switch (deviceType) {
               case DEVICE_TYPE.local:
-                fileExplorerController.transferFiles({
+                getOpenMtpApi().fileExplorer.transferFiles({
                   deviceType: DEVICE_TYPE.mtp,
                   destination: destinationFolder,
                   storageId,
@@ -2471,7 +2482,7 @@ const mapDispatchToProps = (dispatch, _) =>
 
                 break;
               case DEVICE_TYPE.mtp:
-                fileExplorerController.transferFiles({
+                getOpenMtpApi().fileExplorer.transferFiles({
                   deviceType: DEVICE_TYPE.mtp,
                   destination: destinationFolder,
                   storageId,

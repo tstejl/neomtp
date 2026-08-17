@@ -3,15 +3,15 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { Helmet } from 'react-helmet';
-import sanitizeHtml from 'sanitize-html';
 import { styles } from './styles';
-import releaseNotesStyles from './styles/release-notes.scss';
+import releaseNotesStyles from './styles/release-notes.module.scss';
 import { undefinedOrNull } from '../../../utils/funcs';
 import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { setStyle } from '../../../utils/styles';
 import { getAppThemeMode } from '../../../helpers/theme';
 import { getCurrentThemePalette } from '../../App/styles';
 import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { sanitizeHtml } from '../../../utils/sanitizeHtml';
 
 class AppUpdatePage extends Component {
   constructor(props) {
@@ -19,34 +19,6 @@ class AppUpdatePage extends Component {
 
     this.state = {
       releaseInfo: {},
-    };
-
-    this.sanitizeHtmlConfig = {
-      allowedTags: [
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'blockquote',
-        'p',
-        'ul',
-        'ol',
-        'nl',
-        'li',
-        'b',
-        'i',
-        'strong',
-        'em',
-        'strike',
-        'code',
-        'hr',
-        'br',
-        'div',
-        'caption',
-        'pre',
-      ],
     };
   }
 
@@ -58,7 +30,9 @@ class AppUpdatePage extends Component {
   }
 
   componentDidMount() {
-    const appThemeMode = getAppThemeMode();
+    const appThemeMode = getAppThemeMode(
+      getOpenMtpApi().settings.getItems(['appThemeMode']).appThemeMode
+    );
     const { nativeSystemColor } = getCurrentThemePalette(appThemeMode);
 
     setStyle(document.body, {
@@ -100,10 +74,7 @@ class AppUpdatePage extends Component {
     }
 
     const { releaseName, releaseNotes } = releaseInfo;
-    const sanitizedReleaseNotesHtml = sanitizeHtml(
-      releaseNotes,
-      this.sanitizeHtmlConfig
-    );
+    const sanitizedReleaseNotesHtml = sanitizeHtml(releaseNotes);
 
     return (
       <div className={styles.root}>

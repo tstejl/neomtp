@@ -4,8 +4,8 @@ import {
   appendFile as _appendFileAsync,
   readFileSync as _readFileSync,
   writeFileSync as _writeFileSync,
-} from 'fs';
-import { EOL } from 'os';
+} from 'node:fs';
+import { EOL } from 'node:os';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 

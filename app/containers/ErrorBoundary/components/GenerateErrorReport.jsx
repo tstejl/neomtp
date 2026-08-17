@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react';
-import path from 'path';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 import { styles } from '../styles/GenerateErrorReport';
-import { PATHS } from '../../../constants/paths';
-import { fileExistsSync } from '../../../helpers/fileOps';
 import { AUTHOR_EMAIL } from '../../../constants/meta';
 import { throwAlert } from '../../Alerts/actions';
 import {
@@ -13,23 +10,15 @@ import {
   reportGenerateError,
   mailTo,
 } from '../../../templates/generateErrorReport';
-import { compressFile } from '../../../utils/gzip';
 import GenerateErrorReportBody from './GenerateErrorReportBody';
-import { baseName } from '../../../utils/files';
-import { log } from '../../../utils/log';
-import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
+import { log } from '../../../utils/rendererLog';
 import { DEVICE_TYPE } from '../../../enums';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 const openmtp = getOpenMtpApi();
 
-const { logFile } = PATHS;
-const desktopPath = openmtp.app.getPath('desktop');
-const zippedLogFileBaseName = `${baseName(logFile)}.gz`;
-const logFileZippedPath = path.resolve(
-  path.join(desktopPath, `./${zippedLogFileBaseName}`)
-);
+const { zippedLogFileBaseName, logFileZippedPath } = openmtp.report.getInfo();
 const mailToInstructions = _mailToInstructions(zippedLogFileBaseName);
 
 class GenerateErrorReport extends PureComponent {
@@ -42,7 +31,7 @@ class GenerateErrorReport extends PureComponent {
 
   compressLog = async () => {
     try {
-      await compressFile(logFile, logFileZippedPath);
+      return await openmtp.report.compressLog();
     } catch (e) {
       log.error(e, `GenerateErrorReport -> compressLog`);
     }
@@ -72,13 +61,13 @@ class GenerateErrorReport extends PureComponent {
       }
 
       // direct button click action if the generate button is within the error boundary
-      await fileExplorerController.dispose({ deviceType: DEVICE_TYPE.mtp });
+      await openmtp.fileExplorer.dispose({ deviceType: DEVICE_TYPE.mtp });
 
-      await fileExplorerController.fetchDebugReport({
+      await openmtp.fileExplorer.fetchDebugReport({
         deviceType: DEVICE_TYPE.mtp,
       });
 
-      const { error } = await fileExplorerController.deleteFiles({
+      const { error } = await openmtp.fileExplorer.deleteFiles({
         deviceType: DEVICE_TYPE.local,
         fileList: [logFileZippedPath],
         storageId: null,
@@ -103,9 +92,9 @@ class GenerateErrorReport extends PureComponent {
       return null;
     }
 
-    await this.compressLog();
+    const compressResult = await this.compressLog();
 
-    if (!fileExistsSync(logFileZippedPath)) {
+    if (compressResult?.error || !compressResult?.data?.exists) {
       actionCreateThrowError({
         message: reportGenerateError,
       });
@@ -115,7 +104,7 @@ class GenerateErrorReport extends PureComponent {
       return null;
     }
 
-    if (window) {
+    if (typeof window !== 'undefined') {
       window.location.href = `${mailTo} ${mailToInstructions}`;
     }
 

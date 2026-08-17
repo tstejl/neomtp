@@ -9,7 +9,15 @@ export class FileExplorerRepository {
   constructor() {
     this.legacyMtpDataSource = new FileExplorerLegacyDataSource();
     this.localDataSource = new FileExplorerLocalDataSource();
-    this.kalamMtpDataSource = new FileExplorerKalamDataSource();
+    this.kalamMtpDataSource = null;
+  }
+
+  _getKalamMtpDataSource() {
+    if (!this.kalamMtpDataSource) {
+      this.kalamMtpDataSource = new FileExplorerKalamDataSource();
+    }
+
+    return this.kalamMtpDataSource;
   }
 
   /**
@@ -29,7 +37,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.initialize();
+          return this._getKalamMtpDataSource().initialize();
       }
     }
 
@@ -53,7 +61,9 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.dispose();
+          return this.kalamMtpDataSource
+            ? this.kalamMtpDataSource.dispose()
+            : { error: null, stderr: null, data: null };
       }
     }
 
@@ -75,7 +85,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.listStorages();
+          return this._getKalamMtpDataSource().listStorages();
       }
     }
 
@@ -107,7 +117,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.listFiles({
+          return this._getKalamMtpDataSource().listFiles({
             filePath,
             ignoreHidden,
             storageId,
@@ -146,7 +156,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.renameFile({
+          return this._getKalamMtpDataSource().renameFile({
             filePath,
             newFilename,
             storageId,
@@ -183,7 +193,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.deleteFiles({
+          return this._getKalamMtpDataSource().deleteFiles({
             fileList,
             storageId,
           });
@@ -218,7 +228,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.makeDirectory({
+          return this._getKalamMtpDataSource().makeDirectory({
             filePath,
             storageId,
           });
@@ -253,7 +263,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.filesExist({
+          return this._getKalamMtpDataSource().filesExist({
             fileList,
             storageId,
           });
@@ -312,7 +322,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.transferFiles({
+          return this._getKalamMtpDataSource().transferFiles({
             deviceType,
             destination,
             fileList,
@@ -346,7 +356,7 @@ export class FileExplorerRepository {
 
         case MTP_MODE.kalam:
         default:
-          return this.kalamMtpDataSource.fetchDebugReport();
+          return this._getKalamMtpDataSource().fetchDebugReport();
       }
     }
 

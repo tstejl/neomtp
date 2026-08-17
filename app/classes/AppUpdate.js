@@ -3,7 +3,7 @@ import { autoUpdater } from 'electron-updater';
 import { isConnected } from '../utils/isOnline';
 import { log } from '../utils/log';
 import { isPackaged } from '../utils/isPackaged';
-import { PATHS } from '../constants/paths';
+import { getRendererUrl, PATHS } from '../constants/paths';
 import { unixTimestampNow } from '../utils/date';
 import { undefinedOrNull } from '../utils/funcs';
 import {
@@ -65,7 +65,7 @@ const fireProgressbar = () => {
     progressbarWindow = createChildWindow();
 
     progressbarWindow.loadURL(
-      `${PATHS.loadUrlPath}#appUpdatePage/updateProgress`
+      `${getRendererUrl()}#appUpdatePage/updateProgress`
     );
 
     progressbarWindow.webContents.on('did-finish-load', () => {

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"github.com/ganeshrvel/go-mtpfs/mtp"
-	"github.com/ganeshrvel/go-mtpx"
-	"os"
+	"kalam/mtp"
 )
 
 type verifyMtpSessionMode struct {
@@ -13,7 +11,6 @@ type verifyMtpSessionMode struct {
 type deviceContainer struct {
 	dev        *mtp.Device
 	deviceInfo *mtp.DeviceInfo
-	locked     bool
 }
 
 type MakeDirectoryInput struct {
@@ -57,17 +54,4 @@ type DownloadFilesInput struct {
 	Sources         []string `json:"sources"`
 	Destination     string   `json:"destination"`
 	PreprocessFiles bool     `json:"preprocessFiles"`
-}
-
-type UploadPreprocessContainer struct {
-	fi       *os.FileInfo
-	fullPath string
-}
-
-type DownloadPreprocessContainer struct {
-	fi *mtpx.FileInfo
-}
-
-type ProgressContainer struct {
-	pInfo *mtpx.ProgressInfo
 }

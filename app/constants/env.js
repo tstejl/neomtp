@@ -30,12 +30,13 @@ if (isProd) {
   _env = 'debug';
 }
 
-module.exports.ENV_FLAVOR = config[_env];
+export const ENV_FLAVOR = config[_env];
 
-module.exports.IS_DEV = isDev;
+export const IS_DEV = isDev;
 
-module.exports.IS_PROD = isProd;
+export const IS_PROD = isProd;
 
-module.exports.DEBUG_PROD = isDebug;
+export const DEBUG_PROD = isDebug;
 
-module.exports.IS_RENDERER = process && process.type === 'renderer';
+export const IS_RENDERER =
+  typeof process !== 'undefined' && process.type === 'renderer';

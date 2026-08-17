@@ -49,7 +49,7 @@ import {
 import { MTP_ERROR } from '../../../enums/mtpError';
 import { imgsrc } from '../../../utils/imgsrc';
 import { helpPhoneNotConnecting } from '../../../templates/fileExplorer';
-import { isKalamModeSupported } from '../../../helpers/binaries';
+import { isKalamModeSupported } from '../../../helpers/rendererCapabilities';
 
 const hotplugSettingText = `Check if 'Enable auto device detection (USB Hotplug)' is enabled under Settings > General Tab`;
 const deviceLabel = DEVICES_LABEL[DEVICE_TYPE.mtp];

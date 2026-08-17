@@ -1,4 +1,4 @@
-import { platform, release } from 'os';
+import { platform, release } from 'node:os';
 import macosVersion from 'macos-version';
 import { OS_ARCH_TYPE } from '../constants';
 

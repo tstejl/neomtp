@@ -1,5 +1,6 @@
 import { BrowserWindow, nativeTheme } from 'electron';
 import { getAppThemeMode } from './theme';
+import { getAppThemeModeSetting } from './settings';
 import { getCurrentThemePalette } from '../containers/App/styles';
 
 export const getMainWindowMainProcess = () => {
@@ -10,7 +11,7 @@ export const getMainWindowMainProcess = () => {
 
 export const getWindowBackgroundColor = () => {
   const appThemeMode = getAppThemeMode(
-    undefined,
+    getAppThemeModeSetting(),
     nativeTheme.shouldUseDarkColors
   );
   const { background } = getCurrentThemePalette(appThemeMode);

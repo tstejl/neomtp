@@ -9,17 +9,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faPaypal } from '@fortawesome/free-brands-svg-icons';
 import { actionTypes } from './actions';
-import { PATHS } from '../../constants/paths';
-import {
-  DEVICES_DEFAULT_PATH,
-  FILE_EXPLORER_DEFAULT_FOCUSSED_DEVICE_TYPE,
-} from '../../constants';
+import { FILE_EXPLORER_DEFAULT_FOCUSSED_DEVICE_TYPE } from '../../constants';
 import { DEVICE_TYPE } from '../../enums';
 import {
   buyMeACoffeeText,
   supportUsingPayPal,
 } from '../../templates/fileExplorer';
-import { isKalamModeSupported } from '../../helpers/binaries';
+import {
+  DEVICES_DEFAULT_PATH,
+  rendererPaths,
+} from '../../helpers/rendererPaths';
+import { isKalamModeSupported } from '../../helpers/rendererCapabilities';
 
 export const initialState = {
   focussedFileExplorerDeviceType: {
@@ -32,31 +32,31 @@ export const initialState = {
     top: [
       {
         label: 'Home',
-        path: PATHS.homeDir,
+        path: rendererPaths.homeDir,
         icon: 'folder',
         enabled: true,
       },
       {
         label: 'Desktop',
-        path: PATHS.desktopDir,
+        path: rendererPaths.desktopDir,
         icon: 'folder',
         enabled: true,
       },
       {
         label: 'Downloads',
-        path: PATHS.downloadsDir,
+        path: rendererPaths.downloadsDir,
         icon: 'folder',
         enabled: true,
       },
       {
         label: 'Removable Disks',
-        path: PATHS.volumesDir,
+        path: rendererPaths.volumesDir,
         icon: 'folder',
         enabled: true,
       },
       {
         label: 'Root',
-        path: PATHS.systemRootDir,
+        path: rendererPaths.systemRootDir,
         icon: 'folder',
         enabled: true,
       },
