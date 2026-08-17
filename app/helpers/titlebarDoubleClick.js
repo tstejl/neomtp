@@ -1,9 +1,7 @@
-import { getRemoteWindow } from './remoteWindowHelpers';
-
-const remote = getRemoteWindow();
+import { getOpenMtpApi } from './electronApi';
 
 export const toggleWindowSizeOnDoubleClick = () => {
-  const window = remote.getCurrentWindow();
+  const { window } = getOpenMtpApi();
 
   if (!window.isMaximized()) {
     window.maximize();

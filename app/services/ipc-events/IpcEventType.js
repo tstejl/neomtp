@@ -16,4 +16,18 @@ export class IpcEvents {
     'ipc.reportBugsDisposeMtpReply.fromMain';
 
   static USB_HOTPLUG = 'ipc.usbHotplug';
+
+  static SHOW_CONTEXT_MENU = 'ipc.contextMenu.show';
+
+  static GET_PATH = 'ipc.app.getPath';
+
+  static WINDOW_RELOAD = 'ipc.window.reload';
+
+  static WINDOW_MAXIMIZE = 'ipc.window.maximize';
+
+  static WINDOW_UNMAXIMIZE = 'ipc.window.unmaximize';
+
+  static WINDOW_IS_MAXIMIZED = 'ipc.window.isMaximized';
+
+  static WINDOW_SET_PROGRESS_BAR = 'ipc.window.setProgressBar';
 }

@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -12,6 +11,7 @@ import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { setStyle } from '../../../utils/styles';
 import { getAppThemeMode } from '../../../helpers/theme';
 import { getCurrentThemePalette } from '../../App/styles';
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 class AppUpdatePage extends Component {
   constructor(props) {
@@ -51,9 +51,10 @@ class AppUpdatePage extends Component {
   }
 
   componentWillMount() {
-    ipcRenderer.on('appUpdatesUpdateAvailableCommunication', (event, args) => {
-      this.setState({ releaseInfo: { ...args } });
-    });
+    getOpenMtpApi().ipc.on(
+      'appUpdatesUpdateAvailableCommunication',
+      this.updateAvailableCommunicationEvent
+    );
   }
 
   componentDidMount() {
@@ -66,15 +67,18 @@ class AppUpdatePage extends Component {
   }
 
   componentWillUnmount() {
-    ipcRenderer.removeListener(
+    getOpenMtpApi().ipc.removeListener(
       'appUpdatesUpdateAvailableCommunication',
-      () => {}
+      this.updateAvailableCommunicationEvent
     );
-    ipcRenderer.removeListener('appUpdatesUpdateAvailableReply', () => {});
   }
 
+  updateAvailableCommunicationEvent = (_, args) => {
+    this.setState({ releaseInfo: { ...args } });
+  };
+
   _handleBtnClick = ({ confirm }) => {
-    ipcRenderer.send('appUpdatesUpdateAvailableReply', { confirm });
+    getOpenMtpApi().ipc.send('appUpdatesUpdateAvailableReply', { confirm });
     window.close();
   };
 

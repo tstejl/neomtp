@@ -1,7 +1,6 @@
 /* eslint no-case-declarations: off */
 
 import React, { PureComponent, Fragment } from 'react';
-import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
@@ -48,6 +47,7 @@ import { log } from '../../../utils/log';
 import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
 import { checkIf } from '../../../utils/checkIf';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 class ToolbarAreaPane extends PureComponent {
   constructor(props) {
@@ -64,14 +64,14 @@ class ToolbarAreaPane extends PureComponent {
   }
 
   componentWillMount() {
-    ipcRenderer.on(
+    getOpenMtpApi().ipc.on(
       'fileExplorerToolbarActionCommunication',
       this.fileExplorerToolbarActionCommunicationEvent
     );
   }
 
   componentWillUnmount() {
-    ipcRenderer.removeListener(
+    getOpenMtpApi().ipc.removeListener(
       'fileExplorerToolbarActionCommunication',
       this.fileExplorerToolbarActionCommunicationEvent
     );
@@ -296,7 +296,7 @@ class ToolbarAreaPane extends PureComponent {
   };
 
   _handleFaqsBtn = () => {
-    ipcRenderer.send(IpcEvents.OPEN_FAQS_WINDOW);
+    getOpenMtpApi().ipc.send(IpcEvents.OPEN_FAQS_WINDOW);
   };
 
   render() {

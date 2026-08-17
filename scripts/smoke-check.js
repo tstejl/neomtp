@@ -11,6 +11,7 @@ const requiredFiles = [
   'app/app.html',
   'app/index.js',
   'app/main.dev.js',
+  'app/preload.js',
   '.bunfig.toml',
   'bun.lock',
   'electron-builder-config.js',
@@ -26,9 +27,28 @@ const missingScripts = requiredScripts.filter(
   (script) => !packageJson.scripts[script]
 );
 const packagedFiles = new Set((builderConfig.files || []).map(String));
-const missingPackagedFiles = ['app/app.html', 'app/main.prod.js'].filter(
-  (file) => !packagedFiles.has(file)
-);
+const missingPackagedFiles = [
+  'app/app.html',
+  'app/preload.js',
+  'app/main.prod.js',
+].filter((file) => !packagedFiles.has(file));
+const secureElectronFiles = [
+  'app/main.dev.js',
+  'app/classes/AppUpdate.js',
+  'app/helpers/createWindows.js',
+  'app/preload.js',
+  'app/services/ipc-events/IpcEventHandler.js',
+];
+const secureElectronSource = secureElectronFiles
+  .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
+  .join('\n');
+const insecureElectronPatterns = [
+  /@electron\/remote/,
+  /window\.require/,
+  /nodeIntegration\s*:\s*true/,
+  /contextIsolation\s*:\s*false/,
+  /enableRemoteModule/,
+];
 const appHtml = fs.readFileSync(path.join(root, 'app/app.html'), 'utf8');
 const failures = [];
 
@@ -47,6 +67,18 @@ if (missingScripts.length) {
 if (missingPackagedFiles.length) {
   failures.push(
     `builder config does not package: ${missingPackagedFiles.join(', ')}`
+  );
+}
+
+if (packageJson.dependencies?.['@electron/remote']) {
+  failures.push('package.json still declares @electron/remote');
+}
+
+if (
+  insecureElectronPatterns.some((pattern) => pattern.test(secureElectronSource))
+) {
+  failures.push(
+    'secure Electron files contain a legacy remote or insecure setting'
   );
 }
 

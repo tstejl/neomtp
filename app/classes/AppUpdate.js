@@ -9,18 +9,13 @@ import { undefinedOrNull } from '../utils/funcs';
 import {
   getMainWindowMainProcess,
   getWindowBackgroundColor,
-} from '../helpers/windowHelper';
+} from '../helpers/mainWindowHelper';
 import { appUpdateAvailableWindow } from '../helpers/createWindows';
 import { UPDATER_STATUS } from '../enums/appUpdater';
-import { getRemoteWindow } from '../helpers/remoteWindowHelpers';
 
 let progressbarWindow = null;
 let isFileTransferActiveFlag = false;
 let mainWindow = null;
-
-const remote = getRemoteWindow();
-
-remote.initialize();
 
 const createChildWindow = () => {
   try {
@@ -37,9 +32,9 @@ const createChildWindow = () => {
       fullscreenable: false,
       movable: false,
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-        enableRemoteModule: true,
+        preload: PATHS.preloadPath,
+        nodeIntegration: false,
+        contextIsolation: true,
       },
       backgroundColor: getWindowBackgroundColor(),
     });
@@ -68,7 +63,6 @@ const fireProgressbar = () => {
     });
 
     progressbarWindow = createChildWindow();
-    remote.enable(progressbarWindow.webContents);
 
     progressbarWindow.loadURL(
       `${PATHS.loadUrlPath}#appUpdatePage/updateProgress`

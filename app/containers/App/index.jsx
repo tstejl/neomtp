@@ -1,5 +1,4 @@
 import { hot } from 'react-hot-loader/root';
-import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
@@ -26,15 +25,13 @@ import {
   makeMtpMode,
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
-import { getMainWindowRendererProcess } from '../../helpers/windowHelper';
+import { getOpenMtpApi } from '../../helpers/electronApi';
 import { log } from '../../utils/log';
 import { makeMtpDevice, makeMtpStoragesList } from '../HomePage/selectors';
 
 class App extends Component {
   constructor(props) {
     super(props);
-
-    this.mainWindowRendererProcess = getMainWindowRendererProcess();
 
     this.allowWritingJsonToSettings = false;
   }
@@ -53,7 +50,10 @@ class App extends Component {
 
   componentDidMount() {
     try {
-      ipcRenderer.on('nativeThemeUpdated', this.nativeThemeUpdatedEvent);
+      getOpenMtpApi().ipc.on(
+        'nativeThemeUpdated',
+        this.nativeThemeUpdatedEvent
+      );
 
       bootLoader.cleanRotationFiles();
     } catch (e) {
@@ -63,14 +63,9 @@ class App extends Component {
 
   componentWillUnmount() {
     this.deregisterAccelerators();
-    ipcRenderer.removeListener(
+    getOpenMtpApi().ipc.removeListener(
       'nativeThemeUpdated',
       this.nativeThemeUpdatedEvent
-    );
-
-    this.mainWindowRendererProcess.webContents.removeListener(
-      'nativeThemeUpdated',
-      () => {}
     );
   }
 

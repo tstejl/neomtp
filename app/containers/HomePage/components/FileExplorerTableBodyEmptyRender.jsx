@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { ipcRenderer } from 'electron';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -32,6 +31,7 @@ import { helpPhoneNotConnecting } from '../../../templates/fileExplorer';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { APP_NAME } from '../../../constants/meta';
 import { openExternalUrl } from '../../../utils/url';
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
 class FileExplorerTableBodyEmptyRender extends PureComponent {
   constructor(props) {
@@ -58,7 +58,7 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
   };
 
   _handleHelpPhoneNotRecognizedBtn = () => {
-    ipcRenderer.send(IpcEvents.OPEN_HELP_PHONE_NOT_CONNECTING_WINDOW);
+    getOpenMtpApi().ipc.send(IpcEvents.OPEN_HELP_PHONE_NOT_CONNECTING_WINDOW);
   };
 
   render() {

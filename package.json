@@ -68,7 +68,6 @@
     ]
   },
   "dependencies": {
-    "@electron/remote": "^2.0.4",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@fortawesome/free-regular-svg-icons": "^5.15.1",

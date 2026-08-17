@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { shell, ipcRenderer } from 'electron';
 import path from 'path';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -18,17 +17,15 @@ import { compressFile } from '../../../utils/gzip';
 import GenerateErrorReportBody from './GenerateErrorReportBody';
 import { baseName } from '../../../utils/files';
 import { log } from '../../../utils/log';
-import { getMainWindowRendererProcess } from '../../../helpers/windowHelper';
 import fileExplorerController from '../../../data/file-explorer/controllers/FileExplorerController';
 import { DEVICE_TYPE } from '../../../enums';
-import { getRemoteWindow } from '../../../helpers/remoteWindowHelpers';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
+import { getOpenMtpApi } from '../../../helpers/electronApi';
 
-const remote = getRemoteWindow();
+const openmtp = getOpenMtpApi();
 
 const { logFile } = PATHS;
-const { getPath } = remote.app;
-const desktopPath = getPath('desktop');
+const desktopPath = openmtp.app.getPath('desktop');
 const zippedLogFileBaseName = `${baseName(logFile)}.gz`;
 const logFileZippedPath = path.resolve(
   path.join(desktopPath, `./${zippedLogFileBaseName}`)
@@ -36,14 +33,8 @@ const logFileZippedPath = path.resolve(
 const mailToInstructions = _mailToInstructions(zippedLogFileBaseName);
 
 class GenerateErrorReport extends PureComponent {
-  constructor() {
-    super();
-
-    this.mainWindowRendererProcess = getMainWindowRendererProcess();
-  }
-
   componentWillUnmount() {
-    ipcRenderer.removeListener(
+    openmtp.ipc.removeListener(
       IpcEvents.REPORT_BUGS_DISPOSE_MTP_REPLY_FROM_MAIN,
       this._reportBugsDisposeMtpReplyEvent
     );
@@ -68,12 +59,11 @@ class GenerateErrorReport extends PureComponent {
       // if the generate button click action originated from the 'report bugs' page then use ipc channels to communicate
       // else use direct method click
       if (isReportBugsPage) {
-        this.mainWindowRendererProcess.webContents.send(
-          IpcEvents.REPORT_BUGS_DISPOSE_MTP,
-          { logFileZippedPath }
-        );
+        openmtp.ipc.send(IpcEvents.REPORT_BUGS_DISPOSE_MTP, {
+          logFileZippedPath,
+        });
 
-        ipcRenderer.once(
+        openmtp.ipc.once(
           IpcEvents.REPORT_BUGS_DISPOSE_MTP_REPLY_FROM_MAIN,
           this._reportBugsDisposeMtpReplyEvent
         );
@@ -129,7 +119,7 @@ class GenerateErrorReport extends PureComponent {
       window.location.href = `${mailTo} ${mailToInstructions}`;
     }
 
-    shell.showItemInFolder(logFileZippedPath);
+    openmtp.shell.showItemInFolder(logFileZippedPath);
   };
 
   render() {
