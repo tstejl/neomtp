@@ -7,13 +7,13 @@ const { app } = require('electron');
 
 const root = path.resolve(__dirname, '..');
 const temporaryUserData = fs.mkdtempSync(
-  path.join(os.tmpdir(), 'openmtp-main-no-device-e2e-')
+  path.join(os.tmpdir(), 'neomtp-main-no-device-e2e-')
 );
 const temporaryHome = path.join(temporaryUserData, 'home');
 
 fs.mkdirSync(temporaryHome, { recursive: true });
 process.env.HOME = temporaryHome;
-process.env.OPENMTP_NO_DEVICE_E2E = 'true';
+process.env.NEOMTP_NO_DEVICE_E2E = 'true';
 
 app.setPath('userData', temporaryUserData);
 app.disableHardwareAcceleration();
@@ -101,14 +101,14 @@ const run = async () => {
   await waitFor(() => mainWindow.webContents.getURL().length > 0);
   await waitFor(() =>
     mainWindow.webContents.executeJavaScript(
-      `Boolean(window.openmtp && document.querySelector('#root')?.children.length)`,
+      `Boolean(window.neomtp && document.querySelector('#root')?.children.length)`,
       true
     )
   );
 
   const result = await mainWindow.webContents.executeJavaScript(
     `(${async () => {
-      const api = window.openmtp;
+      const api = window.neomtp;
       const noDevice = await api.fileExplorer.initialize({
         deviceType: 'mtp',
       });
@@ -127,6 +127,7 @@ const run = async () => {
         rootHasContent: document.querySelector('#root').children.length > 0,
         noDeviceError: noDevice?.stderr,
         localFiles: localFiles?.data,
+        profileDir: api.app.getPaths().profileDir,
       };
     }})()`,
     true
@@ -134,7 +135,7 @@ const run = async () => {
 
   if (!result.apiShape || !result.rootHasContent) {
     throw new Error(
-      `Actual main-process renderer did not render OpenMTP: ${JSON.stringify(
+      `Actual main-process renderer did not render NeoMTP: ${JSON.stringify(
         result
       )}`
     );
@@ -154,6 +155,33 @@ const run = async () => {
         result
       )}`
     );
+  }
+
+  const identifierFile = path.join(result.profileDir, 'identifier.json');
+  const settingsFile = path.join(result.profileDir, 'settings.json');
+  const legacyProfileDir = path.join(
+    path.dirname(result.profileDir),
+    'io.ganeshrvel.openmtp'
+  );
+
+  if (path.basename(result.profileDir) !== 'io.github.tstejl.neomtp') {
+    throw new Error(`NeoMTP used the wrong profile: ${result.profileDir}`);
+  }
+
+  if (!fs.existsSync(identifierFile)) {
+    throw new Error(
+      `Fresh NeoMTP profile did not create identifier.json: ${identifierFile}`
+    );
+  }
+
+  if (!fs.existsSync(settingsFile)) {
+    throw new Error(
+      `Fresh NeoMTP profile did not create settings.json: ${settingsFile}`
+    );
+  }
+
+  if (fs.existsSync(legacyProfileDir)) {
+    throw new Error(`NeoMTP created an OpenMTP profile: ${legacyProfileDir}`);
   }
 
   if (rendererErrors.length) {

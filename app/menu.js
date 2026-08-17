@@ -1,6 +1,5 @@
 import { app, Menu, shell } from 'electron';
 import {
-  appFeaturesWindow,
   keyboardShortcutsWindow,
   privacyPolicyWindow,
   reportBugsWindow,
@@ -8,8 +7,6 @@ import {
 import { ENV_FLAVOR } from './constants/env';
 import { APP_NAME, APP_GITHUB_URL } from './constants/meta';
 import { openExternalUrl } from './utils/url';
-import { BUY_ME_A_COFFEE_URL } from './constants';
-import { inviteViaEmail } from './templates/menu';
 
 export default class MenuBuilder {
   constructor({ mainWindow, autoAppUpdate, appUpdaterEnable }) {
@@ -199,27 +196,9 @@ export default class MenuBuilder {
           },
         },
         {
-          label: 'New Features And Updates',
-          click: () => {
-            appFeaturesWindow();
-          },
-        },
-        {
           label: 'Privacy Policy',
           click: () => {
             privacyPolicyWindow();
-          },
-        },
-        {
-          label: 'Buy Me A Coffee!',
-          click: () => {
-            openExternalUrl(BUY_ME_A_COFFEE_URL, null, shell);
-          },
-        },
-        {
-          label: `Invite A Friend`,
-          click: () => {
-            openExternalUrl(inviteViaEmail, null, shell);
           },
         },
         {
@@ -319,27 +298,9 @@ export default class MenuBuilder {
             },
           },
           {
-            label: 'New Features And Updates',
-            click: () => {
-              appFeaturesWindow();
-            },
-          },
-          {
             label: 'Privacy Policy',
             click: () => {
               privacyPolicyWindow();
-            },
-          },
-          {
-            label: 'Buy Me A Coffee!',
-            click: () => {
-              openExternalUrl(BUY_ME_A_COFFEE_URL, null, shell);
-            },
-          },
-          {
-            label: `Invite A Friend`,
-            click: () => {
-              openExternalUrl(inviteViaEmail, null, shell);
             },
           },
           {

@@ -39,12 +39,12 @@ func TestPathHelpers(t *testing.T) {
 	parent, destination := mapSourcePathToDestinationPath(
 		"/tmp/source/nested/report.txt",
 		"/tmp/source",
-		"/OpenMTP-Audit",
+		"/NeoMTP-Audit",
 	)
-	if parent != "/OpenMTP-Audit/nested" {
+	if parent != "/NeoMTP-Audit/nested" {
 		t.Fatalf("destination parent = %q", parent)
 	}
-	if destination != "/OpenMTP-Audit/nested/report.txt" {
+	if destination != "/NeoMTP-Audit/nested/report.txt" {
 		t.Fatalf("destination path = %q", destination)
 	}
 

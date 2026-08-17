@@ -9,7 +9,7 @@ import { readdirSync } from 'node:fs';
 import { PATHS } from '../constants/paths';
 import {
   fileExistsSync,
-  writeFileAsync,
+  writeFileSync,
   createDirSync,
   deleteFilesSync,
 } from '../helpers/fileOps';
@@ -17,14 +17,13 @@ import { dateNow, daysDiff } from '../utils/date';
 import { LOG_FILE_ROTATION_CLEANUP_THRESHOLD } from '../constants';
 import { baseName } from '../utils/files';
 
-const { logFile, settingsFile, logDir, prevProfileDir } = PATHS;
+const { identifierFile, logFile, settingsFile, logDir } = PATHS;
 const logFileRotationCleanUpThreshold = LOG_FILE_ROTATION_CLEANUP_THRESHOLD;
 
 export default class Boot {
   constructor() {
     this.verifyDirList = [logDir];
-    this.verifyFileList = [logFile];
-    this.settingsFile = settingsFile;
+    this.verifyFileList = [logFile, settingsFile, identifierFile];
   }
 
   async init() {
@@ -37,22 +36,12 @@ export default class Boot {
         }
       }
 
-      if (!this.verifyFile(this.settingsFile)) {
-        await this.createFile(this.settingsFile);
-      }
-
       for (let i = 0; i < this.verifyFileList.length; i += 1) {
         const item = this.verifyFileList[i];
 
         if (!this.verifyFile(item)) {
           await this.createFile(item);
         }
-      }
-
-      // if the previous version of the profile directory exists then remove it
-      // issue: https://github.com/ganeshrvel/openmtp/issues/143
-      if (await this.verifyDir(prevProfileDir)) {
-        await deleteFilesSync(prevProfileDir);
       }
 
       return true;
@@ -63,7 +52,7 @@ export default class Boot {
 
   async verify() {
     try {
-      for (let i = 0; i < this.verifyFileList.length; i += 1) {
+      for (let i = 0; i < this.verifyDirList.length; i += 1) {
         const item = this.verifyDirList[i];
 
         if (!(await this.verifyDir(item))) {
@@ -94,6 +83,8 @@ export default class Boot {
           return false;
         }
       }
+
+      return true;
     } catch (e) {
       console.error(e);
     }
@@ -125,7 +116,7 @@ export default class Boot {
 
   createFile(filePath) {
     try {
-      writeFileAsync(filePath, ``);
+      writeFileSync(filePath, ``);
     } catch (e) {
       console.error(e);
     }

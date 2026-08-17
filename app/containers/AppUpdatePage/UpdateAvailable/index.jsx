@@ -10,7 +10,7 @@ import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { setStyle } from '../../../utils/styles';
 import { getAppThemeMode } from '../../../helpers/theme';
 import { getCurrentThemePalette } from '../../App/styles';
-import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { getNeoMtpApi } from '../../../helpers/electronApi';
 import { sanitizeHtml } from '../../../utils/sanitizeHtml';
 
 class AppUpdatePage extends Component {
@@ -23,7 +23,7 @@ class AppUpdatePage extends Component {
   }
 
   componentWillMount() {
-    getOpenMtpApi().ipc.on(
+    getNeoMtpApi().ipc.on(
       'appUpdatesUpdateAvailableCommunication',
       this.updateAvailableCommunicationEvent
     );
@@ -31,7 +31,7 @@ class AppUpdatePage extends Component {
 
   componentDidMount() {
     const appThemeMode = getAppThemeMode(
-      getOpenMtpApi().settings.getItems(['appThemeMode']).appThemeMode
+      getNeoMtpApi().settings.getItems(['appThemeMode']).appThemeMode
     );
     const { nativeSystemColor } = getCurrentThemePalette(appThemeMode);
 
@@ -41,7 +41,7 @@ class AppUpdatePage extends Component {
   }
 
   componentWillUnmount() {
-    getOpenMtpApi().ipc.removeListener(
+    getNeoMtpApi().ipc.removeListener(
       'appUpdatesUpdateAvailableCommunication',
       this.updateAvailableCommunicationEvent
     );
@@ -52,7 +52,7 @@ class AppUpdatePage extends Component {
   };
 
   _handleBtnClick = ({ confirm }) => {
-    getOpenMtpApi().ipc.send('appUpdatesUpdateAvailableReply', { confirm });
+    getNeoMtpApi().ipc.send('appUpdatesUpdateAvailableReply', { confirm });
     window.close();
   };
 

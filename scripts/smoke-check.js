@@ -56,6 +56,10 @@ const insecureElectronPatterns = [
   /enableRemoteModule/,
 ];
 const appHtml = fs.readFileSync(path.join(root, 'app/app.html'), 'utf8');
+const preloadSource = fs.readFileSync(
+  path.join(root, 'app/preload-src.js'),
+  'utf8'
+);
 const failures = [];
 const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
 const koffiVersion = String(packageJson.dependencies?.koffi || '').replace(
@@ -66,6 +70,24 @@ const [koffiMajor] = koffiVersion.split('.').map(Number);
 
 if (!String(packageJson.packageManager || '').startsWith('bun@')) {
   failures.push('package.json must declare Bun as its package manager');
+}
+
+if (packageJson.name !== 'neomtp' || packageJson.productName !== 'NeoMTP') {
+  failures.push('package identity must be neomtp / NeoMTP');
+}
+
+if (
+  builderConfig.productName !== 'NeoMTP' ||
+  builderConfig.appId !== 'io.github.tstejl.neomtp'
+) {
+  failures.push('builder identity must match the NeoMTP bundle identity');
+}
+
+if (
+  !preloadSource.includes("exposeInMainWorld('neomtp'") ||
+  preloadSource.includes("exposeInMainWorld('openmtp'")
+) {
+  failures.push('preload bridge must expose only the NeoMTP renderer API');
 }
 
 if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 12)) {
@@ -114,10 +136,14 @@ if (!appHtml.includes('type="module"') || !appHtml.includes('./index.js')) {
   );
 }
 
+if (!appHtml.includes('<title>NeoMTP')) {
+  failures.push('app/app.html does not use the NeoMTP title');
+}
+
 if (failures.length) {
   console.error('Smoke checks failed:');
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;
 } else {
-  console.log(`Smoke checks passed for OpenMTP ${packageJson.version}`);
+  console.log(`Smoke checks passed for NeoMTP ${packageJson.version}`);
 }

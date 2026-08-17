@@ -1,7 +1,7 @@
-import { getOpenMtpApi } from './electronApi';
+import { getNeoMtpApi } from './electronApi';
 
 export const rendererSettings = {
-  getAll: () => getOpenMtpApi().settings.getAll(),
-  getItems: (keys) => getOpenMtpApi().settings.getItems(keys),
-  setAll: (settings) => getOpenMtpApi().settings.setAll(settings),
+  getAll: () => getNeoMtpApi().settings.getAll(),
+  getItems: (keys) => getNeoMtpApi().settings.getItems(keys),
+  setAll: (settings) => getNeoMtpApi().settings.setAll(settings),
 };

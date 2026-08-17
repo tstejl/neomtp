@@ -61,7 +61,6 @@ package.json
 .idea
 vendors
 build
-docs
 .vscode
 .github
 app/dll

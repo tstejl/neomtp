@@ -1,7 +1,7 @@
-export const getOpenMtpApi = () => {
-  if (typeof window === 'undefined' || !window.openmtp) {
-    throw new Error('OpenMTP renderer API is unavailable');
+export const getNeoMtpApi = () => {
+  if (typeof window === 'undefined' || !window.neomtp) {
+    throw new Error('NeoMTP renderer API is unavailable');
   }
 
-  return window.openmtp;
+  return window.neomtp;
 };

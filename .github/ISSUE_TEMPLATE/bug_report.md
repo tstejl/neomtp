@@ -1,32 +1,44 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-labels: 'bug'
-
+about: Report a reproducible problem in NeoMTP
+title: ''
+labels: bug
+assignees: ''
 ---
 
-**Prerequisites**
+Before opening an issue, search the [existing NeoMTP issues](https://github.com/tstejl/neomtp/issues). Remove personal information and device data from all attachments.
 
-- [ ] Have you reviewed the steps in the following link to see if they address your issue? 
-  - https://github.com/ganeshrvel/openmtp/issues/276
+## Describe the bug
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+Give a clear description of the problem.
 
+## Steps to reproduce
 
-**Attachments**
-Include if relevant,
-1. Open your Terminal and run the following code:
+1.
+2.
+3.
+
+## Expected behavior
+
+Describe what you expected to happen.
+
+## Environment
+
+- NeoMTP version or commit:
+- macOS version:
+- Mac model and architecture (Apple silicon or Intel):
+- Android device and Android version:
+
+## Logs and screenshots
+
+If the application generated logs, create an archive from the NeoMTP log directory:
+
 ```shell
-zip -r -X ~/Desktop/OpenMTP-log.zip "$HOME/Library/Application Support/io.ganeshrvel.openmtp/logs/"
+zip -r -X ~/Desktop/NeoMTP-log.zip "$HOME/Library/Application Support/io.github.tstejl.neomtp/logs/"
 ```
-2. Attach the file *OpenMTP-log.zip* found in your Desktop folder here.
 
-Or
+Review `NeoMTP-log.zip` for personal information before attaching it.
+You can also use **Help > Report Bugs** in the application.
+Attach the generated report here.
 
-1. Open the App,
-2. Click on Help > Report Bugs.
-3. Generate and send us the bugs report.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+Add screenshots when they help explain the problem.

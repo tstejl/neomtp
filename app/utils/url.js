@@ -4,7 +4,7 @@ export const openExternalUrl = (url, events = null, shellApi = null) => {
   }
 
   const rendererShell =
-    typeof window !== 'undefined' ? window.openmtp?.shell : null;
+    typeof window !== 'undefined' ? window.neomtp?.shell : null;
 
   (shellApi || rendererShell)?.openExternal(url);
 };

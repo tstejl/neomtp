@@ -52,9 +52,9 @@ const prepareMacNativeBinaries = async ({ arch, resourcesDirectory }) => {
       }
 
       await execFileAsync('lipo', [
+        filePath,
         '-verify_arch',
         target.machoArchitecture,
-        filePath,
       ]);
     })
   );

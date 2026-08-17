@@ -10,7 +10,7 @@ import { log } from '../../utils/rendererLog';
 import { checkIf } from '../../utils/checkIf';
 import { MTP_ERROR } from '../../enums/mtpError';
 import { DEVICES_DEFAULT_PATH } from '../../helpers/rendererPaths';
-import { getOpenMtpApi } from '../../helpers/electronApi';
+import { getNeoMtpApi } from '../../helpers/electronApi';
 
 const prefix = '@@Home';
 const actionTypesList = [
@@ -179,7 +179,7 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
         case MTP_MODE.kalam:
           // eslint-disable-next-line no-case-declarations
           const { error, stderr, data } =
-            await getOpenMtpApi().fileExplorer.dispose({
+            await getNeoMtpApi().fileExplorer.dispose({
               deviceType,
             });
 
@@ -258,7 +258,7 @@ function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
       // if the app was expecting the user to allow access to mtp storage
       // then don't reinitialize mtp
       const { error, stderr, data } =
-        await getOpenMtpApi().fileExplorer.initialize({
+        await getNeoMtpApi().fileExplorer.initialize({
           deviceType,
         });
 
@@ -380,7 +380,7 @@ function listKalamStorages(
       checkIf(mtpMode, 'string');
 
       const { error, stderr, data } =
-        await getOpenMtpApi().fileExplorer.listStorages({
+        await getNeoMtpApi().fileExplorer.listStorages({
           deviceType,
         });
 
@@ -442,7 +442,7 @@ function initLegacyMtp(
 
     try {
       const { error, stderr, data } =
-        await getOpenMtpApi().fileExplorer.listStorages({
+        await getNeoMtpApi().fileExplorer.listStorages({
           deviceType,
         });
 
@@ -633,7 +633,7 @@ export function listDirectory(
             error: localError,
             stderr: localStderr,
             data: localData,
-          } = await getOpenMtpApi().fileExplorer.listFiles({
+          } = await getNeoMtpApi().fileExplorer.listFiles({
             deviceType,
             filePath,
             ignoreHidden,
@@ -670,7 +670,7 @@ export function listDirectory(
           }
 
           const { error, stderr, data } =
-            await getOpenMtpApi().fileExplorer.listFiles({
+            await getNeoMtpApi().fileExplorer.listFiles({
               deviceType,
               filePath,
               ignoreHidden,

@@ -3,50 +3,87 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  pull_request: {}
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Test and package (macOS x64)
     runs-on: macos-15-intel
+    timeout-minutes: 45
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Setup build environment
-        uses: actions/setup-node@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22.12.0'
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: '1.3.11'
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.26.5'
+          cache-dependency-path: ffi/kalam/native/go.sum
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Test OpenMTP
+      - name: Lint JavaScript
+        id: javascript-lint
+        continue-on-error: true
+        run: bun run lint
+      - name: Lint styles
+        id: stylesheet-lint
+        continue-on-error: true
+        run: bun run lint-styles
+      - name: Enforce lint success
+        if: ${{ always() }}
+        run: |
+          test "${{ steps.javascript-lint.outcome }}" = success
+          test "${{ steps.stylesheet-lint.outcome }}" = success
+      - name: Test native MTP stack
+        working-directory: ffi/kalam/native
+        run: |
+          go test -mod=readonly -race ./...
+          go vet -mod=readonly ./...
+      - name: Test NeoMTP
         run: bun run test
-      - name: Build unsigned macOS artifacts
+      - name: Build non-notarized macOS artifacts
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
           ELECTRON_NOTARIZE: 'NO'
-        run: |
-          bun run package-mac-without-notarize
+        run: bun run package-mac-without-notarize-no-verify
       - name: Verify generated macOS artifacts
         run: |
-          test -d dist/mac/OpenMTP.app
-          test ! -e dist/mac/OpenMTP.app/Contents/Resources/bin/arm64
-          lipo -verify_arch x86_64 dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam.dylib
-          lipo -verify_arch x86_64 dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/libusb.dylib
-          lipo -verify_arch x86_64 dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam_debug_report
-          otool -L dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam.dylib | grep -F '@loader_path/libusb.dylib'
-          otool -D dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/libusb.dylib | grep -F '@loader_path/libusb.dylib'
-          vtool -show-build dist/mac/OpenMTP.app/Contents/Resources/bin/amd64/kalam.dylib | grep -F 'minos 11.0'
+          test -d dist/mac/NeoMTP.app
+          test ! -e dist/mac/NeoMTP.app/Contents/Resources/bin/arm64
+          lipo dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/kalam.dylib -verify_arch x86_64
+          lipo dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/libusb.dylib -verify_arch x86_64
+          lipo dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/kalam_debug_report -verify_arch x86_64
+          otool -L dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/kalam.dylib | grep -F '@loader_path/libusb.dylib'
+          otool -D dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/libusb.dylib | grep -F '@loader_path/libusb.dylib'
+          vtool -show-build dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/kalam.dylib | grep -F 'minos 11.0'
           test -n "$(find dist -maxdepth 1 -name '*-mac-x64.dmg' -print -quit)"
           test -n "$(find dist -maxdepth 1 -name '*-mac-x64.zip' -print -quit)"
           shasum -a 256 dist/*-mac-x64.dmg dist/*-mac-x64.zip > dist/CHECKSUM_SHA256.txt
       - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: macOS-x64
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
           path: |
             dist/*-mac-x64.dmg
             dist/*-mac-x64.zip

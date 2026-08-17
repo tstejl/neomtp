@@ -8,21 +8,13 @@ import TouchAppIcon from '@material-ui/icons/TouchApp';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import SendIcon from '@material-ui/icons/Send';
 import UsbIcon from '@material-ui/icons/Usb';
-import EmailIcon from '@material-ui/icons/Email';
 import Button from '@material-ui/core/Button';
 import { DEVICES_LABEL } from '../../../constants';
 import { DEVICE_TYPE } from '../../../enums';
 
 export default class GenerateErrorReportBody extends PureComponent {
   render() {
-    const {
-      styles,
-      zippedLogFileBaseName,
-      mailTo,
-      mailToInstructions,
-      AUTHOR_EMAIL,
-      onGenerateErrorLogs,
-    } = this.props;
+    const { styles, zippedLogFileBaseName, onGenerateErrorLogs } = this.props;
 
     return (
       <Fragment>
@@ -50,8 +42,8 @@ export default class GenerateErrorReportBody extends PureComponent {
               <TouchAppIcon />
             </ListItemIcon>
             <ListItemText
-              primary="Click the 'EMAIL ERROR LOGS' button below"
-              secondary="This will launch your default email client"
+              primary="Click the 'GENERATE ERROR LOGS' button below"
+              secondary="NeoMTP will create a local report and open the issue tracker"
             />
           </ListItem>
           <ListItem>
@@ -59,15 +51,15 @@ export default class GenerateErrorReportBody extends PureComponent {
               <AttachFileIcon />
             </ListItemIcon>
             <ListItemText
-              primary="Attach the generated Error Log file along with the email"
-              secondary={`Check Desktop Folder for ${zippedLogFileBaseName}`}
+              primary="Attach the generated error log to a new issue"
+              secondary={`NeoMTP will reveal ${zippedLogFileBaseName} in Finder`}
             />
           </ListItem>
           <ListItem>
             <ListItemIcon>
               <SendIcon />
             </ListItemIcon>
-            <ListItemText primary="Send the email" />
+            <ListItemText primary="Describe the problem and submit the issue" />
           </ListItem>
         </List>
         <Button
@@ -76,21 +68,8 @@ export default class GenerateErrorReportBody extends PureComponent {
           className={styles.generateLogsBtn}
           onClick={onGenerateErrorLogs}
         >
-          EMAIL ERROR LOGS
+          GENERATE ERROR LOGS
         </Button>
-        <List component="div">
-          <ListItem>
-            <ListItemIcon>
-              <EmailIcon />
-            </ListItemIcon>
-            <a
-              href={`${mailTo} ${mailToInstructions}`}
-              className={styles.emailId}
-            >
-              {AUTHOR_EMAIL}
-            </a>
-          </ListItem>
-        </List>
       </Fragment>
     );
   }

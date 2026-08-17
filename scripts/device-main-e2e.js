@@ -7,33 +7,22 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const { app } = require('electron');
 
-if (process.env.OPENMTP_DEVICE_E2E !== 'true') {
+if (process.env.NEOMTP_DEVICE_E2E !== 'true') {
   throw new Error(
-    'Refusing to run the device E2E without OPENMTP_DEVICE_E2E=true'
+    'Refusing to run the device E2E without NEOMTP_DEVICE_E2E=true'
   );
 }
 
 const root = path.resolve(__dirname, '..');
 const temporaryUserData = fs.mkdtempSync(
-  path.join(os.tmpdir(), 'openmtp-main-device-e2e-')
+  path.join(os.tmpdir(), 'neomtp-main-device-e2e-')
 );
 const temporaryHome = path.join(temporaryUserData, 'home');
 const fixtureRoot = path.join(temporaryHome, 'fixtures');
 const nativeOutput = path.join(temporaryUserData, 'native');
 const nativeLibrary = path.join(nativeOutput, 'kalam.dylib');
-const screenshotPath = path.join(os.tmpdir(), 'openmtp-device-main-e2e.png');
-const remoteRoot = `/OpenMTP-E2E-${crypto.randomUUID()}`;
-const onboardingSource = fs.readFileSync(
-  path.join(root, 'app/constants/onboarding.js'),
-  'utf8'
-);
-const onboardingVersion = onboardingSource.match(
-  /latestUpdatePushVersion\s*=\s*['"]([^'"]+)['"]/
-)?.[1];
-
-if (!onboardingVersion) {
-  throw new Error('Could not read the current onboarding version');
-}
+const screenshotPath = path.join(os.tmpdir(), 'neomtp-device-main-e2e.png');
+const remoteRoot = `/NeoMTP-E2E-${crypto.randomUUID()}`;
 
 const writeFixture = (name, data) => {
   const filePath = path.join(fixtureRoot, name);
@@ -58,7 +47,7 @@ const settingsPath = path.join(
   temporaryHome,
   'Library',
   'Application Support',
-  'io.ganeshrvel.openmtp',
+  'io.github.tstejl.neomtp',
   'settings.json'
 );
 
@@ -67,7 +56,6 @@ fs.writeFileSync(
   settingsPath,
   JSON.stringify({
     freshInstall: 0,
-    onboarding: { lastFiredVersion: onboardingVersion },
     enableAutoUpdateCheck: false,
     enableBackgroundAutoUpdate: false,
     enablePrereleaseUpdates: false,
@@ -81,14 +69,14 @@ fs.writeFileSync(
 );
 
 const fixtures = {
-  single: writeFixture('single.txt', 'OpenMTP single-file app E2E\n'),
+  single: writeFixture('single.txt', 'NeoMTP single-file app E2E\n'),
   multiA: writeFixture(
     'multi-a.txt',
-    'OpenMTP multiple-file app E2E\n'.repeat(97)
+    'NeoMTP multiple-file app E2E\n'.repeat(97)
   ),
   multiB: writeFixture('multi-b.bin', deterministicFixture),
   treeRoot: path.join(fixtureRoot, 'tree'),
-  treeFile: writeFixture('tree/nested/tree.txt', 'OpenMTP tree app E2E\n'),
+  treeFile: writeFixture('tree/nested/tree.txt', 'NeoMTP tree app E2E\n'),
 };
 
 const downloads = {
@@ -121,7 +109,7 @@ execFileSync(
 );
 
 process.env.HOME = temporaryHome;
-process.env.OPENMTP_KALAM_LIB_PATH = nativeLibrary;
+process.env.NEOMTP_KALAM_LIB_PATH = nativeLibrary;
 
 app.setPath('userData', temporaryUserData);
 app.disableHardwareAcceleration();
@@ -210,7 +198,7 @@ const waitFor = async (predicate, timeout = 30000) => {
 };
 
 const rendererWorkflow = async (input) => {
-  const api = window.openmtp;
+  const api = window.neomtp;
   const requireOk = (label, response) => {
     if (!response || response.error || response.stderr) {
       throw new Error(`${label}: ${JSON.stringify(response)}`);
@@ -521,7 +509,6 @@ const rendererWorkflow = async (input) => {
       phonePaneVisible: rootItems.some(
         (item) => item.name && renderedText.includes(item.name)
       ),
-      onboardingDismissed: !renderedText.includes('Release at a Glance!'),
       deviceInfo,
       storageCount: storageEntries.length,
       reopenedStorageCount: Object.keys(reopenedStorages || {}).length,
@@ -622,7 +609,7 @@ const run = async () => {
   await waitFor(() => mainWindow.webContents.getURL().length > 0);
   await waitFor(() =>
     mainWindow.webContents.executeJavaScript(
-      `Boolean(window.openmtp && document.querySelector('#root')?.children.length)`,
+      `Boolean(window.neomtp && document.querySelector('#root')?.children.length)`,
       true
     )
   );
@@ -694,11 +681,10 @@ const run = async () => {
     !result.rootHasContent ||
     !result.localPaneVisible ||
     !result.phonePaneVisible ||
-    !result.onboardingDismissed ||
     result.renderedTextLength < 1
   ) {
     throw new Error(
-      `OpenMTP did not render correctly: ${JSON.stringify(result)}`
+      `NeoMTP did not render correctly: ${JSON.stringify(result)}`
     );
   }
 

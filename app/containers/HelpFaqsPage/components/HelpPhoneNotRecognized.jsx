@@ -29,18 +29,8 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import SystemUpdate from '@material-ui/icons/SystemUpdate';
 import { styles } from '../styles/HelpPhoneNotRecognized';
 import { openExternalUrl } from '../../../utils/url';
-import {
-  APP_GITHUB_ISSUES_URL,
-  APP_NAME,
-  APP_VERSION,
-  AUTHOR_EMAIL,
-} from '../../../constants/meta';
-import {
-  BUY_ME_A_COFFEE_URL,
-  DELETE_KEIS_SMARTSWITCH_URL,
-  DEVICES_LABEL,
-  SUPPORT_PAYPAL_URL,
-} from '../../../constants';
+import { APP_GITHUB_ISSUES_URL, APP_NAME } from '../../../constants/meta';
+import { DELETE_KEIS_SMARTSWITCH_URL, DEVICES_LABEL } from '../../../constants';
 import { DEVICE_TYPE, MTP_MODE } from '../../../enums';
 import {
   localErrorDictionary,
@@ -48,7 +38,6 @@ import {
 } from '../../../helpers/processBufferOutput';
 import { MTP_ERROR } from '../../../enums/mtpError';
 import { imgsrc } from '../../../utils/imgsrc';
-import { helpPhoneNotConnecting } from '../../../templates/fileExplorer';
 import { isKalamModeSupported } from '../../../helpers/rendererCapabilities';
 
 const hotplugSettingText = `Check if 'Enable auto device detection (USB Hotplug)' is enabled under Settings > General Tab`;
@@ -56,7 +45,7 @@ const deviceLabel = DEVICES_LABEL[DEVICE_TYPE.mtp];
 
 class HelpPhoneNotRecognized extends PureComponent {
   _handleGithubThreadTap = (events) => {
-    openExternalUrl(`${APP_GITHUB_ISSUES_URL}8`, events);
+    openExternalUrl(APP_GITHUB_ISSUES_URL, events);
   };
 
   RenderFileTransfer = () => {
@@ -257,65 +246,14 @@ class HelpPhoneNotRecognized extends PureComponent {
           {showPhoneNotRecognizedNote && (
             <>
               <Typography component="p" variant="body2">
-                <strong>{APP_NAME}</strong> was a project that I started to
-                solve a problem that was so personal to me. But I always knew,
-                that there&apos;s a community, whose facing the same problem as
-                I did.
+                <strong>{APP_NAME}</strong> is an independent, open-source
+                Android file transfer application for macOS.
               </Typography>
               <Typography component="p" variant="body2" paragraph>
-                I wasn&apos;t wrong, I guess. Now, we are a strong community
-                with users from over&nbsp;
-                <strong>180 countries</strong>. It&apos;s overwhelming to see
-                the response that I have received from all of you, not just
-                appreciating the app, but also giving me suggestions and
-                feedback to improve it.
-              </Typography>
-              <Typography component="p" variant="body2">
-                As they say, you build for the community and learn from it.
-              </Typography>
-              <Typography component="p" variant="body2" paragraph>
-                I read each and every message that you send and am constantly
-                working to improve the app based on your feedback. Keep sending
-                more of those :)
-              </Typography>
-              <Typography component="p" variant="body2" paragraph>
-                Some of you have been telling me that there are issues with
-                connecting certain mobile phones (<i>mostly Samsung</i>) to{' '}
-                {APP_NAME}. I have been working hard to fix this issue by
-                migrating the existing MTP Kernel to a better one.
-              </Typography>
-              <Typography component="p" variant="body2" paragraph>
-                You may reach out to me at&nbsp;
-                <a
-                  href={`mailto:${AUTHOR_EMAIL}?Subject=${helpPhoneNotConnecting}&Body=${APP_NAME} - ${APP_VERSION}`}
-                >
-                  {AUTHOR_EMAIL}
-                </a>
-                &nbsp;or check out this&nbsp;
-                <a onClick={this._handleGithubThreadTap}>thread</a>
-                &nbsp;on GitHub for tracking the same,&nbsp;
-                <i>
-                  to collaborate and make this community bigger and stronger
-                </i>
-                !
-              </Typography>
-              <Typography component="p" variant="body2" paragraph>
-                If you&apos;d like to support my work or buy me up a cup of
-                coffee, you can contribute via&nbsp;Paypal:&nbsp;
-                <a
-                  onClick={(events) => {
-                    openExternalUrl(SUPPORT_PAYPAL_URL, events);
-                  }}
-                >
-                  {SUPPORT_PAYPAL_URL}
-                </a>
-                &nbsp;or Buy me a coffee:&nbsp;
-                <a
-                  onClick={(events) => {
-                    openExternalUrl(BUY_ME_A_COFFEE_URL, events);
-                  }}
-                >
-                  {BUY_ME_A_COFFEE_URL}
+                Follow the checks below if NeoMTP cannot connect to your device.
+                Report unresolved problems in the{' '}
+                <a onClick={this._handleGithubThreadTap}>
+                  NeoMTP issue tracker
                 </a>
                 .
               </Typography>
@@ -383,10 +321,7 @@ class HelpPhoneNotRecognized extends PureComponent {
                               this issue. `}
                         <a
                           onClick={(events) => {
-                            openExternalUrl(
-                              'https://github.com/ganeshrvel/openmtp/issues/276',
-                              events
-                            );
+                            openExternalUrl(APP_GITHUB_ISSUES_URL, events);
                           }}
                         >
                           Read more...
@@ -411,7 +346,7 @@ class HelpPhoneNotRecognized extends PureComponent {
             </AccordionDetails>
           </Accordion>
 
-          {/* <----- Google drive is interfering with OpenMTP-----> */}
+          {/* <----- Google drive is interfering with NeoMTP-----> */}
           <Accordion className={styles.expansionRoot}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography className={styles.heading}>
@@ -444,7 +379,7 @@ class HelpPhoneNotRecognized extends PureComponent {
             </AccordionDetails>
           </Accordion>
 
-          {/* <----- Dropbox is interfering with OpenMTP-----> */}
+          {/* <----- Dropbox is interfering with NeoMTP-----> */}
           <Accordion className={styles.expansionRoot}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography className={styles.heading}>

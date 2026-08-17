@@ -29,7 +29,7 @@ import {
   isKalamModeSupported,
   isMas,
 } from '../../../helpers/rendererCapabilities';
-import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { getNeoMtpApi } from '../../../helpers/electronApi';
 
 export default class SettingsDialog extends PureComponent {
   constructor(props) {
@@ -576,13 +576,13 @@ export default class SettingsDialog extends PureComponent {
                 <div className={styles.tabContainer}>
                   <FormGroup>
                     <Typography variant="caption">
-                      OpenMTP does not send usage analytics or crash reports.
+                      NeoMTP does not send usage analytics or crash reports.
                       Local logs remain on this device unless you choose to
                       attach them to a support request.&nbsp;
                       <a
                         className={styles.a}
                         onClick={() => {
-                          getOpenMtpApi().ipc.send(
+                          getNeoMtpApi().ipc.send(
                             IpcEvents.OPEN_HELP_PRIVACY_POLICY_WINDOW
                           );
                         }}

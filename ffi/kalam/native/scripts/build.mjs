@@ -49,7 +49,7 @@ const libusbBrewBottles = {
 
 /**
  *  macOS version below Catalina (10.15) are classified as historical OSes
-Support for these older version of the oses are now being deprecated because for OpenMTP to keep supporting these OSes, kernel dylibs needs to compiled on such older versions of macOS which is practically very difficult thing to do.
+Support for these older version of the oses are now being deprecated because for NeoMTP to keep supporting these OSes, kernel dylibs needs to compiled on such older versions of macOS which is practically very difficult thing to do.
 Usually the compilation of the kernel dylibs on these older OSes happen very rarely and only when there is a security issue or something.
 The dylib files compiled against these older versions (historical versions) of macos are built into the directories: `build/mac/bin/medieval`
 Compiling dylibs on the historical macos versions doesn't overwrite builds in the `build/mac/bin/arm64/` or `build/mac/bin/amd64/` which contains the dylibs for the latest and supported versions of macos
@@ -99,7 +99,7 @@ function buildCompatibilityChecks() {
       console.info(
         orangeChalk(`This is a historical version of macOS.
 macOS version below Catalina (10.15) are classified as historical OSes
-Support for these older version of the oses are now being deprecated because for OpenMTP to keep supporting these OSes, kernel dylibs needs to compiled on such older versions of macOS which is practically very difficult thing to do.
+Support for these older version of the oses are now being deprecated because for NeoMTP to keep supporting these OSes, kernel dylibs needs to compiled on such older versions of macOS which is practically very difficult thing to do.
 Usually the compilation of the kernel dylibs on these older OSes happen very rarely and only when there is a security issue or something.
 The dylib files compiled against these older versions (historical versions) of macos are built into the directories: 'build/mac/bin/medieval'
 Compiling dylibs on the historical macos versions doesn't overwrite builds in the 'build/mac/bin/arm64/' or 'build/mac/bin/amd64/' which contains the dylibs for the latest and supported versions of macos

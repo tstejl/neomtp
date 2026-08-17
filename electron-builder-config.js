@@ -14,12 +14,12 @@ module.exports = () => {
   };
 
   return {
-    productName: 'OpenMTP',
-    appId: 'io.ganeshrvel.openmtp',
+    productName: 'NeoMTP',
+    appId: 'io.github.tstejl.neomtp',
     forceCodeSigning: !isCodeSigningDisabled,
     // eslint-disable-next-line no-template-curly-in-string
     artifactName: '${name}-${version}-${os}-${arch}.${ext}',
-    copyright: '© Ganesh Rathinavel',
+    copyright: '© Ganesh Rathinavel and NeoMTP contributors',
     afterPack: './internals/scripts/AfterPack.js',
     afterSign: './internals/scripts/Notarize.js',
     npmRebuild: false,
@@ -27,7 +27,7 @@ module.exports = () => {
       {
         provider: 'github',
         owner: 'tstejl',
-        repo: 'openmtp',
+        repo: 'neomtp',
         private: false,
       },
     ],
@@ -67,7 +67,7 @@ module.exports = () => {
       category: 'public.app-category.productivity',
       entitlements: 'build/entitlements.mas.plist',
       icon: 'build/icon.icns',
-      binaries: ['dist/mas/OpenMTP.app/Contents/Resources/bin/mtp-cli'],
+      binaries: ['dist/mas/NeoMTP.app/Contents/Resources/bin/mtp-cli'],
     },
     dmg: {
       contents: [

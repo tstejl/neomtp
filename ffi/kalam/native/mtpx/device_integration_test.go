@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-const deviceTestEnvironment = "OPENMTP_MTP_DEVICE_TEST"
+const deviceTestEnvironment = "NEOMTP_MTP_DEVICE_TEST"
 
-// TestDeviceRoundTrip operates only when OPENMTP_MTP_DEVICE_TEST=1.
+// TestDeviceRoundTrip operates only when NEOMTP_MTP_DEVICE_TEST=1.
 // It creates and removes one unique directory in the selected device storage.
 func TestDeviceRoundTrip(t *testing.T) {
 	if os.Getenv(deviceTestEnvironment) != "1" {
-		t.Skip("set OPENMTP_MTP_DEVICE_TEST=1 to run the MTP device test")
+		t.Skip("set NEOMTP_MTP_DEVICE_TEST=1 to run the MTP device test")
 	}
 
 	dev, err := Initialize(Init{})
@@ -41,7 +41,7 @@ func TestDeviceRoundTrip(t *testing.T) {
 		t.Fatalf("fetch storages: %v", err)
 	}
 	storageID := selectTestStorage(storages)
-	remoteRoot := fmt.Sprintf("/OpenMTP-Audit-%d", time.Now().UnixNano())
+	remoteRoot := fmt.Sprintf("/NeoMTP-Audit-%d", time.Now().UnixNano())
 
 	t.Cleanup(func() {
 		if deviceOpen {
@@ -68,7 +68,7 @@ func TestDeviceRoundTrip(t *testing.T) {
 	}
 
 	localRoot := t.TempDir()
-	single := writeFixture(t, localRoot, "single.txt", []byte("OpenMTP single-file test\n"))
+	single := writeFixture(t, localRoot, "single.txt", []byte("NeoMTP single-file test\n"))
 	multiA := writeFixture(t, localRoot, "multi-a.txt", bytes.Repeat([]byte("multiple-file-test\n"), 97))
 	multiB := writeFixture(t, localRoot, "multi-b.bin", deterministicFixture(1024*1024+333))
 	treeFile := writeFixture(t, localRoot, "tree/nested/tree.txt", []byte("nested tree test\n"))

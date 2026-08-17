@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import { styles } from './styles';
-import { getOpenMtpApi } from '../../../helpers/electronApi';
+import { getNeoMtpApi } from '../../../helpers/electronApi';
 
 class ProgressbarPage extends Component {
   constructor(props) {
@@ -22,14 +22,14 @@ class ProgressbarPage extends Component {
   }
 
   componentWillMount() {
-    getOpenMtpApi().ipc.on(
+    getNeoMtpApi().ipc.on(
       'appUpdatesProgressBarCommunication',
       this.progressBarCommunicationEvent
     );
   }
 
   componentWillUnmount() {
-    getOpenMtpApi().ipc.removeListener(
+    getNeoMtpApi().ipc.removeListener(
       'appUpdatesProgressBarCommunication',
       this.progressBarCommunicationEvent
     );

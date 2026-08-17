@@ -33,8 +33,8 @@ import { fileExistsSync } from './helpers/fileOps';
 const isSingleInstance = app.requestSingleInstanceLock();
 const isDeviceBootable = bootTheDevice();
 const isMas = electronIs.mas();
-const isNoDeviceE2e = process.env.OPENMTP_NO_DEVICE_E2E === 'true';
-const isDeviceE2e = process.env.OPENMTP_DEVICE_E2E === 'true';
+const isNoDeviceE2e = process.env.NEOMTP_NO_DEVICE_E2E === 'true';
+const isDeviceE2e = process.env.NEOMTP_DEVICE_E2E === 'true';
 const isAutomatedE2e = isNoDeviceE2e || isDeviceE2e;
 let mainWindow = null;
 

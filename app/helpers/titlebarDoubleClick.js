@@ -1,7 +1,7 @@
-import { getOpenMtpApi } from './electronApi';
+import { getNeoMtpApi } from './electronApi';
 
 export const toggleWindowSizeOnDoubleClick = () => {
-  const { window } = getOpenMtpApi();
+  const { window } = getNeoMtpApi();
 
   if (!window.isMaximized()) {
     window.maximize();

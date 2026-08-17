@@ -37,9 +37,6 @@ const configDir = join(root, `./config`);
 const homeDir = homedirOs();
 const profileDir = getAppDataPath();
 
-// old generation [profileDir] path. Used until OpenMTP < v3.0.0
-const prevProfileDir = join(homeDir, `./.io.ganeshrvel`);
-
 const rotateFile = yearMonthNow({});
 const logFileName = IS_DEV
   ? `error-${rotateFile}.dev.log`
@@ -64,7 +61,6 @@ export const PATHS = {
   settingsFile: resolve(settingsFile),
   identifierFile: resolve(identifierFile),
   devAppUpdateFile: resolve(devAppUpdateFile),
-  prevProfileDir: resolve(prevProfileDir),
   desktopDir: join(homeDir, `/Desktop`),
   documentsDir: join(homeDir, `/Documents`),
   downloadsDir: join(homeDir, `/Downloads`),

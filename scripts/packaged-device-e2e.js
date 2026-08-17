@@ -7,9 +7,9 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-if (process.env.OPENMTP_PACKAGED_DEVICE_E2E !== 'true') {
+if (process.env.NEOMTP_PACKAGED_DEVICE_E2E !== 'true') {
   throw new Error(
-    'Refusing to run the packaged device E2E without OPENMTP_PACKAGED_DEVICE_E2E=true'
+    'Refusing to run the packaged device E2E without NEOMTP_PACKAGED_DEVICE_E2E=true'
   );
 }
 
@@ -21,39 +21,25 @@ const root = path.resolve(__dirname, '..');
 const packageOutputDirectory = process.arch === 'arm64' ? 'mac-arm64' : 'mac';
 const appExecutable = path.join(
   root,
-  `dist/${packageOutputDirectory}/OpenMTP.app/Contents/MacOS/OpenMTP`
+  `dist/${packageOutputDirectory}/NeoMTP.app/Contents/MacOS/NeoMTP`
 );
 
 if (!fs.existsSync(appExecutable)) {
   throw new Error(
-    `Packaged OpenMTP executable does not exist: ${appExecutable}`
+    `Packaged NeoMTP executable does not exist: ${appExecutable}`
   );
 }
 
 const temporaryRoot = fs.mkdtempSync(
-  path.join(os.tmpdir(), 'openmtp-packaged-device-e2e-')
+  path.join(os.tmpdir(), 'neomtp-packaged-device-e2e-')
 );
 const temporaryHome = path.join(temporaryRoot, 'home');
 const fixtureRoot = path.join(temporaryHome, 'fixtures');
-const screenshotPath = path.join(
-  os.tmpdir(),
-  'openmtp-packaged-device-e2e.png'
-);
-const remoteRoot = `/OpenMTP-Packaged-E2E-${crypto.randomUUID()}`;
-const uiRemoteRoot = `/OpenMTP-Packaged-UI-E2E-${crypto.randomUUID()}`;
+const screenshotPath = path.join(os.tmpdir(), 'neomtp-packaged-device-e2e.png');
+const remoteRoot = `/NeoMTP-Packaged-E2E-${crypto.randomUUID()}`;
+const uiRemoteRoot = `/NeoMTP-Packaged-UI-E2E-${crypto.randomUUID()}`;
 const uiRemoteName = path.basename(uiRemoteRoot);
 const debuggingPort = 20000 + crypto.randomInt(20000);
-const onboardingSource = fs.readFileSync(
-  path.join(root, 'app/constants/onboarding.js'),
-  'utf8'
-);
-const onboardingVersion = onboardingSource.match(
-  /latestUpdatePushVersion\s*=\s*['"]([^'"]+)['"]/
-)?.[1];
-
-if (!onboardingVersion) {
-  throw new Error('Could not read the current onboarding version');
-}
 
 const writeFixture = (name, data) => {
   const filePath = path.join(fixtureRoot, name);
@@ -77,7 +63,7 @@ const settingsPath = path.join(
   temporaryHome,
   'Library',
   'Application Support',
-  'io.ganeshrvel.openmtp',
+  'io.github.tstejl.neomtp',
   'settings.json'
 );
 
@@ -90,7 +76,6 @@ fs.writeFileSync(
   settingsPath,
   JSON.stringify({
     freshInstall: 0,
-    onboarding: { lastFiredVersion: onboardingVersion },
     enableAutoUpdateCheck: false,
     enableBackgroundAutoUpdate: false,
     enablePrereleaseUpdates: false,
@@ -107,14 +92,14 @@ fs.writeFileSync(
 );
 
 const fixtures = {
-  single: writeFixture('single.txt', 'OpenMTP packaged single-file E2E\n'),
+  single: writeFixture('single.txt', 'NeoMTP packaged single-file E2E\n'),
   multiA: writeFixture(
     'multi-a.txt',
-    'OpenMTP packaged multiple-file E2E\n'.repeat(97)
+    'NeoMTP packaged multiple-file E2E\n'.repeat(97)
   ),
   multiB: writeFixture('multi-b.bin', deterministicFixture),
   treeRoot: path.join(fixtureRoot, 'tree'),
-  treeFile: writeFixture('tree/nested/tree.txt', 'OpenMTP packaged tree E2E\n'),
+  treeFile: writeFixture('tree/nested/tree.txt', 'NeoMTP packaged tree E2E\n'),
   uiUpload: writeFixture(
     'ui-upload.bin',
     Buffer.concat([deterministicFixture, deterministicFixture])
@@ -174,7 +159,7 @@ const waitForPage = async () => {
     await wait(100);
   }
 
-  throw new Error('Timed out waiting for the packaged OpenMTP renderer');
+  throw new Error('Timed out waiting for the packaged NeoMTP renderer');
 };
 
 const connect = async (page) => {
@@ -209,7 +194,7 @@ const connect = async (page) => {
 };
 
 const rendererWorkflow = async (input) => {
-  const api = window.openmtp;
+  const api = window.neomtp;
   const requireOk = (label, response) => {
     if (!response || response.error || response.stderr) {
       throw new Error(`${label}: ${JSON.stringify(response)}`);
@@ -474,7 +459,6 @@ const rendererWorkflow = async (input) => {
       rootHasContent: document.querySelector('#root')?.children.length > 0,
       renderedTextLength: renderedText.length,
       localPaneVisible: renderedText.includes('fixtures'),
-      onboardingDismissed: !renderedText.includes('Release at a Glance!'),
       deviceInfo,
       storageCount: storageEntries.length,
       rootItemCount: rootItems.length,
@@ -744,7 +728,7 @@ const installUiDriver = () => {
     };
   };
 
-  window.__openmtpPackagedUi = {
+  window.__neomtpPackagedUi = {
     rect,
     resetTransferObservations() {
       state.progressSeen = false;
@@ -796,7 +780,7 @@ const child = spawn(
     env: {
       ...process.env,
       HOME: temporaryHome,
-      OPENMTP_DEVICE_E2E: 'true',
+      NEOMTP_DEVICE_E2E: 'true',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   }
@@ -880,7 +864,7 @@ const timeout = setTimeout(async () => {
 
   cleanupRemoteRoots = async (paths) => {
     const cleanupResult = await evaluate(`(async (remotePaths) => {
-      const api = window.openmtp;
+      const api = window.neomtp;
       const errors = [];
       let storagesResponse = await api.fileExplorer.listStorages({
         deviceType: 'mtp',
@@ -1007,7 +991,7 @@ const timeout = setTimeout(async () => {
   };
   const domCall = (method, ...args) =>
     evaluate(
-      `window.__openmtpPackagedUi.${method}(${args
+      `window.__neomtpPackagedUi.${method}(${args
         .map((argument) => JSON.stringify(argument))
         .join(',')})`
     );
@@ -1164,7 +1148,7 @@ const timeout = setTimeout(async () => {
         const phoneItems = phonePane?.querySelectorAll('img[alt]').length || 0;
 
         return Boolean(
-          window.openmtp?.fileExplorer &&
+          window.neomtp?.fileExplorer &&
           document.querySelector('#root')?.children.length &&
           phoneItems > 0 &&
           !phoneText.includes('not connected')
@@ -1212,12 +1196,11 @@ const timeout = setTimeout(async () => {
     !result.apiShape ||
     !result.rootHasContent ||
     !result.localPaneVisible ||
-    !result.onboardingDismissed ||
     result.storageCount < 1 ||
     result.reopenedStorageCount !== result.storageCount
   ) {
     throw new Error(
-      `Packaged OpenMTP did not render correctly: ${JSON.stringify(result)}`
+      `Packaged NeoMTP did not render correctly: ${JSON.stringify(result)}`
     );
   }
 
@@ -1236,7 +1219,7 @@ const timeout = setTimeout(async () => {
   const reloadMarker = crypto.randomUUID();
 
   await evaluate(
-    `window.__openmtpPackagedReloadMarker = ${JSON.stringify(reloadMarker)}`
+    `window.__neomtpPackagedReloadMarker = ${JSON.stringify(reloadMarker)}`
   );
 
   const reloadResponse = await send('Page.reload', { ignoreCache: true });
@@ -1277,7 +1260,7 @@ const timeout = setTimeout(async () => {
         )];
 
         return {
-          reloadMarker: window.__openmtpPackagedReloadMarker,
+          reloadMarker: window.__neomtpPackagedReloadMarker,
           phoneItems,
           localItems,
           phoneText: phonePane?.innerText || '',
@@ -1430,7 +1413,7 @@ const timeout = setTimeout(async () => {
   );
 
   const uiDeleteVerification = await evaluate(`(async () => {
-    const api = window.openmtp;
+    const api = window.neomtp;
     const storages = await api.fileExplorer.listStorages({ deviceType: 'mtp' });
 
     if (storages?.error || storages?.stderr) {
@@ -1498,7 +1481,7 @@ const timeout = setTimeout(async () => {
   fs.writeFileSync(screenshotPath, screenshot.result.data, 'base64');
 
   const disposeResponse = await send('Runtime.evaluate', {
-    expression: "window.openmtp.fileExplorer.dispose({ deviceType: 'mtp' })",
+    expression: "window.neomtp.fileExplorer.dispose({ deviceType: 'mtp' })",
     awaitPromise: true,
     returnByValue: true,
   });
