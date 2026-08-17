@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable no-console */
 
 const fs = require('fs');
 const path = require('path');
@@ -11,20 +11,30 @@ const requiredFiles = [
   'app/app.html',
   'app/index.js',
   'app/main.dev.js',
+  '.bunfig.toml',
+  'bun.lock',
   'electron-builder-config.js',
   'webpack/config.main.prod.babel.js',
   'webpack/config.renderer.prod.babel.js',
 ];
 
-const missingFiles = requiredFiles.filter(file => !fs.existsSync(path.join(root, file)));
+const missingFiles = requiredFiles.filter(
+  (file) => !fs.existsSync(path.join(root, file))
+);
 const requiredScripts = ['build', 'build-main', 'build-renderer', 'test:smoke'];
-const missingScripts = requiredScripts.filter(script => !packageJson.scripts[script]);
+const missingScripts = requiredScripts.filter(
+  (script) => !packageJson.scripts[script]
+);
 const packagedFiles = new Set((builderConfig.files || []).map(String));
 const missingPackagedFiles = ['app/app.html', 'app/main.prod.js'].filter(
-  file => !packagedFiles.has(file)
+  (file) => !packagedFiles.has(file)
 );
 const appHtml = fs.readFileSync(path.join(root, 'app/app.html'), 'utf8');
 const failures = [];
+
+if (!String(packageJson.packageManager || '').startsWith('bun@')) {
+  failures.push('package.json must declare Bun as its package manager');
+}
 
 if (missingFiles.length) {
   failures.push(`missing required files: ${missingFiles.join(', ')}`);
@@ -35,7 +45,9 @@ if (missingScripts.length) {
 }
 
 if (missingPackagedFiles.length) {
-  failures.push(`builder config does not package: ${missingPackagedFiles.join(', ')}`);
+  failures.push(
+    `builder config does not package: ${missingPackagedFiles.join(', ')}`
+  );
 }
 
 if (!appHtml.includes('id="root"')) {
@@ -43,12 +55,14 @@ if (!appHtml.includes('id="root"')) {
 }
 
 if (!appHtml.includes('renderer.prod.js')) {
-  failures.push('app/app.html does not reference the production renderer bundle');
+  failures.push(
+    'app/app.html does not reference the production renderer bundle'
+  );
 }
 
 if (failures.length) {
   console.error('Smoke checks failed:');
-  failures.forEach(failure => console.error(`- ${failure}`));
+  failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;
 } else {
   console.log(`Smoke checks passed for OpenMTP ${packageJson.version}`);
