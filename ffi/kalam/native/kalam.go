@@ -5,10 +5,8 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"kalam/mtpx"
 	"kalam/send_to_js"
-	"log"
 	"os"
 	"strings"
-	"time"
 )
 
 /*	#include "stdint.h"
@@ -27,6 +25,7 @@ func Initialize(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	_, err := _initialize(mtpx.Init{DebugMode: false})
 	if err != nil {
@@ -61,6 +60,7 @@ func FetchDeviceInfo(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	dInfo, err := _fetchDeviceInfo()
 	if err != nil {
@@ -88,6 +88,7 @@ func FetchStorages(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	_sendFetchStorages(true, sendToJsOnDonePtr)
 }
@@ -122,6 +123,7 @@ func MakeDirectory(makeDirectoryInputJson *C.char, onDonePtr *C.on_cb_result_t) 
 
 		return
 	}
+	defer unlockMtp()
 
 	i := MakeDirectoryInput{}
 
@@ -151,6 +153,7 @@ func FileExists(fileExistsInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := FileExistsInput{}
 
@@ -188,6 +191,7 @@ func DeleteFile(deleteFileInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := DeleteFileInput{}
 
@@ -225,6 +229,7 @@ func RenameFile(renameFileInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := RenameFileInput{}
 
@@ -259,6 +264,7 @@ func Walk(walkInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := WalkInput{}
 
@@ -291,6 +297,7 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 
 		return
 	}
+	defer unlockMtp()
 
 	i := UploadFilesInput{}
 
@@ -302,45 +309,17 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 		return
 	}
 
-	var pInterface interface{}
-
-	ch := make(chan bool)
-	go func() {
-		for {
-			select {
-			case <-ch:
-				close(ch)
-
-				return
-			default:
-				if pInterface != nil {
-					switch v := pInterface.(type) {
-					case UploadPreprocessContainer:
-						send_to_js.SendUploadFilesPreprocess(sendToJsOnPreprocessPtr, v.fi, v.fullPath)
-
-					case ProgressContainer:
-						send_to_js.SendTransferFilesProgress(sendToJsOnProgressPtr, v.pInfo)
-
-					default:
-						log.Panicln("unimplemented UploadFiles.pInterface type")
-					}
-				}
-
-				time.Sleep(time.Millisecond * 500)
-			}
-		}
-	}()
-
 	err = _uploadFiles(i.StorageId, i.Sources, i.Destination, i.PreprocessFiles,
 		func(fi *os.FileInfo, fullPath string, err error) error {
 			if err != nil {
 				return err
 			}
 
-			pInterface = UploadPreprocessContainer{
-				fi:       fi,
-				fullPath: fullPath,
-			}
+			send_to_js.SendUploadFilesPreprocess(
+				sendToJsOnPreprocessPtr,
+				fi,
+				fullPath,
+			)
 
 			return nil
 		},
@@ -349,21 +328,16 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 				return err
 			}
 
-			pInterface = ProgressContainer{
-				pInfo: p,
-			}
+			send_to_js.SendTransferFilesProgress(sendToJsOnProgressPtr, p)
 
 			return nil
 		})
+
 	if err != nil {
 		send_to_js.SendError(sendToJsOnDonePtr, err)
 
-		ch <- true
-
 		return
 	}
-
-	ch <- true
 
 	send_to_js.SendTransferFilesDone(sendToJsOnDonePtr)
 }
@@ -379,6 +353,7 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 
 		return
 	}
+	defer unlockMtp()
 
 	i := DownloadFilesInput{}
 
@@ -390,44 +365,13 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 		return
 	}
 
-	var pInterface interface{}
-
-	ch := make(chan bool)
-	go func() {
-		for {
-			select {
-			case <-ch:
-				close(ch)
-
-				return
-			default:
-				if pInterface != nil {
-					switch v := pInterface.(type) {
-					case DownloadPreprocessContainer:
-						send_to_js.SendDownloadFilesPreprocess(sendToJsOnPreprocessPtr, v.fi)
-
-					case ProgressContainer:
-						send_to_js.SendTransferFilesProgress(sendToJsOnProgressPtr, v.pInfo)
-
-					default:
-						log.Panicln("unimplemented DownloadFiles.pInterface type")
-					}
-				}
-
-				time.Sleep(time.Millisecond * 500)
-			}
-		}
-	}()
-
 	err = _downloadFiles(i.StorageId, i.Sources, i.Destination, i.PreprocessFiles,
 		func(fi *mtpx.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
-			pInterface = DownloadPreprocessContainer{
-				fi: fi,
-			}
+			send_to_js.SendDownloadFilesPreprocess(sendToJsOnPreprocessPtr, fi)
 
 			return nil
 		},
@@ -436,21 +380,16 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 				return err
 			}
 
-			pInterface = ProgressContainer{
-				pInfo: p,
-			}
+			send_to_js.SendTransferFilesProgress(sendToJsOnProgressPtr, p)
 
 			return nil
 		})
+
 	if err != nil {
 		send_to_js.SendError(sendToJsOnDonePtr, err)
 
-		ch <- true
-
 		return
 	}
-
-	ch <- true
 
 	send_to_js.SendTransferFilesDone(sendToJsOnDonePtr)
 }
@@ -464,6 +403,7 @@ func Dispose(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	if err := _dispose(); err != nil {
 		send_to_js.SendError(sendToJsOnDonePtr, err)

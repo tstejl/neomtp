@@ -12,6 +12,8 @@ package send_to_js
 		if(cb != 0 && cb != NULL){
 			cb(json);
 		}
+
+		free(json);
 	}
 */
 import "C"

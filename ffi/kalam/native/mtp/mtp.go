@@ -388,7 +388,11 @@ func (d *Device) RunTransaction(req *Container, rep *Container,
 		_, ok2 := err.(SyncError)
 		_, ok1 := err.(usb.Error)
 		if ok1 || ok2 {
-			log.Printf("fatal error %v; closing connection.", err)
+			log.Printf(
+				"MTP transaction %s failed with transport or synchronization error %v; closing connection.",
+				OC_names[int(req.Code)],
+				err,
+			)
 			d.Close()
 		}
 		return err
