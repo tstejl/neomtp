@@ -10,7 +10,7 @@ import BugReportIcon from '@material-ui/icons/BugReport';
 import SystemUpdate from '@material-ui/icons/SystemUpdate';
 import { styles } from '../styles/WhatsNew';
 import { APP_NAME, APP_VERSION } from '../../../constants/meta';
-import { isKalamModeSupported } from '../../../helpers/binaries';
+import { isKalamModeSupported } from '../../../helpers/rendererCapabilities';
 import { MTP_MODE } from '../../../enums';
 
 class WhatsNew extends PureComponent {

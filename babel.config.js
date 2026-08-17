@@ -1,7 +1,7 @@
 /* eslint global-require: off */
 
 const developmentEnvironments = ['development', 'test'];
-const developmentPlugins = [require('react-hot-loader/babel')];
+const developmentPlugins = [];
 const productionPlugins = [
   require('babel-plugin-dev-expression'),
   require('@babel/plugin-transform-react-constant-elements'),
@@ -18,7 +18,7 @@ module.exports = (api) => {
         require('@babel/preset-env'),
         {
           targets: {
-            node: 16,
+            node: 22,
           },
           useBuiltIns: 'usage',
           corejs: '3.0.0',

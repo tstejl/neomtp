@@ -1,18 +1,30 @@
-'use strict';
+import extensions from './index.json';
 
-var path = require('path');
-
-var extensions = require('./index.json');
-var unknown = extensions[''];
+const unknown = extensions[''];
 
 function isString(value) {
-  return (typeof value === 'string') ||
-    (Object.prototype.toString.call(value) === '[object String]');
+  return (
+    typeof value === 'string' ||
+    Object.prototype.toString.call(value) === '[object String]'
+  );
 }
 
 function getIcon(filename, type) {
   // Extract extension from the filename
-  var ext = isString(filename) ? path.extname(filename).toLowerCase() : '';
+  var ext = '';
+
+  if (isString(filename)) {
+    var filenameString = filename.toString();
+    var lastDot = filenameString.lastIndexOf('.');
+    var lastSlash = Math.max(
+      filenameString.lastIndexOf('/'),
+      filenameString.lastIndexOf('\\')
+    );
+
+    if (lastDot > lastSlash && lastDot > 0) {
+      ext = filenameString.slice(lastDot).toLowerCase();
+    }
+  }
 
   // Validate type - it should be 'svg' or '.svg'
   type = isString(type) ? type.toLowerCase() : '';
@@ -28,7 +40,8 @@ function getIcon(filename, type) {
   return (extensions[ext] || unknown) + type;
 }
 
-module.exports.getIcon = getIcon;
-
-module.exports.unknown = unknown;
-module.exports.extensions = extensions;
+export default {
+  getIcon,
+  unknown,
+  extensions,
+};

@@ -4,7 +4,7 @@ const electronBuilder =
   process.platform === 'win32' ? 'electron-builder.cmd' : 'electron-builder';
 const env = { ...process.env };
 
-// electron-builder 23 delegates native rebuilds to the package manager named by
+// electron-builder delegates native rebuilds to the package manager named by
 // these variables. Bun exposes itself here, but Bun does not provide the npm
 // compatible `rebuild` command that electron-builder expects.
 delete env.npm_execpath;

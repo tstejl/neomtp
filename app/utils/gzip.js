@@ -1,5 +1,5 @@
-import { createGzip } from 'zlib';
-import { createReadStream, createWriteStream } from 'fs';
+import { createGzip } from 'node:zlib';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { log } from './log';
 
 export const compressFile = async (_input, _output) => {

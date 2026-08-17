@@ -1,9 +1,7 @@
 import { APP_THEME_MODE_TYPE } from '../enums';
 import { undefinedOrNull } from '../utils/funcs';
-import { getAppThemeModeSetting } from './settings';
 
-// [appThemeModeSettings] is optional
-// if [appThemeModeSettings] is not provided then fetch the theme value from the settings
+// [appThemeModeSettings] is optional. When omitted, auto mode is used.
 export const getAppThemeMode = (
   appThemeModeSettings,
   systemShouldUseDarkColors
@@ -17,7 +15,7 @@ export const getAppThemeMode = (
   let _appThemeModeSettings = appThemeModeSettings;
 
   if (undefinedOrNull(_appThemeModeSettings)) {
-    _appThemeModeSettings = getAppThemeModeSetting();
+    _appThemeModeSettings = APP_THEME_MODE_TYPE.auto;
   }
 
   switch (_appThemeModeSettings) {

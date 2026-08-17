@@ -11,13 +11,13 @@ function CheckBuildExist() {
     '..',
     'app',
     'dist',
-    'renderer.prod.js'
+    'app.html'
   );
 
   if (!fs.existsSync(mainPath)) {
     throw new Error(
       chalk.whiteBright.bgRed.bold(
-        'The main process is not built yet. Build it by running "bun run build-main"'
+        'The main process is not built yet. Build it by running "bun run build"'
       )
     );
   }
@@ -25,7 +25,7 @@ function CheckBuildExist() {
   if (!fs.existsSync(rendererPath)) {
     throw new Error(
       chalk.whiteBright.bgRed.bold(
-        'The renderer process is not built yet. Build it by running "bun run build-renderer"'
+        'The renderer process is not built yet. Build it by running "bun run build"'
       )
     );
   }

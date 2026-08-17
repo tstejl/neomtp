@@ -11,24 +11,30 @@ const requiredFiles = [
   'app/app.html',
   'app/index.js',
   'app/main.dev.js',
-  'app/preload.js',
+  'app/preload-src.js',
   '.bunfig.toml',
   'bun.lock',
   'electron-builder-config.js',
-  'webpack/config.main.prod.babel.js',
-  'webpack/config.renderer.prod.babel.js',
+  'electron.vite.config.js',
+  'scripts/no-device-main-e2e.js',
 ];
 
 const missingFiles = requiredFiles.filter(
   (file) => !fs.existsSync(path.join(root, file))
 );
-const requiredScripts = ['build', 'build-main', 'build-renderer', 'test:smoke'];
+const requiredScripts = [
+  'build',
+  'build-no-verify',
+  'dev',
+  'test:smoke',
+  'test:e2e:no-device',
+];
 const missingScripts = requiredScripts.filter(
   (script) => !packageJson.scripts[script]
 );
 const packagedFiles = new Set((builderConfig.files || []).map(String));
 const missingPackagedFiles = [
-  'app/app.html',
+  'app/dist/',
   'app/preload.js',
   'app/main.prod.js',
 ].filter((file) => !packagedFiles.has(file));
@@ -36,7 +42,7 @@ const secureElectronFiles = [
   'app/main.dev.js',
   'app/classes/AppUpdate.js',
   'app/helpers/createWindows.js',
-  'app/preload.js',
+  'app/preload-src.js',
   'app/services/ipc-events/IpcEventHandler.js',
 ];
 const secureElectronSource = secureElectronFiles
@@ -51,9 +57,25 @@ const insecureElectronPatterns = [
 ];
 const appHtml = fs.readFileSync(path.join(root, 'app/app.html'), 'utf8');
 const failures = [];
+const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
+const koffiVersion = String(packageJson.dependencies?.koffi || '').replace(
+  /^[^\d]*/u,
+  ''
+);
+const [koffiMajor] = koffiVersion.split('.').map(Number);
 
 if (!String(packageJson.packageManager || '').startsWith('bun@')) {
   failures.push('package.json must declare Bun as its package manager');
+}
+
+if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 12)) {
+  failures.push('Node.js 22.12.0 or newer is required');
+}
+
+if (koffiMajor !== 2) {
+  failures.push(
+    'Kalam requires Koffi 2.x; Koffi 3 crashes Electron async callbacks'
+  );
 }
 
 if (missingFiles.length) {
@@ -86,9 +108,9 @@ if (!appHtml.includes('id="root"')) {
   failures.push('app/app.html does not contain the renderer root element');
 }
 
-if (!appHtml.includes('renderer.prod.js')) {
+if (!appHtml.includes('type="module"') || !appHtml.includes('./index.js')) {
   failures.push(
-    'app/app.html does not reference the production renderer bundle'
+    'app/app.html does not reference the Vite renderer entry point'
   );
 }
 

@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { promisify } from 'node:util';
 import junk from 'junk';
 import rimraf from 'rimraf';
@@ -12,7 +12,7 @@ import {
   rename as fsRename,
   readlink,
   realpathSync,
-} from 'fs';
+} from 'node:fs';
 import findLodash from 'lodash/find';
 import { log } from '../../../utils/log';
 import { isArray, isEmpty, undefinedOrNull } from '../../../utils/funcs';

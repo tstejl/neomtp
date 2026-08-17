@@ -1,7 +1,7 @@
-import path from 'path';
+import path from 'node:path';
 import { promisify } from 'node:util';
 import findLodash from 'lodash/find';
-import { exec, spawn } from 'child_process';
+import { exec, spawn } from 'node:child_process';
 import { log } from '../../../utils/log';
 import {
   isArray,

@@ -1,5 +1,5 @@
-import EventEmitter from 'events';
-import util from 'util';
+import EventEmitter from 'node:events';
+import util from 'node:util';
 
 export default function EmitAppEvents() {
   EventEmitter.call(this);

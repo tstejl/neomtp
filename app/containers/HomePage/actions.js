@@ -6,11 +6,11 @@ import {
 } from '../../helpers/processBufferOutput';
 import { isArraysEqual, isEmpty, undefinedOrNull } from '../../utils/funcs';
 import { DEVICE_TYPE, MTP_MODE } from '../../enums';
-import { log } from '../../utils/log';
-import fileExplorerController from '../../data/file-explorer/controllers/FileExplorerController';
+import { log } from '../../utils/rendererLog';
 import { checkIf } from '../../utils/checkIf';
 import { MTP_ERROR } from '../../enums/mtpError';
-import { DEVICES_DEFAULT_PATH } from '../../constants';
+import { DEVICES_DEFAULT_PATH } from '../../helpers/rendererPaths';
+import { getOpenMtpApi } from '../../helpers/electronApi';
 
 const prefix = '@@Home';
 const actionTypesList = [
@@ -178,9 +178,10 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
       switch (mtpMode) {
         case MTP_MODE.kalam:
           // eslint-disable-next-line no-case-declarations
-          const { error, stderr, data } = await fileExplorerController.dispose({
-            deviceType,
-          });
+          const { error, stderr, data } =
+            await getOpenMtpApi().fileExplorer.dispose({
+              deviceType,
+            });
 
           await new Promise((resolve) => {
             dispatch(
@@ -256,9 +257,10 @@ function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
 
       // if the app was expecting the user to allow access to mtp storage
       // then don't reinitialize mtp
-      const { error, stderr, data } = await fileExplorerController.initialize({
-        deviceType,
-      });
+      const { error, stderr, data } =
+        await getOpenMtpApi().fileExplorer.initialize({
+          deviceType,
+        });
 
       await new Promise((resolve) => {
         dispatch(
@@ -377,11 +379,10 @@ function listKalamStorages(
 
       checkIf(mtpMode, 'string');
 
-      const { error, stderr, data } = await fileExplorerController.listStorages(
-        {
+      const { error, stderr, data } =
+        await getOpenMtpApi().fileExplorer.listStorages({
           deviceType,
-        }
-      );
+        });
 
       return new Promise((resolve) => {
         dispatch(
@@ -440,11 +441,10 @@ function initLegacyMtp(
     const { mtpMode } = getState().Settings;
 
     try {
-      const { error, stderr, data } = await fileExplorerController.listStorages(
-        {
+      const { error, stderr, data } =
+        await getOpenMtpApi().fileExplorer.listStorages({
           deviceType,
-        }
-      );
+        });
 
       dispatch(
         churnMtpBuffer({
@@ -633,7 +633,7 @@ export function listDirectory(
             error: localError,
             stderr: localStderr,
             data: localData,
-          } = await fileExplorerController.listFiles({
+          } = await getOpenMtpApi().fileExplorer.listFiles({
             deviceType,
             filePath,
             ignoreHidden,
@@ -670,7 +670,7 @@ export function listDirectory(
           }
 
           const { error, stderr, data } =
-            await fileExplorerController.listFiles({
+            await getOpenMtpApi().fileExplorer.listFiles({
               deviceType,
               filePath,
               ignoreHidden,

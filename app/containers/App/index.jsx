@@ -1,4 +1,3 @@
-import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {
@@ -13,8 +12,6 @@ import Alerts from '../Alerts';
 import Titlebar from './components/Titlebar';
 import ErrorBoundary from '../ErrorBoundary';
 import Routes from '../../routing';
-import { bootLoader } from '../../helpers/bootHelper';
-import { settingsStorage } from '../../helpers/storageHelper';
 import SettingsDialog from '../Settings';
 import { withReducer } from '../../store/reducers/withReducer';
 import reducers from './reducers';
@@ -26,7 +23,8 @@ import {
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
 import { getOpenMtpApi } from '../../helpers/electronApi';
-import { log } from '../../utils/log';
+import { log } from '../../utils/rendererLog';
+import { rendererSettings } from '../../helpers/rendererSettings';
 import { makeMtpDevice, makeMtpStoragesList } from '../HomePage/selectors';
 
 class App extends Component {
@@ -55,7 +53,7 @@ class App extends Component {
         this.nativeThemeUpdatedEvent
       );
 
-      bootLoader.cleanRotationFiles();
+      getOpenMtpApi().app.cleanRotationFiles();
     } catch (e) {
       log.error(e, `App -> componentDidMount`);
     }
@@ -84,7 +82,7 @@ class App extends Component {
   setFreshInstall() {
     try {
       const { actionCreateFreshInstall } = this.props;
-      const setting = settingsStorage.getItems(['freshInstall']);
+      const setting = rendererSettings.getItems(['freshInstall']);
       let isFreshInstall = 0;
 
       switch (setting.freshInstall) {
@@ -119,7 +117,7 @@ class App extends Component {
   writeJsonToSettings() {
     try {
       const { actionCreateCopyJsonFileToSettings } = this.props;
-      const settingsFromStorage = settingsStorage.getAll();
+      const settingsFromStorage = rendererSettings.getAll();
 
       actionCreateCopyJsonFileToSettings({ ...settingsFromStorage });
     } catch (e) {
@@ -182,4 +180,4 @@ const mapStateToProps = (state) => {
 export default withReducer(
   'App',
   reducers
-)(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(hot(App))));
+)(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(App)));

@@ -1,9 +1,22 @@
 import { settingsStorage } from './storageHelper';
 import { getAppThemeMode } from './theme';
 import { isPrereleaseVersion, undefinedOrNull } from '../utils/funcs';
-import { initialState } from '../containers/Settings/reducers';
 import { checkIf } from '../utils/checkIf';
-import { FILE_TRANSFER_DIRECTION } from '../enums';
+import {
+  APP_THEME_MODE_TYPE,
+  FILE_TRANSFER_DIRECTION,
+  MTP_MODE,
+} from '../enums';
+
+const defaultSettings = {
+  appThemeMode: APP_THEME_MODE_TYPE.auto,
+  mtpMode: MTP_MODE.kalam,
+  enablePrereleaseUpdates: isPrereleaseVersion() || false,
+  filesPreprocessingBeforeTransfer: {
+    [FILE_TRANSFER_DIRECTION.upload]: true,
+    [FILE_TRANSFER_DIRECTION.download]: true,
+  },
+};
 
 export const getAppThemeModeSetting = () => {
   const setting = settingsStorage.getItems(['appThemeMode']);
@@ -11,7 +24,7 @@ export const getAppThemeModeSetting = () => {
   let value = setting.appThemeMode;
 
   if (undefinedOrNull(value)) {
-    value = initialState.appThemeMode;
+    value = defaultSettings.appThemeMode;
   }
 
   return getAppThemeMode(value);
@@ -23,7 +36,7 @@ export const getMtpModeSetting = () => {
   let value = setting.mtpMode;
 
   if (undefinedOrNull(value)) {
-    value = initialState.mtpMode;
+    value = defaultSettings.mtpMode;
   }
 
   return value;
@@ -42,7 +55,7 @@ export const getFilesPreprocessingBeforeTransferSetting = ({ direction }) => {
     : null;
 
   if (undefinedOrNull(value)) {
-    value = initialState.filesPreprocessingBeforeTransfer[direction];
+    value = defaultSettings.filesPreprocessingBeforeTransfer[direction];
   }
 
   checkIf(value, 'boolean');
@@ -62,7 +75,7 @@ export const getEnablePrereleaseUpdatesSetting = () => {
   }
 
   if (undefinedOrNull(value)) {
-    value = initialState.enablePrereleaseUpdates;
+    value = defaultSettings.enablePrereleaseUpdates;
   }
 
   return value;

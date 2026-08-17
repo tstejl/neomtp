@@ -1,5 +1,5 @@
 import clp from 'console-log-plus';
-import os, { EOL } from 'os';
+import os, { EOL } from 'node:os';
 import { IS_PROD } from '../constants/env';
 import { APP_NAME, APP_VERSION } from '../constants/meta';
 import { PATHS } from '../constants/paths';

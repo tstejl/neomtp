@@ -9,12 +9,12 @@
  */
 export const imgsrc = (filePath, returnNoImageFound = true) => {
   try {
-    return require('../public/images/' + filePath).default;
+    return new URL(`images/${filePath}`, document.baseURI).href;
   } catch (e) {
     if (!returnNoImageFound) {
       return null;
     }
 
-    return require('../public/images/no-image.png').default;
+    return new URL('images/no-image.png', document.baseURI).href;
   }
 };
