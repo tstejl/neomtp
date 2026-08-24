@@ -2,4 +2,3 @@
 
 *.dylib binary
 build/mac/bin/**/kalam_debug_report binary
-build/mac/bin/mtp-cli binary

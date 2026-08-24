@@ -4,18 +4,27 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { app } = require('electron');
+const macPermissions = require('node-mac-permissions');
 
 const root = path.resolve(__dirname, '..');
 const temporaryUserData = fs.mkdtempSync(
   path.join(os.tmpdir(), 'neomtp-main-no-device-e2e-')
 );
 const temporaryHome = path.join(temporaryUserData, 'home');
+const temporaryDownloads = path.join(temporaryHome, 'Downloads');
+const protectedFolderFixtureName = 'neomtp-protected-folder-fixture.txt';
+const originalAskForFoldersAccess = macPermissions.askForFoldersAccess;
+const folderPermissionRequests = [];
 const marqueeScreenshotPath = path.join(
   os.tmpdir(),
   'neomtp-no-device-marquee-e2e.png'
 );
 
-fs.mkdirSync(temporaryHome, { recursive: true });
+fs.mkdirSync(temporaryDownloads, { recursive: true });
+fs.writeFileSync(
+  path.join(temporaryDownloads, protectedFolderFixtureName),
+  'NeoMTP protected-folder permission fixture\n'
+);
 const marqueeFixtures = [
   {
     relativePath: 'neomtp-marquee-alpha.txt',
@@ -56,6 +65,11 @@ const marqueeTargetPaths = marqueeFixtures.map(({ relativePath }) =>
 process.env.HOME = temporaryHome;
 process.env.NEOMTP_NO_DEVICE_E2E = 'true';
 
+macPermissions.askForFoldersAccess = async (folder) => {
+  folderPermissionRequests.push(folder);
+  return 'authorized';
+};
+
 app.setPath('userData', temporaryUserData);
 app.disableHardwareAcceleration();
 
@@ -69,6 +83,7 @@ const cleanup = () => {
 
   cleanedUp = true;
   clearTimeout(startupTimeout);
+  macPermissions.askForFoldersAccess = originalAskForFoldersAccess;
   fs.rmSync(temporaryUserData, { recursive: true, force: true });
 };
 const startupTimeout = setTimeout(() => {
@@ -159,6 +174,12 @@ const run = async () => {
         ignoreHidden: true,
         storageId: null,
       });
+      const protectedFolderFiles = await api.fileExplorer.listFiles({
+        deviceType: 'local',
+        filePath: `${api.app.getPaths().homeDir}/Downloads`,
+        ignoreHidden: true,
+        storageId: null,
+      });
 
       return {
         apiShape:
@@ -168,6 +189,7 @@ const run = async () => {
         rootHasContent: document.querySelector('#root').children.length > 0,
         noDeviceError: noDevice?.stderr,
         localFiles: localFiles?.data,
+        protectedFolderFiles: protectedFolderFiles?.data,
         profileDir: api.app.getPaths().profileDir,
       };
     }})()`,
@@ -195,6 +217,21 @@ const run = async () => {
       `Actual local IPC response did not return a file list: ${JSON.stringify(
         result
       )}`
+    );
+  }
+
+  if (
+    !Array.isArray(result.protectedFolderFiles) ||
+    !result.protectedFolderFiles.some(
+      ({ name }) => name === protectedFolderFixtureName
+    ) ||
+    !folderPermissionRequests.includes('downloads')
+  ) {
+    throw new Error(
+      `Compiled main-process permission flow failed: ${JSON.stringify({
+        protectedFolderFiles: result.protectedFolderFiles,
+        folderPermissionRequests,
+      })}`
     );
   }
 

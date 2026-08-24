@@ -57,6 +57,7 @@ const singleBackendFiles = [
   'app/data/file-explorer/repositories/FileExplorerRepository.js',
   'app/containers/HomePage/actions.js',
   'app/containers/HomePage/components/ToolbarBody.jsx',
+  'app/containers/HelpFaqsPage/components/HelpPhoneNotRecognized.jsx',
   'app/containers/Settings/components/SettingsDialog.jsx',
   'app/containers/Settings/reducers.js',
 ];
@@ -172,7 +173,11 @@ if (
   failures.push('legacy MTP files must not be present');
 }
 
-if (/\bMTP_MODE\b|\bmtpMode\b|FileExplorerLegacy/u.test(singleBackendSource)) {
+if (
+  /\bMTP_MODE\b|\bmtpMode\b|FileExplorerLegacy|Change the ["']MTP Mode/iu.test(
+    singleBackendSource
+  )
+) {
   failures.push('runtime and settings must use a single MTP backend');
 }
 
