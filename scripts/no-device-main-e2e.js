@@ -20,11 +20,7 @@ const marqueeScreenshotPath = path.join(
   'neomtp-no-device-marquee-e2e.png'
 );
 
-fs.mkdirSync(temporaryDownloads, { recursive: true });
-fs.writeFileSync(
-  path.join(temporaryDownloads, protectedFolderFixtureName),
-  'NeoMTP protected-folder permission fixture\n'
-);
+fs.mkdirSync(temporaryHome, { recursive: true });
 const marqueeFixtures = [
   {
     relativePath: 'neomtp-marquee-alpha.txt',
@@ -175,13 +171,6 @@ const run = async () => {
         ignoreHidden: true,
         storageId: null,
       });
-      const protectedFolderFiles = await api.fileExplorer.listFiles({
-        deviceType: 'local',
-        filePath: `${api.app.getPaths().homeDir}/Downloads`,
-        ignoreHidden: true,
-        storageId: null,
-      });
-
       return {
         apiShape:
           typeof api.fileExplorer.initialize === 'function' &&
@@ -190,7 +179,6 @@ const run = async () => {
         rootHasContent: document.querySelector('#root').children.length > 0,
         noDeviceError: noDevice?.stderr,
         localFiles: localFiles?.data,
-        protectedFolderFiles: protectedFolderFiles?.data,
         profileDir: api.app.getPaths().profileDir,
       };
     }})()`,
@@ -218,21 +206,6 @@ const run = async () => {
       `Actual local IPC response did not return a file list: ${JSON.stringify(
         result
       )}`
-    );
-  }
-
-  if (
-    !Array.isArray(result.protectedFolderFiles) ||
-    !result.protectedFolderFiles.some(
-      ({ name }) => name === protectedFolderFixtureName
-    ) ||
-    !folderPermissionRequests.includes('downloads')
-  ) {
-    throw new Error(
-      `Compiled main-process permission flow failed: ${JSON.stringify({
-        protectedFolderFiles: result.protectedFolderFiles,
-        folderPermissionRequests,
-      })}`
     );
   }
 
@@ -724,10 +697,46 @@ const run = async () => {
     10000
   );
 
+  fs.mkdirSync(temporaryDownloads, { recursive: true });
+  fs.writeFileSync(
+    path.join(temporaryDownloads, protectedFolderFixtureName),
+    'NeoMTP protected-folder permission fixture\n'
+  );
+
+  const protectedFolderFiles = await execute(
+    `(${async () => {
+      const api = window.neomtp;
+      const response = await api.fileExplorer.listFiles({
+        deviceType: 'local',
+        filePath: `${api.app.getPaths().homeDir}/Downloads`,
+        ignoreHidden: true,
+        storageId: null,
+      });
+
+      return response?.data;
+    }})()`
+  );
+
+  if (
+    !Array.isArray(protectedFolderFiles) ||
+    !protectedFolderFiles.some(
+      ({ name }) => name === protectedFolderFixtureName
+    ) ||
+    !folderPermissionRequests.includes('downloads')
+  ) {
+    throw new Error(
+      `Compiled main-process permission flow failed: ${JSON.stringify({
+        protectedFolderFiles,
+        folderPermissionRequests,
+      })}`
+    );
+  }
+
   console.log(
     'Actual main-process no-device E2E passed:',
     JSON.stringify({
       ...result,
+      protectedFolderFiles,
       marquee: {
         targetPaths: dragLayout.drag.coveredPaths,
         start: dragLayout.drag.start,
