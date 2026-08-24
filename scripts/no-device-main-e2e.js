@@ -171,6 +171,7 @@ const run = async () => {
         ignoreHidden: true,
         storageId: null,
       });
+
       return {
         apiShape:
           typeof api.fileExplorer.initialize === 'function' &&
