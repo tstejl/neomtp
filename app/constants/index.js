@@ -24,8 +24,6 @@ export const KALAM_HISTORIC_MACOS_VERSION_RANGE = {
 
 export const NODE_MAC_PERMISSIONS_MIN_OS = `11.0.0`;
 
-export const KALAM_MODE_MIN_MACOS_VERSION = `>=10.14`;
-
 export const DEVICES_DEFAULT_PATH = {
   [DEVICE_TYPE.mtp]: '/',
   [DEVICE_TYPE.local]: '/',

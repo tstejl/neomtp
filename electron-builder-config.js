@@ -8,7 +8,7 @@ module.exports = () => {
       {
         from: 'build/mac/bin',
         to: 'Resources/bin',
-        filter: ['arm64/**/*', 'amd64/**/*', 'mtp-cli'],
+        filter: ['arm64/**/*', 'amd64/**/*'],
       },
     ];
   };
@@ -67,7 +67,6 @@ module.exports = () => {
       category: 'public.app-category.productivity',
       entitlements: 'build/entitlements.mas.plist',
       icon: 'build/icon.icns',
-      binaries: ['dist/mas/NeoMTP.app/Contents/Resources/bin/mtp-cli'],
     },
     dmg: {
       contents: [

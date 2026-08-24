@@ -19,6 +19,7 @@ import { isArray, isEmpty, undefinedOrNull } from '../../../utils/funcs';
 import { pathUp } from '../../../utils/files';
 import { appDateFormat } from '../../../utils/date';
 import { checkIf } from '../../../utils/checkIf';
+import { loadMacPermissions } from '../../../helpers/macPermissions';
 import { PATHS } from '../../../constants/paths';
 import { NODE_MAC_PERMISSIONS_MIN_OS } from '../../../constants';
 
@@ -115,10 +116,8 @@ export class FileExplorerLocalDataSource {
       return true;
     }
 
-    const { askForFoldersAccess, askForPhotosAccess } = await import(
-      // eslint-disable-next-line import/no-unresolved
-      'node-mac-permissions'
-    );
+    const { askForFoldersAccess, askForPhotosAccess } =
+      await loadMacPermissions();
 
     checkIf(filePath, 'string');
 

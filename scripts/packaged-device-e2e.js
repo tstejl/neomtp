@@ -83,7 +83,6 @@ fs.writeFileSync(
     enableStatusBar: true,
     hideHiddenFiles: { local: true, mtp: true },
     fileExplorerListingType: { local: 'list', mtp: 'list' },
-    mtpMode: 'kalam',
     filesPreprocessingBeforeTransfer: {
       upload: true,
       download: true,
@@ -280,7 +279,6 @@ const rendererWorkflow = async (input) => {
   try {
     const settingsUpdated = await api.settings.setAll({
       ...api.settings.getAll(),
-      mtpMode: 'kalam',
       enableAutoUpdateCheck: false,
       enableBackgroundAutoUpdate: false,
       enableUsbHotplug: false,

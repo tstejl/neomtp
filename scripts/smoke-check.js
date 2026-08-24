@@ -18,6 +18,7 @@ const requiredFiles = [
   'electron-builder-config.js',
   'electron.vite.config.js',
   'scripts/dev-no-device-e2e.js',
+  'scripts/mac-permissions-test.js',
   'scripts/no-device-main-e2e.js',
 ];
 
@@ -29,6 +30,7 @@ const requiredScripts = [
   'build-no-verify',
   'dev',
   'test:smoke',
+  'test:mac-permissions',
   'test:e2e:dev-no-device',
   'test:e2e:no-device',
 ];
@@ -51,6 +53,20 @@ const secureElectronFiles = [
 const secureElectronSource = secureElectronFiles
   .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
   .join('\n');
+const singleBackendFiles = [
+  'app/data/file-explorer/repositories/FileExplorerRepository.js',
+  'app/containers/HomePage/actions.js',
+  'app/containers/HomePage/components/ToolbarBody.jsx',
+  'app/containers/Settings/components/SettingsDialog.jsx',
+  'app/containers/Settings/reducers.js',
+];
+const singleBackendSource = singleBackendFiles
+  .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
+  .join('\n');
+const removedLegacyMtpFiles = [
+  'app/data/file-explorer/data-sources/FileExplorerLegacyDataSource.js',
+  'build/mac/bin/mtp-cli',
+];
 const insecureElectronPatterns = [
   /@electron\/remote/,
   /window\.require/,
@@ -65,7 +81,6 @@ const preloadSource = fs.readFileSync(
 );
 const failures = [];
 const nativeMacBinaries = [
-  'build/mac/bin/mtp-cli',
   'build/mac/bin/amd64/kalam.dylib',
   'build/mac/bin/amd64/kalam_debug_report',
   'build/mac/bin/amd64/libusb.dylib',
@@ -149,6 +164,16 @@ if (missingPackagedFiles.length) {
 
 if (packageJson.dependencies?.['@electron/remote']) {
   failures.push('package.json still declares @electron/remote');
+}
+
+if (
+  removedLegacyMtpFiles.some((file) => fs.existsSync(path.join(root, file)))
+) {
+  failures.push('legacy MTP files must not be present');
+}
+
+if (/\bMTP_MODE\b|\bmtpMode\b|FileExplorerLegacy/u.test(singleBackendSource)) {
+  failures.push('runtime and settings must use a single MTP backend');
 }
 
 if (

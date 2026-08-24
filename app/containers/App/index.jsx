@@ -19,7 +19,6 @@ import { copyJsonFileToSettings, freshInstall } from '../Settings/actions';
 import {
   makeAppThemeMode,
   makeAppThemeModeSettings,
-  makeMtpMode,
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
 import { getNeoMtpApi } from '../../helpers/electronApi';
@@ -123,18 +122,14 @@ class App extends Component {
   }
 
   render() {
-    const { classes: styles, mtpDevice, mtpStoragesList, mtpMode } = this.props;
+    const { classes: styles, mtpDevice, mtpStoragesList } = this.props;
     const muiTheme = this.getMuiTheme();
 
     return (
       <div className={styles.root}>
         <MuiThemeProvider theme={muiTheme}>
           <CssBaseline />
-          <Titlebar
-            mtpDevice={mtpDevice}
-            mtpStoragesList={mtpStoragesList}
-            mtpMode={mtpMode}
-          />
+          <Titlebar mtpDevice={mtpDevice} mtpStoragesList={mtpStoragesList} />
           <Alerts />
           <ErrorBoundary>
             <SettingsDialog />
@@ -169,7 +164,6 @@ const mapStateToProps = (state) => {
     appThemeModeSettings: makeAppThemeModeSettings(state),
     appThemeMode: makeAppThemeMode(state),
     mtpDevice: makeMtpDevice(state),
-    mtpMode: makeMtpMode(state),
     mtpStoragesList: makeMtpStoragesList(state),
   };
 };

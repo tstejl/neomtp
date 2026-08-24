@@ -45,7 +45,6 @@ import {
   makeEnableUsbHotplug,
   makeFileExplorerListingType,
   makeHideHiddenFiles,
-  makeMtpMode,
   makeShowDirectoriesFirst,
 } from '../../Settings/selectors';
 import {
@@ -73,7 +72,6 @@ import {
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
   FILE_TRANSFER_DIRECTION,
-  MTP_MODE,
   USB_HOTPLUG_EVENTS,
 } from '../../../enums';
 import { log } from '../../../utils/rendererLog';
@@ -291,12 +289,10 @@ class FileExplorer extends Component {
       deviceType,
       hideHiddenFiles,
       enableUsbHotplug,
-      mtpMode,
     } = this.props;
 
     checkIf(device, 'string');
     checkIf(eventName, 'inObjectValues', USB_HOTPLUG_EVENTS);
-    checkIf(mtpMode, 'inObjectValues', MTP_MODE);
 
     checkIf(actionCreateReloadDirList, 'function');
     checkIf(currentBrowsePath, 'object');
@@ -309,11 +305,6 @@ class FileExplorer extends Component {
       }
 
       const _usbDeviceInfo = JSON.parse(device);
-
-      // if the mtp mode is not kalam then dont proceed.
-      if (mtpMode !== MTP_MODE.kalam) {
-        return;
-      }
 
       if (!enableUsbHotplug) {
         return;
@@ -1921,7 +1912,6 @@ const mapDispatchToProps = (dispatch, _) =>
               {
                 filePath,
                 ignoreHidden,
-                changeLegacyMtpStorageOnlyOnDeviceChange: false,
                 deviceType,
               },
               getState
@@ -1966,8 +1956,6 @@ const mapDispatchToProps = (dispatch, _) =>
       actionCreateRenameFile:
         ({ filePath, newFilename, deviceType }, { ...listDirectoryArgs }) =>
         async (_, getState) => {
-          const { mtpMode } = getState().Settings;
-
           try {
             switch (deviceType) {
               case DEVICE_TYPE.local:
@@ -2021,7 +2009,6 @@ const mapDispatchToProps = (dispatch, _) =>
                     error: mtpError,
                     stderr: mtpStderr,
                     data: mtpData,
-                    mtpMode,
                     onSuccess: () => {
                       dispatch(
                         listDirectory(
@@ -2046,8 +2033,6 @@ const mapDispatchToProps = (dispatch, _) =>
         ({ newFolderPath, deviceType }, { ...listDirectoryArgs }) =>
         async (_, getState) => {
           try {
-            const { mtpMode } = getState().Settings;
-
             switch (deviceType) {
               case DEVICE_TYPE.local:
                 const {
@@ -2098,7 +2083,6 @@ const mapDispatchToProps = (dispatch, _) =>
                     error: mtpError,
                     stderr: mtpStderr,
                     data: mtpData,
-                    mtpMode,
                     onSuccess: () => {
                       dispatch(
                         listDirectory(
@@ -2153,8 +2137,7 @@ const mapDispatchToProps = (dispatch, _) =>
         ({ ...pasteArgs }, { ...listDirectoryArgs }, deviceType) =>
         (_, getState) => {
           try {
-            const { mtpMode, filesPreprocessingBeforeTransfer } =
-              getState().Settings;
+            const { filesPreprocessingBeforeTransfer } = getState().Settings;
 
             const { destinationFolder, storageId, fileTransferClipboard } =
               pasteArgs;
@@ -2204,74 +2187,48 @@ const mapDispatchToProps = (dispatch, _) =>
 
               let progressInfo = [];
 
-              /// file transfer progress on legacy mode
-              if (mtpMode === MTP_MODE.legacy) {
-                bodyText1 = `${Math.floor(activeFileProgress)}% complete of "${
-                  springTruncate(currentFile, 45).truncatedText
-                }"`;
-                progressText = `${niceBytes(activeFileSizeSent)} / ${niceBytes(
-                  activeFileSize
-                )}`;
-                windowProgressBar = activeFileProgress / 100;
+              checkIf(direction, 'string');
+              checkIf(direction, 'inObjectValues', FILE_TRANSFER_DIRECTION);
 
-                const _speed = speed ? `${niceBytes(speed)}` : `--`;
+              bodyText1 = `${Math.floor(activeFileProgress)}% complete of "${
+                springTruncate(currentFile, 45).truncatedText
+              }"`;
+              progressText = `${niceBytes(activeFileSizeSent)} / ${niceBytes(
+                activeFileSize
+              )}`;
+              const elapsedTimeText = `Elapsed: ${elapsedTime} | `;
 
-                progressInfo = [
-                  {
-                    bodyText1,
-                    bodyText2: `Elapsed: ${elapsedTime} | Progress: ${progressText} @ ${_speed}/sec`,
-                    variant: `determinate`,
-                    percentage: activeFileProgress,
-                  },
-                ];
-              } else {
-                checkIf(direction, 'string');
-                checkIf(direction, 'inObjectValues', FILE_TRANSFER_DIRECTION);
+              progressInfo = [
+                {
+                  bodyText1,
+                  bodyText2: `${
+                    !filesPreprocessingBeforeTransfer[direction]
+                      ? elapsedTimeText
+                      : ''
+                  }Progress: ${progressText} @ ${speed} MB/sec`,
+                  variant: `determinate`,
+                  percentage: activeFileProgress,
+                },
+              ];
+              windowProgressBar = activeFileProgress / 100;
 
-                // active file progress
-                bodyText1 = `${Math.floor(activeFileProgress)}% complete of "${
-                  springTruncate(currentFile, 45).truncatedText
-                }"`;
-                progressText = `${niceBytes(activeFileSizeSent)} / ${niceBytes(
-                  activeFileSize
-                )}`;
-                const elapsedTimeText = `Elapsed: ${elapsedTime} | `;
+              if (filesPreprocessingBeforeTransfer[direction]) {
+                windowProgressBar = totalFileProgress / 100;
 
-                progressInfo = [
-                  {
-                    bodyText1,
-                    bodyText2: `${
-                      !filesPreprocessingBeforeTransfer[direction]
-                        ? elapsedTimeText
-                        : ''
-                    }Progress: ${progressText} @ ${speed} MB/sec`,
-                    variant: `determinate`,
-                    percentage: activeFileProgress,
-                  },
-                ];
-                windowProgressBar = activeFileProgress / 100;
+                const bodyText1 = `${filesSent} of ${totalFiles} ${getPluralText(
+                  'file',
+                  totalFiles
+                )} copied | ${Math.floor(totalFileProgress)}% completed`;
+                const progressText = `${niceBytes(
+                  totalFileSizeSent
+                )} / ${niceBytes(totalFileSize)}`;
 
-                /// if preprocessing of file transfer is enabled then show total file transfer information as well
-                if (filesPreprocessingBeforeTransfer[direction]) {
-                  // if preprocessing of file transfer is enabled then [windowProgressBar]
-                  // progress value should be the [totalFileProgress] else [activeFileProgress] will be used
-                  windowProgressBar = totalFileProgress / 100;
-
-                  const bodyText1 = `${filesSent} of ${totalFiles} ${getPluralText(
-                    'file',
-                    totalFiles
-                  )} copied | ${Math.floor(totalFileProgress)}% completed`;
-                  const progressText = `${niceBytes(
-                    totalFileSizeSent
-                  )} / ${niceBytes(totalFileSize)}`;
-
-                  progressInfo.push({
-                    bodyText1,
-                    bodyText2: `${elapsedTimeText}Progress: ${progressText}`,
-                    variant: `determinate`,
-                    percentage: totalFileProgress,
-                  });
-                }
+                progressInfo.push({
+                  bodyText1,
+                  bodyText2: `${elapsedTimeText}Progress: ${progressText}`,
+                  variant: `determinate`,
+                  percentage: totalFileProgress,
+                });
               }
 
               getNeoMtpApi().window.setProgressBar(windowProgressBar);
@@ -2293,7 +2250,6 @@ const mapDispatchToProps = (dispatch, _) =>
                   error,
                   stderr,
                   data,
-                  mtpMode,
                   onSuccess: () => {
                     getNeoMtpApi().window.setProgressBar(-1);
                     dispatch(clearFileTransfer());
@@ -2374,21 +2330,18 @@ const mapDispatchToProps = (dispatch, _) =>
       },
       actionCreatedDisposeMtp:
         ({ deviceType }) =>
-        (_, getState) => {
+        (_, __) => {
           try {
             if (deviceType === DEVICE_TYPE.local) {
               return;
             }
 
             dispatch(
-              disposeMtp(
-                {
-                  deviceType,
-                  onError: () => {},
-                  onSuccess: () => {},
-                },
-                getState
-              )
+              disposeMtp({
+                deviceType,
+                onError: () => {},
+                onSuccess: () => {},
+              })
             );
           } catch (e) {
             log.error(e);
@@ -2413,7 +2366,6 @@ const mapStateToProps = (state, _) => {
     fileExplorerListingType: makeFileExplorerListingType(state),
     focussedFileExplorerDeviceType: makeFocussedFileExplorerDeviceType(state),
     appThemeMode: makeAppThemeMode(state),
-    mtpMode: makeMtpMode(state),
     enableUsbHotplug: makeEnableUsbHotplug(state),
     showDirectoriesFirst: makeShowDirectoriesFirst(state),
   };

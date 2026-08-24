@@ -59,11 +59,6 @@ export const makeAppThemeMode = createSelector(make, (state) => {
   return getAppThemeMode(theme);
 });
 
-// returns the selected mtp mode
-export const makeMtpMode = createSelector(make, (state) =>
-  state ? state.mtpMode : initialState.mtpMode
-);
-
 // returns whether USB hotplug is enabled or not
 export const makeEnableUsbHotplug = createSelector(make, (state) =>
   state ? state.enableUsbHotplug : initialState.enableUsbHotplug

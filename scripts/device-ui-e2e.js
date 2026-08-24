@@ -78,7 +78,6 @@ fs.writeFileSync(
     enableStatusBar: true,
     hideHiddenFiles: { local: true, mtp: true },
     fileExplorerListingType: { local: 'list', mtp: 'list' },
-    mtpMode: 'kalam',
     filesPreprocessingBeforeTransfer: {
       upload: true,
       download: true,

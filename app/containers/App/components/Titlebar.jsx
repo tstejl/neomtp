@@ -3,13 +3,13 @@ import { withStyles } from '@material-ui/core/styles';
 import { styles } from '../styles/Titlebar';
 import { toggleWindowSizeOnDoubleClick } from '../../../helpers/titlebarDoubleClick';
 import { APP_TITLEBAR_DOM_ID } from '../../../constants/dom';
-import { capitalize, isEmpty, niceBytes } from '../../../utils/funcs';
+import { isEmpty, niceBytes } from '../../../utils/funcs';
 import { getSelectedStorage } from '../../HomePage/actions';
 import { getCurrentWindowHash } from '../../../helpers/windowHelper';
 
 class Titlebar extends PureComponent {
   render() {
-    const { classes: styles, mtpDevice, mtpStoragesList, mtpMode } = this.props;
+    const { classes: styles, mtpDevice, mtpStoragesList } = this.props;
 
     const selectedStorage = getSelectedStorage(mtpStoragesList);
     const windowHash = getCurrentWindowHash();
@@ -34,13 +34,9 @@ class Titlebar extends PureComponent {
               parseInt(selectedStorage?.data.info?.FreeSpaceInBytes ?? 0, 10)
             )} Free of ${niceBytes(
               parseInt(selectedStorage?.data.info?.MaxCapability ?? 0, 10)
-            )}, ${capitalize(mtpMode)} Mode`}
+            )}`}
           </span>
-        ) : (
-          <span className={styles.deviceInfo}>
-            {`${capitalize(mtpMode)} Mode`}
-          </span>
-        )}
+        ) : null}
       </div>
     );
   }

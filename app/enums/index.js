@@ -8,11 +8,6 @@ export const DEVICE_TYPE = {
   local: 'local',
 };
 
-export const MTP_MODE = {
-  legacy: 'legacy',
-  kalam: 'kalam',
-};
-
 export const FILE_EXPLORER_VIEW_TYPE = {
   grid: 'grid',
   list: 'list',

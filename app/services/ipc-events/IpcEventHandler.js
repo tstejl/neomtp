@@ -13,7 +13,6 @@ import fileExplorerController from '../../data/file-explorer/controllers/FileExp
 import { settingsStorage } from '../../helpers/storageHelper';
 import { PATHS } from '../../constants/paths';
 import { bootLoader } from '../../helpers/bootHelper';
-import { isKalamModeSupported } from '../../helpers/binaries';
 import { isProcessRunning } from '../../utils/process';
 import { log } from '../../utils/log';
 import { compressFile } from '../../utils/gzip';
@@ -253,7 +252,6 @@ export default class IpcEventService {
       // eslint-disable-next-line no-param-reassign
       event.returnValue = {
         isMas: electronIs.mas(),
-        isKalamModeSupported: isKalamModeSupported(),
       };
     });
 

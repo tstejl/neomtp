@@ -22,7 +22,6 @@ const rows = [
     label: 'Size',
   },
   {
-    // for legacy kernel it is date added while for kalam kernel it is modified time
     id: 'dateAdded',
     numeric: false,
     disablePadding: true,

@@ -44,10 +44,6 @@ const prepareMacNativeBinaries = async ({ arch, resourcesDirectory }) => {
         machoArchitecture: target.machoArchitecture,
       })
     ),
-    {
-      filePath: path.join(binaryDirectory, 'mtp-cli'),
-      machoArchitecture: 'x86_64',
-    },
   ];
 
   await Promise.all(

@@ -11,7 +11,6 @@ import {
   fileExplorerListingType,
   freshInstall,
   hideHiddenFiles,
-  selectMtpMode,
   setCommonSettings,
   toggleSettings,
 } from './actions';
@@ -167,12 +166,6 @@ class Settings extends Component {
     actionCreateSetFilesPreprocessingBeforeTransfer({ value, direction });
   };
 
-  _handleMtpModeChange = (event, value, deviceType) => {
-    const { actionCreateSelectMtpMode } = this.props;
-
-    actionCreateSelectMtpMode({ value }, deviceType);
-  };
-
   _handleSetCommonSettingsChange = ({ key, value }, deviceType) => {
     const { actionSetCommonSettings } = this.props;
 
@@ -214,7 +207,6 @@ class Settings extends Component {
         onFilesPreprocessingBeforeTransferChange={
           this._handleFilesPreprocessingBeforeTransferChange
         }
-        onMtpModeChange={this._handleMtpModeChange}
         onEnableUsbHotplug={this._handleEnableUsbHotplug}
         {...parentProps}
       />
@@ -249,15 +241,6 @@ const mapDispatchToProps = (dispatch, _) =>
         ({ ...data }, deviceType) =>
         (_, getState) => {
           dispatch(fileExplorerListingType({ ...data }, deviceType, getState));
-        },
-
-      actionCreateSelectMtpMode:
-        ({ value }, deviceType) =>
-        (_, getState) => {
-          checkIf(value, 'string');
-          checkIf(deviceType, 'string');
-
-          dispatch(selectMtpMode({ value }, deviceType, getState));
         },
 
       actionSetCommonSettings:
