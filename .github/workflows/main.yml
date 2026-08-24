@@ -57,6 +57,7 @@ jobs:
           go test -mod=readonly -race ./...
           go vet -mod=readonly ./...
       - name: Test NeoMTP
+        timeout-minutes: 5
         run: bun run test
       - name: Build non-notarized macOS artifacts
         env:

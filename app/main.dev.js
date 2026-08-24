@@ -46,7 +46,10 @@ if (IS_PROD) {
 }
 
 if (IS_DEV || DEBUG_PROD) {
-  electronDebug({ showDevTools: false });
+  electronDebug({
+    isEnabled: !isAutomatedE2e,
+    showDevTools: false,
+  });
 }
 
 async function bootTheDevice() {

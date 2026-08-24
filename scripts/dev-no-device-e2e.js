@@ -39,8 +39,19 @@ try {
   });
 
   exitCode = await new Promise((resolve, reject) => {
-    electron.once('error', reject);
+    const timeout = setTimeout(() => {
+      electron.kill('SIGKILL');
+      reject(new Error('Development Electron E2E timed out after 45 seconds'));
+    }, 45000);
+    const settle = (callback) => (value) => {
+      clearTimeout(timeout);
+      callback(value);
+    };
+
+    electron.once('error', settle(reject));
     electron.once('exit', (code, signal) => {
+      clearTimeout(timeout);
+
       if (signal) {
         reject(new Error(`Development Electron E2E exited via ${signal}`));
 
