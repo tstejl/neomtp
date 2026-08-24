@@ -50,7 +50,7 @@ const fixtures = {
   single: writeFixture('single.bin', Buffer.alloc(3 * 1024 * 1024 + 17, 0x5a)),
   multiA: writeFixture(
     'multi-a.txt',
-    'NeoMTP click-driven multiple-file E2E\n'.repeat(30000)
+    'NeoMTP marquee multiple-file E2E\n'.repeat(30000)
   ),
   multiB: writeFixture('multi-b.bin', Buffer.alloc(6 * 1024 * 1024 + 31, 0xa5)),
 };
@@ -135,7 +135,7 @@ process.once('exit', cleanup);
 
 startupTimeout = setTimeout(() => {
   console.error(
-    `Timed out running the click-driven device E2E${
+    `Timed out running the connected-device UI E2E${
       rendererErrors.length ? `: ${rendererErrors.join('; ')}` : ''
     }`
   );
@@ -428,12 +428,19 @@ const installDomDriver = () => {
     const images = [
       ...(paneElement?.querySelectorAll('img[alt]') || []),
     ].filter(visible);
+    const entries = [
+      ...(paneElement?.querySelectorAll('[data-file-entry][data-file-path]') ||
+        []),
+    ].filter(visible);
     const items = [
       ...new Set(images.map((image) => image.getAttribute('alt'))),
     ];
     const selected = items.filter(
       (name) => findItem(deviceType, name)?.checkbox?.checked
     );
+    const selectedPaths = entries
+      .filter((entry) => entry.querySelector('input[type="checkbox"]')?.checked)
+      .map((entry) => entry.getAttribute('data-file-path'));
     const breadcrumbs = [
       ...(paneRoot(deviceType)?.querySelectorAll('ul li a') || []),
     ].map((link) => link.textContent.trim());
@@ -441,13 +448,160 @@ const installDomDriver = () => {
     return {
       items,
       selected,
+      selectedPaths,
       breadcrumbs,
       text: paneElement?.innerText || '',
     };
   };
 
+  const marqueeDrag = (deviceType, names) => {
+    const paneElement = pane(deviceType);
+    const entries = [
+      ...(paneElement?.querySelectorAll('[data-file-entry][data-file-path]') ||
+        []),
+    ].filter(visible);
+    const pathForEntry = (entry) => entry.getAttribute('data-file-path');
+    const pathMatchesName = (filePath, name) =>
+      filePath === name || filePath?.endsWith(`/${name}`);
+    const rectFor = (element) => {
+      const bounds = element.getBoundingClientRect();
+
+      return {
+        left: bounds.left,
+        top: bounds.top,
+        right: bounds.right,
+        bottom: bounds.bottom,
+        width: bounds.width,
+        height: bounds.height,
+      };
+    };
+    const paneBounds = paneElement ? rectFor(paneElement) : null;
+    const targetEntries = entries.filter((entry) =>
+      names.some((name) => pathMatchesName(pathForEntry(entry), name))
+    );
+    const targetPaths = targetEntries.map(pathForEntry);
+    const targetRects = targetEntries
+      .map((entry) => ({ path: pathForEntry(entry), rect: rectFor(entry) }))
+      .filter(({ rect }) => rect.width > 0 && rect.height > 0);
+
+    const sampleAxis = (start, end, count = 24) => {
+      const inset = 8;
+
+      if (end - start <= inset * 2) {
+        return [(start + end) / 2];
+      }
+
+      return Array.from(
+        { length: count },
+        (_, index) =>
+          start + inset + ((end - start - inset * 2) * index) / (count - 1)
+      );
+    };
+    const pointIsEmpty = (x, y) => {
+      const hit = document.elementFromPoint(x, y);
+
+      return Boolean(
+        hit &&
+          paneElement?.contains(hit) &&
+          !hit.closest('[data-file-entry]') &&
+          !hit.closest(
+            'input,button,a,select,textarea,[role="button"],thead,th,[contenteditable="true"]'
+          )
+      );
+    };
+    const emptyPoints = [];
+
+    if (paneBounds) {
+      sampleAxis(paneBounds.left, paneBounds.right).forEach((x) => {
+        sampleAxis(paneBounds.top, paneBounds.bottom).forEach((y) => {
+          if (pointIsEmpty(x, y)) {
+            emptyPoints.push({ x, y });
+          }
+        });
+      });
+    }
+
+    const endpointPoints = targetRects.flatMap(({ rect }) => {
+      const xs = [rect.left + 2, (rect.left + rect.right) / 2, rect.right - 2];
+      const ys = [rect.top + 2, (rect.top + rect.bottom) / 2, rect.bottom - 2];
+
+      return xs.flatMap((x) => ys.map((y) => ({ x, y })));
+    });
+    const intersects = (start, end, rect) => {
+      const left = Math.min(start.x, end.x);
+      const right = Math.max(start.x, end.x);
+      const top = Math.min(start.y, end.y);
+      const bottom = Math.max(start.y, end.y);
+
+      return (
+        rect.left <= right &&
+        rect.right >= left &&
+        rect.top <= bottom &&
+        rect.bottom >= top
+      );
+    };
+    let bestDrag = null;
+
+    emptyPoints.forEach((start) => {
+      endpointPoints.forEach((end) => {
+        const distance = Math.hypot(end.x - start.x, end.y - start.y);
+
+        if (distance < 24) {
+          return;
+        }
+
+        const coveredPaths = entries
+          .map((entry) => ({ path: pathForEntry(entry), rect: rectFor(entry) }))
+          .filter(({ rect }) => intersects(start, end, rect))
+          .map(({ path }) => path);
+        const coversExactlyTargets =
+          coveredPaths.length === targetPaths.length &&
+          targetPaths.every((filePath) => coveredPaths.includes(filePath));
+
+        if (!coversExactlyTargets) {
+          return;
+        }
+
+        const area = Math.abs((end.x - start.x) * (end.y - start.y));
+
+        if (!bestDrag || area > bestDrag.area) {
+          bestDrag = {
+            start: { x: Math.round(start.x), y: Math.round(start.y) },
+            end: { x: Math.round(end.x), y: Math.round(end.y) },
+            targetPaths,
+            area,
+          };
+        }
+      });
+    });
+
+    return {
+      panePresent: Boolean(paneElement),
+      entryCount: entries.length,
+      targetPaths,
+      emptyPointCount: emptyPoints.length,
+      drag: bestDrag,
+    };
+  };
+
+  const isEmptyMarqueePoint = (deviceType, point) => {
+    const paneElement = pane(deviceType);
+    const hit = document.elementFromPoint(point.x, point.y);
+
+    return Boolean(
+      hit &&
+        paneElement?.contains(hit) &&
+        !hit.closest('[data-file-entry]') &&
+        !hit.closest(
+          'input,button,a,select,textarea,[role="button"],thead,th,[contenteditable="true"]'
+        )
+    );
+  };
+
   window.__neomtpUiE2e = {
     rect,
+    marqueeDrag,
+    isEmptyMarqueePoint,
     resetTransferObservations() {
       state.progressTitles = [];
       state.snackbarMessages = [];
@@ -479,6 +633,9 @@ const installDomDriver = () => {
         dialogs: dialogs.map((dialog) => dialog.innerText),
         confirmText: confirmDialog?.innerText || '',
         progressVisible: Boolean(progressDialog),
+        marqueeVisible: Boolean(
+          document.querySelector('[data-marquee-selection-box]')
+        ),
         progressTitles: [...state.progressTitles],
         snackbarMessages: [...state.snackbarMessages],
         keyEvents: [...state.keyEvents],
@@ -547,6 +704,103 @@ const physicalClick = async (spec, modifiers = []) => {
     modifiers,
   });
   await wait(100);
+};
+
+const physicalMarqueeDrag = async (deviceType, names) => {
+  let layout = null;
+
+  await waitFor(
+    `${deviceType} marquee layout for ${names.join(', ')}`,
+    async () => {
+      layout = await domCall('marqueeDrag', deviceType, names);
+
+      return Boolean(
+        layout?.panePresent &&
+          layout.targetPaths?.length === names.length &&
+          layout.emptyPointCount > 0 &&
+          layout.drag?.targetPaths?.length === names.length
+      );
+    },
+    10000
+  );
+
+  const startIsEmpty = await domCall(
+    'isEmptyMarqueePoint',
+    deviceType,
+    layout.drag.start
+  );
+
+  if (!startIsEmpty) {
+    throw new Error(
+      `Marquee start point was not empty in ${deviceType} pane: ${JSON.stringify(
+        layout
+      )}`
+    );
+  }
+
+  const expectedPaths = layout.drag.targetPaths;
+  const hasExactSelection = (state) => {
+    const paneSelection = state[deviceType];
+    const selectedPaths = paneSelection.selectedPaths || [];
+
+    return (
+      paneSelection.selected.length === names.length &&
+      names.every((name) => paneSelection.selected.includes(name)) &&
+      selectedPaths.length === expectedPaths.length &&
+      expectedPaths.every((filePath) => selectedPaths.includes(filePath))
+    );
+  };
+
+  app.focus({ steal: true });
+  mainWindow.show();
+  mainWindow.focus();
+  mainWindow.webContents.focus();
+  mainWindow.webContents.sendInputEvent({
+    type: 'mouseMove',
+    x: layout.drag.start.x,
+    y: layout.drag.start.y,
+  });
+  mainWindow.webContents.sendInputEvent({
+    type: 'mouseDown',
+    x: layout.drag.start.x,
+    y: layout.drag.start.y,
+    button: 'left',
+    clickCount: 1,
+  });
+  await wait(100);
+  mainWindow.webContents.sendInputEvent({
+    type: 'mouseMove',
+    x: layout.drag.end.x,
+    y: layout.drag.end.y,
+  });
+
+  await waitFor(
+    `${deviceType} marquee selection ${names.join(', ')}`,
+    async () => {
+      const state = await snapshot();
+
+      return state.marqueeVisible && hasExactSelection(state);
+    },
+    10000
+  );
+
+  mainWindow.webContents.sendInputEvent({
+    type: 'mouseUp',
+    x: layout.drag.end.x,
+    y: layout.drag.end.y,
+    button: 'left',
+    clickCount: 1,
+  });
+
+  await waitFor(
+    `${deviceType} marquee release ${names.join(', ')}`,
+    async () => {
+      const state = await snapshot();
+
+      return !state.marqueeVisible && hasExactSelection(state);
+    },
+    10000
+  );
 };
 
 const physicalDoubleClick = async (spec) => {
@@ -647,6 +901,12 @@ const waitForBreadcrumb = async (deviceType, name) =>
   });
 
 const selectItems = async (deviceType, names) => {
+  if (names.length > 1) {
+    await physicalMarqueeDrag(deviceType, names);
+
+    return;
+  }
+
   for (let index = 0; index < names.length; index += 1) {
     await physicalClick({
       kind: 'itemCheckbox',

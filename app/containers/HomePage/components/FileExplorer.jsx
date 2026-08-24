@@ -1382,14 +1382,6 @@ class FileExplorer extends Component {
     return destinationDeviceType === deviceType;
   };
 
-  _handleIsDraggable = (deviceType) => {
-    const { directoryLists, mtpDevice } = this.props;
-    const { queue } = directoryLists[deviceType];
-    const { selected } = queue;
-
-    return selected.length > 0 && mtpDevice.isAvailable;
-  };
-
   _handleSetFilesDrag = ({ ...args }) => {
     const { actionCreateSetFilesDrag } = this.props;
 
@@ -1638,6 +1630,26 @@ class FileExplorer extends Component {
     actionCreateTableClick({ selected: newSelected }, deviceType);
   };
 
+  _handleSelectionChange = (selected, deviceType) => {
+    if (!isArray(selected)) {
+      return null;
+    }
+
+    const { actionCreateTableClick, directoryLists } = this.props;
+    const currentSelected = directoryLists[deviceType]?.queue?.selected || [];
+
+    if (
+      currentSelected.length === selected.length &&
+      currentSelected.every((path, index) => path === selected[index])
+    ) {
+      return null;
+    }
+
+    actionCreateTableClick({ selected }, deviceType);
+
+    return null;
+  };
+
   _handleTableDoubleClick = (item, deviceType) => {
     const { isFolder, path } = item;
 
@@ -1842,7 +1854,7 @@ class FileExplorer extends Component {
           onContextMenuClick={this._handleContextMenuClick}
           onTableDoubleClick={this._handleTableDoubleClick}
           onTableClick={this._handleTableClick}
-          onIsDraggable={this._handleIsDraggable}
+          onSelectionChange={this._handleSelectionChange}
           onExternalFileDragLeave={this._handleExternalFileDragLeave}
           onFocussedFileExplorerDeviceType={
             this._handleFocussedFileExplorerDeviceType
