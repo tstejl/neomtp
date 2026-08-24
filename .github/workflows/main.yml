@@ -67,6 +67,7 @@ jobs:
       - name: Verify generated macOS artifacts
         run: |
           test -d dist/mac/NeoMTP.app
+          codesign --verify --deep --strict --verbose=2 dist/mac/NeoMTP.app
           test ! -e dist/mac/NeoMTP.app/Contents/Resources/bin/arm64
           lipo dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/kalam.dylib -verify_arch x86_64
           lipo dist/mac/NeoMTP.app/Contents/Resources/bin/amd64/libusb.dylib -verify_arch x86_64
