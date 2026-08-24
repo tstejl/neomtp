@@ -400,6 +400,28 @@ const run = async () => {
       )
   );
 
+  await waitFor(
+    () =>
+      execute(
+        `(${() => {
+          const pane = document.querySelector(
+            '#file-explorer-body-wrapper-local'
+          );
+          const entry = pane?.querySelector('[data-file-entry]');
+          const rect = entry?.getBoundingClientRect();
+          const hit = rect
+            ? document.elementFromPoint(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2
+              )
+            : null;
+
+          return Boolean(entry && hit && entry.contains(hit));
+        }})()`
+      ),
+    10000
+  );
+
   dragLayout = await execute(
     `(${(targetPaths) => {
       const pane = document.querySelector('#file-explorer-body-wrapper-local');
