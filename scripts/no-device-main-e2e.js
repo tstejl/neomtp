@@ -67,6 +67,7 @@ process.env.NEOMTP_NO_DEVICE_E2E = 'true';
 
 macPermissions.askForFoldersAccess = async (folder) => {
   folderPermissionRequests.push(folder);
+
   return 'authorized';
 };
 
