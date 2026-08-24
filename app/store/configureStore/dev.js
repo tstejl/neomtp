@@ -1,6 +1,3 @@
-/* eslint global-require: off */
-/* eslint-disable import/no-import-module-exports */
-
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
@@ -55,10 +52,10 @@ const configureStore = (initialState) => {
     return store;
   };
 
-  if (module.hot) {
-    module.hot.accept('../reducers', () =>
-      store.replaceReducer(require('../reducers').default)
-    );
+  if (import.meta.hot) {
+    import.meta.hot.accept('../reducers', ({ default: nextRootReducer }) => {
+      store.replaceReducer(nextRootReducer(store.asyncReducers));
+    });
   }
 
   return store;

@@ -1,4 +1,3 @@
-import clp from 'console-log-plus';
 import os, { EOL } from 'node:os';
 import { IS_PROD } from '../constants/env';
 import { APP_NAME, APP_VERSION } from '../constants/meta';
@@ -36,18 +35,11 @@ export const log = {
     }
 
     if (!isEmpty(title)) {
-      clp({
-        color: 'white',
-        background: 'green',
-        message: title,
-      });
+      console.info(title);
     }
 
     if (!isEmpty(e)) {
-      clp({
-        color: 'blue',
-        message: e,
-      });
+      console.info(e);
     }
   },
 
@@ -67,17 +59,10 @@ export const log = {
     }
 
     if (!isEmpty(title)) {
-      clp({
-        color: 'white',
-        background: 'red',
-        message: title,
-      });
+      console.error(title);
     }
 
-    clp({
-      color: 'red',
-      message: e,
-    });
+    console.error(e);
   },
 
   /**

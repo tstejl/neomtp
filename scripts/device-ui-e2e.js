@@ -47,7 +47,10 @@ fs.mkdirSync(downloadRoot, { recursive: true });
 fs.mkdirSync(nativeOutput, { recursive: true });
 
 const fixtures = {
-  single: writeFixture('single.bin', Buffer.alloc(3 * 1024 * 1024 + 17, 0x5a)),
+  single: writeFixture(
+    'alpha-single.bin',
+    Buffer.alloc(3 * 1024 * 1024 + 17, 0x5a)
+  ),
   multiA: writeFixture(
     'multi-a.txt',
     'NeoMTP marquee multiple-file E2E\n'.repeat(30000)
@@ -1195,13 +1198,17 @@ const runUiWorkflow = async () => {
     name: 'fixtures',
   });
   await waitForBreadcrumb('local', 'fixtures');
-  await waitForPaneItems('local', ['single.bin', 'multi-a.txt', 'multi-b.bin']);
+  await waitForPaneItems('local', [
+    'alpha-single.bin',
+    'multi-a.txt',
+    'multi-b.bin',
+  ]);
 
-  await selectItems('local', ['single.bin']);
+  await selectItems('local', ['alpha-single.bin']);
   await copySelection('local', 1);
   await pasteAndWait({
     deviceType: 'mtp',
-    names: ['single.bin'],
+    names: ['alpha-single.bin'],
     title: 'Copying files to Phone...',
   });
 
@@ -1226,11 +1233,11 @@ const runUiWorkflow = async () => {
   });
   await waitForBreadcrumb('local', 'downloads');
 
-  await selectItems('mtp', ['single.bin']);
+  await selectItems('mtp', ['alpha-single.bin']);
   await copySelection('mtp', 1);
   await pasteAndWait({
     deviceType: 'local',
-    names: ['single.bin'],
+    names: ['alpha-single.bin'],
     title: 'Copying files to Computer...',
   });
 
@@ -1242,7 +1249,7 @@ const runUiWorkflow = async () => {
     title: 'Copying files to Computer...',
   });
 
-  requireSameFile(fixtures.single, path.join(downloadRoot, 'single.bin'));
+  requireSameFile(fixtures.single, path.join(downloadRoot, 'alpha-single.bin'));
   requireSameFile(fixtures.multiA, path.join(downloadRoot, 'multi-a.txt'));
   requireSameFile(fixtures.multiB, path.join(downloadRoot, 'multi-b.bin'));
 
@@ -1312,8 +1319,8 @@ const runUiWorkflow = async () => {
 
   return {
     deviceTitle: finalState.title,
-    uploaded: ['single.bin', 'multi-a.txt', 'multi-b.bin'],
-    downloaded: ['single.bin', 'multi-a.txt', 'multi-b.bin'],
+    uploaded: ['alpha-single.bin', 'multi-a.txt', 'multi-b.bin'],
+    downloaded: ['alpha-single.bin', 'multi-a.txt', 'multi-b.bin'],
     remoteCleanupVerified: !finalState.mtp.items.includes(remoteName),
     screenshotPath,
   };

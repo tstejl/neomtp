@@ -38,15 +38,20 @@ const prepareMacNativeBinaries = async ({ arch, resourcesDirectory }) => {
   );
 
   const requiredMachOBinaries = [
-    'kalam.dylib',
-    'libusb.dylib',
-    'kalam_debug_report',
+    ...['kalam.dylib', 'libusb.dylib', 'kalam_debug_report'].map(
+      (fileName) => ({
+        filePath: path.join(targetDirectory, fileName),
+        machoArchitecture: target.machoArchitecture,
+      })
+    ),
+    {
+      filePath: path.join(binaryDirectory, 'mtp-cli'),
+      machoArchitecture: 'x86_64',
+    },
   ];
 
   await Promise.all(
-    requiredMachOBinaries.map(async (fileName) => {
-      const filePath = path.join(targetDirectory, fileName);
-
+    requiredMachOBinaries.map(async ({ filePath, machoArchitecture }) => {
       if (!(await fs.pathExists(filePath))) {
         throw new Error(`Missing packaged native binary: ${filePath}`);
       }
@@ -54,7 +59,13 @@ const prepareMacNativeBinaries = async ({ arch, resourcesDirectory }) => {
       await execFileAsync('lipo', [
         filePath,
         '-verify_arch',
-        target.machoArchitecture,
+        machoArchitecture,
+      ]);
+      await execFileAsync('codesign', [
+        '--verify',
+        '--strict',
+        '--verbose=2',
+        filePath,
       ]);
     })
   );

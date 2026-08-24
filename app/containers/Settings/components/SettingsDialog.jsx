@@ -118,11 +118,13 @@ export default class SettingsDialog extends PureComponent {
         maxWidth="sm"
         aria-labelledby="settings-dialogbox"
         disableEscapeKeyDown={false}
-        onEscapeKeyDown={() =>
-          onDialogBoxCloseBtnClick({
-            confirm: false,
-          })
-        }
+        onClose={(_event, reason) => {
+          if (reason === 'escapeKeyDown') {
+            onDialogBoxCloseBtnClick({
+              confirm: false,
+            });
+          }
+        }}
       >
         <Typography variant="h5" className={styles.title}>
           Settings

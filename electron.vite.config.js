@@ -19,6 +19,7 @@ const packageInfo = {
   homepage: packageJson.homepage,
   bugs: packageJson.bugs,
 };
+const bundledMainDependencies = ['electron-debug'];
 const nodeBuiltins = new Set([
   'assert',
   'buffer',
@@ -88,7 +89,10 @@ export default defineConfig(({ mode }) => {
   return {
     main: {
       define,
-      plugins: [cleanMainOutput, externalizeDepsPlugin()],
+      plugins: [
+        cleanMainOutput,
+        externalizeDepsPlugin({ exclude: bundledMainDependencies }),
+      ],
       build: {
         outDir: appRoot,
         emptyOutDir: false,

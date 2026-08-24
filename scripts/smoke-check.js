@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
 const packageJson = require(path.join(root, 'package.json'));
@@ -16,6 +17,7 @@ const requiredFiles = [
   'bun.lock',
   'electron-builder-config.js',
   'electron.vite.config.js',
+  'scripts/dev-no-device-e2e.js',
   'scripts/no-device-main-e2e.js',
 ];
 
@@ -27,6 +29,7 @@ const requiredScripts = [
   'build-no-verify',
   'dev',
   'test:smoke',
+  'test:e2e:dev-no-device',
   'test:e2e:no-device',
 ];
 const missingScripts = requiredScripts.filter(
@@ -61,6 +64,18 @@ const preloadSource = fs.readFileSync(
   'utf8'
 );
 const failures = [];
+const nativeMacBinaries = [
+  'build/mac/bin/mtp-cli',
+  'build/mac/bin/amd64/kalam.dylib',
+  'build/mac/bin/amd64/kalam_debug_report',
+  'build/mac/bin/amd64/libusb.dylib',
+  'build/mac/bin/arm64/kalam.dylib',
+  'build/mac/bin/arm64/kalam_debug_report',
+  'build/mac/bin/arm64/libusb.dylib',
+  'build/mac/bin/medieval/amd64/kalam.dylib',
+  'build/mac/bin/medieval/amd64/kalam_debug_report',
+  'build/mac/bin/medieval/amd64/libusb.dylib',
+];
 const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
 const koffiVersion = String(packageJson.dependencies?.koffi || '').replace(
   /^[^\d]*/u,
@@ -98,6 +113,24 @@ if (koffiMajor !== 2) {
   failures.push(
     'Kalam requires Koffi 2.x; Koffi 3 crashes Electron async callbacks'
   );
+}
+
+if (process.platform === 'darwin') {
+  nativeMacBinaries.forEach((file) => {
+    const result = spawnSync(
+      'codesign',
+      ['--verify', '--strict', '--verbose=2', path.join(root, file)],
+      { encoding: 'utf8' }
+    );
+
+    if (result.status !== 0) {
+      failures.push(
+        `invalid native binary signature: ${file} (${(
+          result.stderr || result.stdout
+        ).trim()})`
+      );
+    }
+  });
 }
 
 if (missingFiles.length) {
