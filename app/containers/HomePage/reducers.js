@@ -3,7 +3,6 @@ import {
   faSync,
   faSdCard,
   faCog,
-  faPlug,
   faArrowLeft,
   faQuestionCircle,
 } from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +14,6 @@ import {
   DEVICES_DEFAULT_PATH,
   rendererPaths,
 } from '../../helpers/rendererPaths';
-import { isKalamModeSupported } from '../../helpers/rendererCapabilities';
 
 export const initialState = {
   focussedFileExplorerDeviceType: {
@@ -113,11 +111,6 @@ export const initialState = {
         enabled: true,
         label: 'Storage',
         icon: faSdCard,
-      },
-      mtpMode: {
-        enabled: isKalamModeSupported(),
-        label: 'MTP Mode',
-        icon: faPlug,
       },
       settings: {
         enabled: true,

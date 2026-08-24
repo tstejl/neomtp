@@ -28,11 +28,10 @@ import {
 import {
   makeAppThemeMode,
   makeHideHiddenFiles,
-  makeMtpMode,
   makeShowLocalPaneOnLeftSide,
 } from '../../Settings/selectors';
 import { DEVICES_DEFAULT_PATH } from '../../../helpers/rendererPaths';
-import { selectMtpMode, toggleSettings } from '../../Settings/actions';
+import { toggleSettings } from '../../Settings/actions';
 import { toggleWindowSizeOnDoubleClick } from '../../../helpers/titlebarDoubleClick';
 import ToolbarBody from './ToolbarBody';
 import { openExternalUrl } from '../../../utils/url';
@@ -51,7 +50,6 @@ class ToolbarAreaPane extends PureComponent {
       toggleDrawer: false,
       toggleDeleteConfirmDialog: false,
       toggleMtpStorageSelectionDialog: false,
-      toggleMtpModeSelectionDialog: false,
     };
     this.state = {
       ...this.initialState,
@@ -109,12 +107,6 @@ class ToolbarAreaPane extends PureComponent {
     });
   };
 
-  _handleToggleMtpModeSelectionDialog = (status) => {
-    this.setState({
-      toggleMtpModeSelectionDialog: status,
-    });
-  };
-
   _handleMtpStoragesListClick = ({ ...args }) => {
     const {
       actionCreateSetMtpStorage,
@@ -139,19 +131,6 @@ class ToolbarAreaPane extends PureComponent {
       },
       deviceType
     );
-  };
-
-  _handleMtpModeSelectionDialogClick = ({ ...args }) => {
-    const { actionCreateSelectMtpMode, deviceType } = this.props;
-    const { selectedValue, triggerChange } = args;
-
-    this._handleToggleMtpModeSelectionDialog(false);
-
-    if (!triggerChange) {
-      return null;
-    }
-
-    actionCreateSelectMtpMode({ value: selectedValue }, deviceType);
   };
 
   _handleDeleteConfirmDialog = (confirm) => {
@@ -224,11 +203,6 @@ class ToolbarAreaPane extends PureComponent {
 
         break;
 
-      case 'mtpMode':
-        this._handleToggleMtpModeSelectionDialog(true);
-
-        break;
-
       case 'faqs':
         this._handleFaqsBtn();
 
@@ -286,7 +260,6 @@ class ToolbarAreaPane extends PureComponent {
       focussedFileExplorerDeviceType,
       appThemeMode,
       showLocalPaneOnLeftSide,
-      mtpMode,
       ...parentProps
     } = this.props;
 
@@ -294,7 +267,6 @@ class ToolbarAreaPane extends PureComponent {
       toggleDrawer,
       toggleDeleteConfirmDialog,
       toggleMtpStorageSelectionDialog,
-      toggleMtpModeSelectionDialog,
     } = this.state;
 
     const { isLoaded: isLoadedDirectoryLists } = directoryLists[deviceType];
@@ -308,16 +280,11 @@ class ToolbarAreaPane extends PureComponent {
           isLoadedDirectoryLists={isLoadedDirectoryLists}
           toggleDeleteConfirmDialog={toggleDeleteConfirmDialog}
           toggleMtpStorageSelectionDialog={toggleMtpStorageSelectionDialog}
-          toggleMtpModeSelectionDialog={toggleMtpModeSelectionDialog}
           toggleDrawer={toggleDrawer}
           appThemeMode={appThemeMode}
           showLocalPaneOnLeftSide={showLocalPaneOnLeftSide}
-          mtpMode={mtpMode}
           onDeleteConfirmDialog={this._handleDeleteConfirmDialog}
           onMtpStoragesListClick={this._handleMtpStoragesListClick}
-          onMtpModeSelectionDialogClick={
-            this._handleMtpModeSelectionDialogClick
-          }
           onToggleDrawer={this._handleToggleDrawer}
           onListDirectory={this._handleListDirectory}
           onDoubleClickToolBar={this._handleDoubleClickToolBar}
@@ -365,8 +332,6 @@ const mapDispatchToProps = (dispatch, _) =>
         ({ fileList, deviceType }, { ...listDirectoryArgs }) =>
         async (_, getState) => {
           try {
-            const { mtpMode } = getState().Settings;
-
             switch (deviceType) {
               case DEVICE_TYPE.local:
                 const {
@@ -417,7 +382,6 @@ const mapDispatchToProps = (dispatch, _) =>
                     error: mtpError,
                     stderr: mtpStderr,
                     data: mtpData,
-                    mtpMode,
                     onSuccess: () => {
                       dispatch(
                         listDirectory(
@@ -474,14 +438,6 @@ const mapDispatchToProps = (dispatch, _) =>
           dispatch(listDirectory({ ...listDirArgs }, deviceType, getState));
         },
 
-      actionCreateSelectMtpMode:
-        ({ value }, deviceType) =>
-        (_, getState) => {
-          checkIf(value, 'string');
-          checkIf(deviceType, 'string');
-
-          dispatch(selectMtpMode({ value }, deviceType, getState));
-        },
       actionCreateToggleSettings: (data) => (_, __) => {
         dispatch(toggleSettings(data));
       },
@@ -500,7 +456,6 @@ const mapStateToProps = (state, __) => {
     mtpStoragesList: makeMtpStoragesList(state),
     focussedFileExplorerDeviceType: makeFocussedFileExplorerDeviceType(state),
     appThemeMode: makeAppThemeMode(state),
-    mtpMode: makeMtpMode(state),
     showLocalPaneOnLeftSide: makeShowLocalPaneOnLeftSide(state),
   };
 };

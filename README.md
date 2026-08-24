@@ -64,7 +64,7 @@ bun run build-no-verify
 # Build and run the production application locally.
 bun run start
 
-# Create a local macOS package without notarization.
+# Create an ad-hoc-signed local macOS package without notarization.
 bun run package-mac-without-notarize
 ```
 

@@ -8,6 +8,7 @@ export const styles = (theme) => ({
   tableWrapper: {
     ...mixins({ theme }).noOutline,
     height: `calc(100vh - 120px)`,
+    position: 'relative',
     overflowY: 'auto',
     overflowX: 'auto',
     borderBottom: `solid 1px ${theme.palette.fileExplorerThinLineDividerColor}`,
@@ -18,5 +19,12 @@ export const styles = (theme) => ({
     [`&.statusBarActive`]: {
       height: `calc(100vh - 150px) !important`,
     },
+  },
+  selectionMarquee: {
+    position: 'fixed',
+    zIndex: 2,
+    border: `1px solid ${theme.palette.secondary.main}`,
+    backgroundColor: 'rgba(0, 122, 245, 0.18)',
+    pointerEvents: 'none',
   },
 });

@@ -1,4 +1,3 @@
-import clp from 'console-log-plus';
 import os, { EOL } from 'node:os';
 import { IS_PROD } from '../constants/env';
 import { APP_NAME, APP_VERSION } from '../constants/meta';
@@ -7,7 +6,6 @@ import { appendFileAsync } from '../helpers/fileOps';
 import { dateTimeUnixTimestampNow } from './date';
 import { getDeviceInfo } from '../helpers/deviceInfo';
 import { isEmpty } from './funcs';
-import { getMtpModeSetting } from '../helpers/settings';
 import { redactHomeDirectory } from '../helpers/logs';
 import { isConsoleError } from './errors';
 import { getMachineId } from '../helpers/identifiers';
@@ -36,18 +34,11 @@ export const log = {
     }
 
     if (!isEmpty(title)) {
-      clp({
-        color: 'white',
-        background: 'green',
-        message: title,
-      });
+      console.info(title);
     }
 
     if (!isEmpty(e)) {
-      clp({
-        color: 'blue',
-        message: e,
-      });
+      console.info(e);
     }
   },
 
@@ -67,17 +58,10 @@ export const log = {
     }
 
     if (!isEmpty(title)) {
-      clp({
-        color: 'white',
-        background: 'red',
-        message: title,
-      });
+      console.error(title);
     }
 
-    clp({
-      color: 'red',
-      message: e,
-    });
+    console.error(e);
   },
 
   /**
@@ -119,7 +103,6 @@ export const log = {
 
     let _deviceInfoStrigified = '';
     const deviceInfo = getDeviceInfo();
-    const mtpMode = getMtpModeSetting();
     const uuid = getMachineId();
 
     if (!isEmpty(deviceInfo)) {
@@ -134,9 +117,8 @@ export const log = {
       monthInletters: true,
     })}`;
     const _appInfo = `${EOL}App Name: ${APP_NAME}${EOL}App Version: ${APP_VERSION}${EOL}UUID: ${uuid}`;
-    const _mtpMode = `${EOL}MTP Mode: ${mtpMode}`;
     const _osInfo = `OS type: ${os.type()} / OS Platform: ${os.platform()} / OS Release: ${os.release()}`;
-    const _error = `${sectionSeperator}${EOL}${_appInfo}${EOL}${_mtpMode}${EOL}${_date}${EOL}${_osInfo}${EOL}${_deviceInfoStrigified}${logType}: ${err}${EOL}${sectionSeperator}${EOL}`;
+    const _error = `${sectionSeperator}${EOL}${_appInfo}${EOL}${_date}${EOL}${_osInfo}${EOL}${_deviceInfoStrigified}${logType}: ${err}${EOL}${sectionSeperator}${EOL}`;
 
     appendFileAsync(logFile, _error);
   },

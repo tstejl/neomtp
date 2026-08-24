@@ -293,6 +293,16 @@ async function runPrerequisites({ bottles }) {
         `skipping the processing of the libusb dylib which was downloaded from the custom file path`
       );
     }
+
+    if (!(await fs.pathExists(bottlePath.libusbDylibInBuildDir))) {
+      throw new Error(
+        `missing processed libusb binary: ${bottlePath.libusbDylibInBuildDir}`
+      );
+    }
+
+    // install_name_tool invalidates the bottle's existing signature. Apply a
+    // fresh ad-hoc signature after every normal or custom processing path.
+    await $`codesign --force --sign - ${bottlePath.libusbDylibInBuildDir}`;
   }
 
   await $`sleep 1`;
@@ -342,4 +352,10 @@ for await (const [, bottle] of Object.entries(chosenBottlesForBuilding)) {
         -v -a -trimpath -buildvcs=false \
         -o ${bottlePath.kalamDebugReportInBuildDir} kalam_debug_report/*.go
         )`;
+
+  // Cross-compiled Intel binaries are not linker-signed by Go. Keep all
+  // development artifacts loadable on current macOS releases; release builds
+  // replace these ad-hoc signatures with the configured distribution identity.
+  await $`codesign --force --sign - ${bottlePath.kalamDylibInBuildDir}`;
+  await $`codesign --force --sign - ${bottlePath.kalamDebugReportInBuildDir}`;
 }

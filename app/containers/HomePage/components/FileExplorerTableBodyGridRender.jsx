@@ -92,6 +92,8 @@ class FileExplorerTableBodyGridRender extends PureComponent {
     return (
       <div
         draggable="true"
+        data-file-entry="true"
+        data-file-path={item.path}
         className={classNames(styles.itemWrapper, {
           [styles.itemSelected]: isSelected,
         })}

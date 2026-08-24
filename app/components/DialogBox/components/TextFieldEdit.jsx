@@ -58,9 +58,11 @@ class TextFieldEdit extends PureComponent {
         fullWidth={fullWidthDialog}
         maxWidth={maxWidthDialog}
         disableEscapeKeyDown={false}
-        onEscapeKeyDown={(event) =>
-          this._handleBtnClick({ confirm: false }, event)
-        }
+        onClose={(event, reason) => {
+          if (reason === 'escapeKeyDown') {
+            this._handleBtnClick({ confirm: false }, event);
+          }
+        }}
       >
         <DialogTitle>{titleText}</DialogTitle>
         <form

@@ -3,7 +3,6 @@ import {
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
-  MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../enums';
 import { checkIf } from '../../utils/checkIf';
@@ -30,8 +29,6 @@ export const initialState = {
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,
   showDirectoriesFirst: true,
-  mtpMode: MTP_MODE.kalam,
-  wasForcedToToggleMtpModeForMinOsRequirement: false,
   filesPreprocessingBeforeTransfer: {
     [FILE_TRANSFER_DIRECTION.upload]: true,
     [FILE_TRANSFER_DIRECTION.download]: true,

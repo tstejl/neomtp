@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
 const packageJson = require(path.join(root, 'package.json'));
@@ -16,6 +17,8 @@ const requiredFiles = [
   'bun.lock',
   'electron-builder-config.js',
   'electron.vite.config.js',
+  'scripts/dev-no-device-e2e.js',
+  'scripts/mac-permissions-test.js',
   'scripts/no-device-main-e2e.js',
 ];
 
@@ -27,6 +30,8 @@ const requiredScripts = [
   'build-no-verify',
   'dev',
   'test:smoke',
+  'test:mac-permissions',
+  'test:e2e:dev-no-device',
   'test:e2e:no-device',
 ];
 const missingScripts = requiredScripts.filter(
@@ -48,6 +53,21 @@ const secureElectronFiles = [
 const secureElectronSource = secureElectronFiles
   .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
   .join('\n');
+const singleBackendFiles = [
+  'app/data/file-explorer/repositories/FileExplorerRepository.js',
+  'app/containers/HomePage/actions.js',
+  'app/containers/HomePage/components/ToolbarBody.jsx',
+  'app/containers/HelpFaqsPage/components/HelpPhoneNotRecognized.jsx',
+  'app/containers/Settings/components/SettingsDialog.jsx',
+  'app/containers/Settings/reducers.js',
+];
+const singleBackendSource = singleBackendFiles
+  .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
+  .join('\n');
+const removedLegacyMtpFiles = [
+  'app/data/file-explorer/data-sources/FileExplorerLegacyDataSource.js',
+  'build/mac/bin/mtp-cli',
+];
 const insecureElectronPatterns = [
   /@electron\/remote/,
   /window\.require/,
@@ -61,6 +81,17 @@ const preloadSource = fs.readFileSync(
   'utf8'
 );
 const failures = [];
+const nativeMacBinaries = [
+  'build/mac/bin/amd64/kalam.dylib',
+  'build/mac/bin/amd64/kalam_debug_report',
+  'build/mac/bin/amd64/libusb.dylib',
+  'build/mac/bin/arm64/kalam.dylib',
+  'build/mac/bin/arm64/kalam_debug_report',
+  'build/mac/bin/arm64/libusb.dylib',
+  'build/mac/bin/medieval/amd64/kalam.dylib',
+  'build/mac/bin/medieval/amd64/kalam_debug_report',
+  'build/mac/bin/medieval/amd64/libusb.dylib',
+];
 const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
 const koffiVersion = String(packageJson.dependencies?.koffi || '').replace(
   /^[^\d]*/u,
@@ -100,6 +131,24 @@ if (koffiMajor !== 2) {
   );
 }
 
+if (process.platform === 'darwin') {
+  nativeMacBinaries.forEach((file) => {
+    const result = spawnSync(
+      'codesign',
+      ['--verify', '--strict', '--verbose=2', path.join(root, file)],
+      { encoding: 'utf8' }
+    );
+
+    if (result.status !== 0) {
+      failures.push(
+        `invalid native binary signature: ${file} (${(
+          result.stderr || result.stdout
+        ).trim()})`
+      );
+    }
+  });
+}
+
 if (missingFiles.length) {
   failures.push(`missing required files: ${missingFiles.join(', ')}`);
 }
@@ -116,6 +165,20 @@ if (missingPackagedFiles.length) {
 
 if (packageJson.dependencies?.['@electron/remote']) {
   failures.push('package.json still declares @electron/remote');
+}
+
+if (
+  removedLegacyMtpFiles.some((file) => fs.existsSync(path.join(root, file)))
+) {
+  failures.push('legacy MTP files must not be present');
+}
+
+if (
+  /\bMTP_MODE\b|\bmtpMode\b|FileExplorerLegacy|Change the ["']MTP Mode/iu.test(
+    singleBackendSource
+  )
+) {
+  failures.push('runtime and settings must use a single MTP backend');
 }
 
 if (

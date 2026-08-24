@@ -2,10 +2,13 @@ require('dotenv').config();
 
 const path = require('path');
 const fs = require('fs');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
 const { notarize: electronNotarize } = require('@electron/notarize');
 const electronBuilderConfig = require('../../electron-builder-config');
 
 const electronBuilderData = electronBuilderConfig();
+const execFileAsync = promisify(execFile);
 
 const { ELECTRON_NOTARIZE } = process.env;
 
@@ -30,6 +33,14 @@ exports.default = async (context) => {
   if (!fs.existsSync(appPath)) {
     throw new Error(`Cannot find application at: ${appPath}`);
   }
+
+  await execFileAsync('codesign', [
+    '--verify',
+    '--deep',
+    '--strict',
+    '--verbose=2',
+    appPath,
+  ]);
 
   console.info(`Notarizing ${appBundleId} found at ${appPath}`);
 

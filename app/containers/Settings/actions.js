@@ -1,10 +1,6 @@
-import { disposeMtp, initializeMtp } from '../HomePage/actions';
 import prefixer from '../../helpers/reducerPrefixer';
 import { rendererSettings } from '../../helpers/rendererSettings';
 import { initialState } from './reducers';
-import { checkIf } from '../../utils/checkIf';
-import { MTP_MODE } from '../../enums';
-import { DEVICES_DEFAULT_PATH } from '../../helpers/rendererPaths';
 
 const prefix = '@@Settings';
 const actionTypesList = [
@@ -80,76 +76,6 @@ export function fileExplorerListingType({ ...data }, deviceType, getState) {
     });
 
     dispatch(copySettingsToJsonFile(getState));
-  };
-}
-
-export function selectMtpMode({ value }, deviceType, getState) {
-  const { hideHiddenFiles, mtpMode } = getState().Settings;
-
-  checkIf(deviceType, 'string');
-  checkIf(getState, 'function');
-  checkIf(hideHiddenFiles, 'object');
-  checkIf(mtpMode, 'string');
-
-  const key = 'mtpMode';
-
-  return async (dispatch) => {
-    // dont proceed if the mtp wasn't changed
-    if (mtpMode === value) {
-      return;
-    }
-
-    // reset the mtp device if it was previously connected using kalam
-    if (mtpMode === MTP_MODE.kalam) {
-      const { error, stderr } = await new Promise((resolve) => {
-        dispatch(
-          disposeMtp(
-            {
-              deviceType,
-              onSuccess: ({ error, stderr, data }) => {
-                resolve({ error, stderr, data });
-              },
-              onError: ({ error, stderr, data }) => {
-                resolve({ error, stderr, data });
-              },
-            },
-            getState
-          )
-        );
-      });
-
-      if (error || stderr) {
-        return;
-      }
-    }
-
-    await new Promise((resolve) => {
-      dispatch(
-        setCommonSettings(
-          {
-            key,
-            value,
-            onSuccess: () => {
-              resolve();
-            },
-          },
-          deviceType,
-          getState
-        )
-      );
-    });
-
-    dispatch(
-      initializeMtp(
-        {
-          deviceType,
-          filePath: DEVICES_DEFAULT_PATH[deviceType],
-          ignoreHidden: hideHiddenFiles[deviceType],
-          changeLegacyMtpStorageOnlyOnDeviceChange: true,
-        },
-        getState
-      )
-    );
   };
 }
 

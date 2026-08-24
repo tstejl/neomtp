@@ -69,7 +69,6 @@ class FileExplorerTableBodyRender extends PureComponent {
       onSelectAllClick,
       onRequestSort,
       onContextMenuClick,
-      onIsDraggable,
       onDragStart,
     } = this.props;
     const { nodes, order, orderBy, queue } = directoryLists[deviceType];
@@ -89,7 +88,6 @@ class FileExplorerTableBodyRender extends PureComponent {
           hideColList={hideColList}
         />
         <TableBody
-          draggable={onIsDraggable(deviceType)}
           onDragStart={(event) => {
             onDragStart(event, {
               sourceDeviceType: deviceType,

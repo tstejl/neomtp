@@ -74,5 +74,10 @@ export const PATHS = {
   }),
 };
 
-export const getRendererUrl = () =>
-  process.env.ELECTRON_RENDERER_URL || PATHS.loadUrlPath;
+export const getRendererUrl = () => {
+  const devServerUrl = process.env.ELECTRON_RENDERER_URL;
+
+  return devServerUrl
+    ? `${devServerUrl.replace(/\/$/u, '')}/app.html`
+    : PATHS.loadUrlPath;
+};

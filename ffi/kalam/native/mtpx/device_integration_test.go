@@ -68,9 +68,9 @@ func TestDeviceRoundTrip(t *testing.T) {
 	}
 
 	localRoot := t.TempDir()
-	single := writeFixture(t, localRoot, "single.txt", []byte("NeoMTP single-file test\n"))
-	multiA := writeFixture(t, localRoot, "multi-a.txt", bytes.Repeat([]byte("multiple-file-test\n"), 97))
-	multiB := writeFixture(t, localRoot, "multi-b.bin", deterministicFixture(1024*1024+333))
+	single := writeFixture(t, localRoot, "single.bin", deterministicFixture(3*1024*1024+17))
+	multiA := writeFixture(t, localRoot, "multi-a.txt", bytes.Repeat([]byte("multiple-file-test\n"), 30000))
+	multiB := writeFixture(t, localRoot, "multi-b.bin", deterministicFixture(6*1024*1024+31))
 	treeFile := writeFixture(t, localRoot, "tree/nested/tree.txt", []byte("nested tree test\n"))
 
 	uploadAndRequireTotals(t, dev, storageID, []string{single}, remoteRoot, 1)
@@ -78,7 +78,7 @@ func TestDeviceRoundTrip(t *testing.T) {
 	uploadAndRequireTotals(t, dev, storageID, []string{filepath.Join(localRoot, "tree")}, remoteRoot, 1)
 
 	wantSizes := map[string]int64{
-		remoteRoot + "/single.txt":           fileSize(t, single),
+		remoteRoot + "/single.bin":           fileSize(t, single),
 		remoteRoot + "/multi-a.txt":          fileSize(t, multiA),
 		remoteRoot + "/multi-b.bin":          fileSize(t, multiB),
 		remoteRoot + "/tree/nested/tree.txt": fileSize(t, treeFile),
@@ -103,8 +103,8 @@ func TestDeviceRoundTrip(t *testing.T) {
 	}
 
 	singleDestination := filepath.Join(localRoot, "download-single")
-	downloadAndRequireTotals(t, dev, storageID, []string{remoteRoot + "/single.txt"}, singleDestination, 1)
-	requireSameFile(t, single, filepath.Join(singleDestination, "single.txt"))
+	downloadAndRequireTotals(t, dev, storageID, []string{remoteRoot + "/single.bin"}, singleDestination, 1)
+	requireSameFile(t, single, filepath.Join(singleDestination, "single.bin"))
 
 	multipleDestination := filepath.Join(localRoot, "download-multiple")
 	downloadAndRequireTotals(t, dev, storageID, []string{

@@ -41,7 +41,11 @@ class Notification extends PureComponent {
         maxWidth={maxWidthDialog}
         aria-labelledby="notification-dialogbox"
         disableEscapeKeyDown={false}
-        onEscapeKeyDown={() => this._handleBtnClick({ confirm: false })}
+        onClose={(_event, reason) => {
+          if (reason === 'escapeKeyDown') {
+            this._handleBtnClick({ confirm: false });
+          }
+        }}
       >
         <DialogTitle>{titleText}</DialogTitle>
         <DialogContent>
